@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1021773678340",
+    "project_id": "urtask-calendar-project",
+    "storage_bucket": "urtask-calendar-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021773678340:android:b7380ef6937799b7feb251",
+        "android_client_info": {
+          "package_name": "com.example.urtask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1021773678340-ojl3e5mus0ig554ikin1mnbhmfoa3j14.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAf2We2MK4DWnpV9cLV0ar5eCw2N2JCnN0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021773678340-ojl3e5mus0ig554ikin1mnbhmfoa3j14.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
