@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:urtask/color.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -8,26 +11,20 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  int _selectedDestination = 0;
 
   @override
   Widget build(BuildContext context) {
-    
+
+    final theme = Theme.of(context);//for
+    final textTheme = theme.textTheme;
+
     return Scaffold(
       appBar: AppBar(
         
-        leading: Icon(Icons.menu, size: 32, color: Colors.white),
+        //leading: Icon(Icons.menu, size: 32, color: Colors.white),
         title: Text("June 2023"),
+        iconTheme: IconThemeData(color: Colors.white),
         actions: [
           
           Padding(
@@ -36,13 +33,48 @@ class _HomeViewState extends State<HomeView> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.today, size: 32, color: Colors.white),
+            child: Icon(Icons.event_available, size: 32, color: Colors.white),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(Icons.account_circle, size: 32, color: Colors.white),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          //padding: EdgeInsets.zero,
+          children: <Widget>[
+            ListTile(
+              title: Text('Week'),
+              selected: _selectedDestination == 0,
+              onTap: () => selectDestination(0),
+              selectedColor: Colors.white,
+              selectedTileColor: primary,
+            ),
+            ListTile(
+              title: Text('Month'),
+              selected: _selectedDestination == 1,
+              onTap: () => selectDestination(1),
+              selectedColor: Colors.white,
+              selectedTileColor: primary,
+            ),
+            DottedLine(),
+            ListTile(
+              title: Text('Edit Category'),
+              selected: _selectedDestination == 3,
+              onTap: () => selectDestination(3),
+              selectedColor: Colors.white,
+              selectedTileColor: primary,
+            ),
+            Divider(
+              height: 1,
+              thickness: 2,
+            ),
+            TaskList()
+          ],
+        ),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -69,17 +101,89 @@ class _HomeViewState extends State<HomeView> {
             ),
             Text(
               '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+              style: textTheme.headline4,
             ),
             Progress(),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add, color: Colors.white),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: SpeedDial( //Speed dial menu
+        marginBottom: 10, //margin bottom
+        icon: Icons.add_rounded, //icon on Floating action button
+        activeIcon: Icons.close, //icon when menu is expanded on button
+        backgroundColor: primary, //background color of button
+        foregroundColor: Colors.white, //font color, icon color in button
+        activeBackgroundColor: primary, //background color when menu is expanded
+        activeForegroundColor: Colors.white,
+        buttonSize: 56.0, //button size
+        visible: true,
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.white,
+        overlayOpacity: 0.8,
+        onOpen: () => print('OPENING DIAL'), // action when menu opens
+        onClose: () => print('DIAL CLOSED'), //action when menu closes
+
+        elevation: 8.0, //shadow elevation of button
+        shape: CircleBorder(), //shape of button
+        
+        children: [
+          SpeedDialChild( //speed dial child
+            child: Icon(Icons.category),
+            backgroundColor: secondary,
+            foregroundColor: primary,
+            label: 'Event Category',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () => print('ADD EVENT CATEGORY'),
+            onLongPress: () => print('FIRST CHILD LONG PRESS'),
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.event),
+            backgroundColor: secondary,
+            foregroundColor: primary,
+            label: 'Event',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () => print('ADD EVENT'),
+            onLongPress: () => print('SECOND CHILD LONG PRESS'),
+          ),
+        ],
+      ),
+    );
+  }
+  void selectDestination(int index) {
+    setState(() {
+      _selectedDestination = index;
+    });
+  }
+}
+
+class TaskList extends StatelessWidget{
+   @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TaskItem(label: "Birthdays"),
+        TaskItem(label: "Consumables"),
+        TaskItem(label: "Meeting"),
+        TaskItem(label: "Public Holiday"),
+        TaskItem(label: "Special Events"),
+        TaskItem(label: "Subscriptions")
+      ],
+    );
+}
+}
+
+class TaskItem extends StatelessWidget{
+  final String label;
+  const TaskItem({Key? key, required this.label}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Checkbox(value: false, onChanged: null),
+        Text(label)
+      ],
     );
   }
 }
