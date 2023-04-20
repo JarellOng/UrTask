@@ -15,18 +15,15 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-
-    final theme = Theme.of(context);//for
+    final theme = Theme.of(context); //for
     final textTheme = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
-        
         //leading: Icon(Icons.menu, size: 32, color: Colors.white),
         title: Text("June 2023"),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(Icons.search, size: 32, color: Colors.white),
@@ -107,7 +104,8 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      floatingActionButton: SpeedDial( //Speed dial menu
+      floatingActionButton: SpeedDial(
+        //Speed dial menu
         marginBottom: 10, //margin bottom
         icon: Icons.add_rounded, //icon on Floating action button
         activeIcon: Icons.close, //icon when menu is expanded on button
@@ -126,9 +124,10 @@ class _HomeViewState extends State<HomeView> {
 
         elevation: 8.0, //shadow elevation of button
         shape: CircleBorder(), //shape of button
-        
+
         children: [
-          SpeedDialChild( //speed dial child
+          SpeedDialChild(
+            //speed dial child
             child: Icon(Icons.category),
             backgroundColor: secondary,
             foregroundColor: primary,
@@ -150,6 +149,7 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
+
   void selectDestination(int index) {
     setState(() {
       _selectedDestination = index;
@@ -157,8 +157,8 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
-class TaskList extends StatelessWidget{
-   @override
+class TaskList extends StatelessWidget {
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -170,25 +170,22 @@ class TaskList extends StatelessWidget{
         TaskItem(label: "Subscriptions")
       ],
     );
-}
+  }
 }
 
-class TaskItem extends StatelessWidget{
+class TaskItem extends StatelessWidget {
   final String label;
   const TaskItem({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        Checkbox(value: false, onChanged: null),
-        Text(label)
-      ],
+      children: [Checkbox(value: false, onChanged: null), Text(label)],
     );
   }
 }
 
-class Progress extends StatelessWidget{
+class Progress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -196,6 +193,5 @@ class Progress extends StatelessWidget{
         Text("testing"),
       ],
     );
-
-}
+  }
 }
