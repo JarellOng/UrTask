@@ -1,9 +1,15 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
-import 'package:urtask/view/event_view.dart';
 import 'package:urtask/view/home_view.dart';
-import 'firebase_options.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:urtask/helpers/loading/loading_screen.dart';
+import 'package:urtask/services/auth/bloc/auth_bloc.dart';
+import 'package:urtask/services/auth/bloc/auth_event.dart';
+import 'package:urtask/services/auth/bloc/auth_state.dart';
+import 'package:urtask/services/auth/firebase_auth_provider.dart';
+import 'package:urtask/view/login_view.dart';
+import 'package:urtask/view/register_view.dart';
+import 'package:urtask/view/verify_email_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,34 +19,45 @@ void main() {
       theme: ThemeData(
         primarySwatch: primary,
       ),
-      home: const MyApp(),
+      home: BlocProvider<AuthBloc>(
+        create: (context) => AuthBloc(FirebaseAuthProvider()),
+        child: const HomePage(),
+      ),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      // Initialize FlutterFire
-      future: Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ),
-      builder: (context, snapshot) {
-        // Check for errors
-        // if (snapshot.hasError) {
-        //   return SomethingWentWrong();
-        // }
-
-        // Once complete, show your application
-        if (snapshot.connectionState == ConnectionState.done) {
-          return const HomeView();
+    context.read<AuthBloc>().add(const AuthEventInitialize());
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state.isLoading) {
+          LoadingScreen().show(
+            context: context,
+            text: state.loadingText ?? "Please wait a moment",
+          );
+        } else {
+          LoadingScreen().hide();
         }
-
-        // Otherwise, show something whilst waiting for initialization to complete
-        return const CircularProgressIndicator();
+      },
+      builder: (context, state) {
+        if (state is AuthStateLoggedIn) {
+          return const HomeView();
+        } else if (state is AuthStateNeedsVerification) {
+          return const VerifyEmailView();
+        } else if (state is AuthStateLoggedOut) {
+          return const LoginView();
+        } else if (state is AuthStateRegistering) {
+          return const RegisterView();
+        } else {
+          return const Scaffold(
+            body: CircularProgressIndicator(),
+          );
+        }
       },
     );
   }
