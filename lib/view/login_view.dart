@@ -85,14 +85,6 @@ class _LoginViewState extends State<LoginView> {
                 child: const Text("Login"),
               ),
 
-              // Forgot Password Nav
-              TextButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(const AuthEventForgotPassword());
-                },
-                child: const Text("I forgot my password"),
-              ),
-
               // Register Page Nav
               TextButton(
                 onPressed: () {
