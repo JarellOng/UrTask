@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
+import 'package:urtask/view/event_view.dart';
 import 'package:urtask/view/home_view.dart';
 import 'firebase_options.dart';
 
