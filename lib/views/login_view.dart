@@ -15,6 +15,7 @@ class _LoginViewState extends State<LoginView> {
   // Text Editing Controller
   late final TextEditingController _email;
   late final TextEditingController _password;
+  bool _isHidden = true;
 
   // Init State
   @override
@@ -22,6 +23,13 @@ class _LoginViewState extends State<LoginView> {
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
+  }
+
+  // Toggle Password Visibility
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
   }
 
   // Dispose
@@ -44,10 +52,6 @@ class _LoginViewState extends State<LoginView> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              const Text(
-                "Please log in to your account in order to interact with and create notes!",
-              ),
-
               // Email
               TextField(
                 controller: _email,
@@ -55,18 +59,25 @@ class _LoginViewState extends State<LoginView> {
                 autocorrect: false,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
-                  hintText: "Enter your email here",
+                  hintText: "Email",
                 ),
               ),
 
               // Password
-              TextField(
+              TextFormField(
                 controller: _password,
-                obscureText: true,
+                obscureText: _isHidden,
                 enableSuggestions: false,
                 autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: "Enter your password here",
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  suffixIcon: GestureDetector(
+                    onTap: _togglePasswordVisibility,
+                    child: Icon(
+                      _isHidden ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
               ),
 
@@ -82,7 +93,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       );
                 },
-                child: const Text("Login"),
+                child: const Text("Enter"),
               ),
 
               // Register Page Nav
@@ -90,7 +101,7 @@ class _LoginViewState extends State<LoginView> {
                 onPressed: () {
                   context.read<AuthBloc>().add(const AuthEventShouldRegister());
                 },
-                child: const Text("Not registered yet? Register here!"),
+                child: const Text("Don't have an account? Sign up here"),
               ),
             ],
           ),
