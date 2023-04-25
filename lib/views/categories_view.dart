@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:urtask/service/categories/categories_controller.dart';
-import 'package:urtask/service/categories/categories_model.dart';
-import 'package:urtask/service/colors/colors_controller.dart';
-import 'package:urtask/service/colors/colors_model.dart' as color_model;
+import 'package:urtask/services/categories/categories_controller.dart';
+import 'package:urtask/services/categories/categories_model.dart';
+import 'package:urtask/services/colors/colors_controller.dart';
+import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/utilities/extensions/hex_color.dart';
 
 class CategoryView extends StatefulWidget {

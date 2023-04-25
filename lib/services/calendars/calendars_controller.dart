@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:urtask/service/calendars/calendars_constants.dart';
-import 'package:urtask/service/calendars/calendars_model.dart';
+import 'package:urtask/services/auth/auth_service.dart';
+import 'package:urtask/services/calendars/calendars_constants.dart';
+import 'calendars_model.dart';
 
 class CalendarController {
   final calendars = FirebaseFirestore.instance.collection("calendar");
-  final userId = "admin";
+  final userId = AuthService.firebase().currentUser!.id;
 
   static final CalendarController _shared =
       CalendarController._sharedInstance();

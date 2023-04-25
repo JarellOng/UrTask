@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:urtask/service/categories/categories_constants.dart';
-import 'package:urtask/service/categories/categories_model.dart';
+import 'package:urtask/services/categories/categories_constants.dart';
+import 'package:urtask/services/categories/categories_model.dart';
 
 class CategoryController {
   final categories = FirebaseFirestore.instance.collection("categories");

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:urtask/service/colors/colors_model.dart';
+import 'package:urtask/services/colors/colors_model.dart';
 
 class ColorController {
   final colors = FirebaseFirestore.instance.collection("colors");

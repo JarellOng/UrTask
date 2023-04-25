@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:urtask/service/calendars/calendars_constants.dart';
+import 'package:urtask/services/calendars/calendars_constants.dart';
 
 @immutable
 class Calendars {
