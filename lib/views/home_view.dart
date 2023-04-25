@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
+import 'calendar_view.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -12,16 +15,20 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _counter = 0;
   int _selectedDestination = 0;
+  var uot = CalendarFormat.month;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context); //for
     final textTheme = theme.textTheme;
+    var borderRadius = const BorderRadius.all(Radius.circular(20));
+    final padding = 20;
+    
 
     return Scaffold(
       appBar: AppBar(
         //leading: Icon(Icons.menu, size: 32, color: Colors.white),
-        title: Text("June 2023"),
+        title: Text(DateFormat('yMMMM').format(DateTime.now()), style: TextStyle(color: Colors.white)),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
           Padding(
@@ -40,30 +47,55 @@ class _HomeViewState extends State<HomeView> {
       ),
       drawer: Drawer(
         child: ListView(
-          // Important: Remove any padding from the ListView.
-          //padding: EdgeInsets.zero,
           children: <Widget>[
-            ListTile(
-              title: Text('Week'),
-              selected: _selectedDestination == 0,
-              onTap: () => selectDestination(0),
-              selectedColor: Colors.white,
-              selectedTileColor: primary,
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+              child: ListTile(
+                title: Text('Week',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
+                selected: _selectedDestination == 1,
+                shape: RoundedRectangleBorder(borderRadius: borderRadius),
+                onTap: () {
+                  selectDestination(1);
+                    uot = CalendarFormat.week;
+                }, 
+                contentPadding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0, left: 12.0),
+                selectedColor: Colors.white,
+                selectedTileColor: primary,
+              ),
             ),
-            ListTile(
-              title: Text('Month'),
-              selected: _selectedDestination == 1,
-              onTap: () => selectDestination(1),
-              selectedColor: Colors.white,
-              selectedTileColor: primary,
+            Padding(
+              padding:
+                  const EdgeInsets.only(right: 8.0, bottom: 8.0, left: 8.0),
+              child: ListTile(
+                title: Text('Month',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
+                selected: _selectedDestination == 0,
+                shape: RoundedRectangleBorder(borderRadius: borderRadius),
+                onTap: () {
+                  selectDestination(0);
+                    uot = CalendarFormat.month;
+                  },
+                contentPadding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0, left: 12.0, ),
+                selectedColor: Colors.white,
+                selectedTileColor: primary,
+              ),
             ),
             DottedLine(),
-            ListTile(
-              title: Text('Edit Category'),
-              selected: _selectedDestination == 3,
-              onTap: () => selectDestination(3),
-              selectedColor: Colors.white,
-              selectedTileColor: primary,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                title: Text('Edit Category',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
+                selected: _selectedDestination == 3,
+                onTap: () => selectDestination(3),
+                contentPadding: const EdgeInsets.only(top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
+                selectedColor: Colors.white,
+                selectedTileColor: primary,
+              ),
             ),
             Divider(
               height: 1,
@@ -73,6 +105,7 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
+<<<<<<< HEAD:lib/views/home_view.dart
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -104,6 +137,9 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
+=======
+      body: calendar(calendarFilter: uot),
+>>>>>>> fb8acdc (Add calendar_view (Calendar and Event list)):lib/view/home_view.dart
       floatingActionButton: SpeedDial(
         //Speed dial menu
         marginBottom: 10, //margin bottom
@@ -183,6 +219,7 @@ class TaskItem extends StatelessWidget {
       children: [Checkbox(value: false, onChanged: null), Text(label)],
     );
   }
+<<<<<<< HEAD:lib/views/home_view.dart
 }
 
 class Progress extends StatelessWidget {
@@ -195,3 +232,6 @@ class Progress extends StatelessWidget {
     );
   }
 }
+=======
+}
+>>>>>>> fb8acdc (Add calendar_view (Calendar and Event list)):lib/view/home_view.dart

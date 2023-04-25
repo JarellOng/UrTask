@@ -14,7 +14,12 @@ const MaterialColor primary = MaterialColor(_primaryPrimaryValue, <int, Color>{
 });
  const int _primaryPrimaryValue = 0xFFFC7E7E;
 
- const MaterialColor secondary = MaterialColor(_secondaryAccentValue, <int, Color>{
+const MaterialColor secondary = MaterialColor(_secondaryAccentValue, <int, Color>{
   500: Color(_secondaryAccentValue),
 });
- const int _secondaryAccentValue = 0xFFFFF2F2;
+ const int _secondaryAccentValue = 0xFFFFF0F0;
+
+ const MaterialColor tertiary = MaterialColor(_tertiaryAccentValue, <int, Color>{
+  500: Color(_tertiaryAccentValue),
+});
+ const int _tertiaryAccentValue = 0xFFFEBFBF;
