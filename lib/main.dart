@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
-import 'package:urtask/view/home_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:urtask/helpers/loading/loading_screen.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
 import 'package:urtask/services/auth/firebase_auth_provider.dart';
-import 'package:urtask/view/login_view.dart';
-import 'package:urtask/view/register_view.dart';
-import 'package:urtask/view/verify_email_view.dart';
+import 'package:urtask/views/home_view.dart';
+import 'package:urtask/views/login_view.dart';
+import 'package:urtask/views/register_view.dart';
+import 'package:urtask/views/verify_email_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:urtask/service/calendars/calendars_controller.dart';
-import 'package:urtask/service/events/events_constants.dart';
-import 'package:urtask/service/events/events_model.dart';
+import 'package:urtask/services/calendars/calendars_controller.dart';
+import 'package:urtask/services/events/events_constants.dart';
+import 'package:urtask/services/events/events_model.dart';
 
 class EventController {
   final calendarController = CalendarController();

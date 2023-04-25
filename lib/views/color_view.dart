@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:urtask/service/events/events_controller.dart';
-import 'package:urtask/service/events/events_model.dart';
+import 'package:urtask/services/colors/colors_controller.dart';
+import 'package:urtask/services/colors/colors_model.dart' as color_model;
+import 'package:urtask/utilities/extensions/hex_color.dart';
 
-class EventView extends StatefulWidget {
-  const EventView({super.key});
+class ColorView extends StatefulWidget {
+  const ColorView({super.key});
 
   @override
-  State<EventView> createState() => _EventViewState();
+  State<ColorView> createState() => _ColorViewState();
 }
 
-class _EventViewState extends State<EventView> {
-  late final EventController _eventService;
+class _ColorViewState extends State<ColorView> {
+  late final ColorController _colorService;
 
   @override
   void initState() {
-    _eventService = EventController();
+    _colorService = ColorController();
     super.initState();
   }
 
@@ -22,27 +23,27 @@ class _EventViewState extends State<EventView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Events"),
+        title: const Text("Colors"),
       ),
       backgroundColor: const Color.fromARGB(31, 133, 133, 133),
-      body: StreamBuilder(
-        stream: _eventService.getAll(),
+      body: FutureBuilder(
+        future: _colorService.getAll(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-            case ConnectionState.active:
+            case ConnectionState.done:
               if (snapshot.hasData) {
-                final events = snapshot.data as Iterable<Events>;
+                final colors = snapshot.data as Iterable<color_model.Colors>;
                 return ListView.builder(
-                  itemCount: events.length,
+                  itemCount: colors.length,
                   itemBuilder: (context, index) {
-                    final event = events.elementAt(index);
+                    final color = colors.elementAt(index);
                     return ListTile(
                       title: Text(
-                        event.start.toDate().toIso8601String(),
+                        color.name,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      textColor: Colors.amber,
+                      textColor: HexColor.fromHex(color.hex),
                     );
                   },
                 );
