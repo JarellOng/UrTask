@@ -112,7 +112,7 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      body: calendar(calendarFilter: uot),
+      body: CalendarView(calendarFilter: uot),
       floatingActionButton: SpeedDial(
         //Speed dial menu
         marginBottom: 10, //margin bottom

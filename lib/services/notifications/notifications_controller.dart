@@ -27,4 +27,6 @@ class EventController {
       notificationTypeField: type.toString(),
     });
   }
+
+  // TODO: Make Schedule Functions
 }

@@ -3,15 +3,15 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:urtask/color.dart';
 import 'package:intl/intl.dart';
 
-class calendar extends StatefulWidget {
+class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;
-  const calendar({super.key, required this.calendarFilter});
+  const CalendarView({super.key, required this.calendarFilter});
 
   @override
-  State<calendar> createState() => _calendarState();
+  State<CalendarView> createState() => _CalendarViewState();
 }
 
-class _calendarState extends State<calendar> {
+class _CalendarViewState extends State<CalendarView> {
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
 

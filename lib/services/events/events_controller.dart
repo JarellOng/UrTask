@@ -40,11 +40,15 @@ class EventController {
     return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc)).first;
   }
 
-  Stream<Iterable<Events>> getAll() async* {
+  Stream<Iterable<Events>> getByDay({required DateTime dateTime}) async* {
     final events = await _getCollection();
-    yield* events
-        .snapshots()
-        .map((data) => data.docs.map((doc) => Events.fromSnapshot(doc)));
+    yield* events.snapshots().map((data) => data.docs
+        .map((doc) => Events.fromSnapshot(doc))
+        .where((element) => _isBetweenDate(
+              start: element.start.toDate(),
+              end: element.end.toDate(),
+              compare: dateTime,
+            )));
   }
 
   // TODO: Add Appropriate Start and End Datatypes
@@ -69,5 +73,26 @@ class EventController {
   Future<void> delete({required String id}) async {
     final events = await _getCollection();
     await events.doc(id).delete();
+  }
+
+  static bool _isBetweenDate({
+    required DateTime start,
+    required DateTime end,
+    required DateTime compare,
+  }) {
+    final startDay = start.day;
+    final startMonth = start.month;
+    final startYear = start.year;
+    final endDay = end.day;
+    final endMonth = end.month;
+    final endYear = end.year;
+    final compareDay = compare.day;
+    final compareMonth = compare.month;
+    final compareYear = compare.year;
+
+    if (!(startDay <= compareDay && endDay >= compareDay)) return false;
+    if (!(startMonth <= compareMonth && endMonth >= compareMonth)) return false;
+    if (!(startYear <= compareYear && endYear >= compareYear)) return false;
+    return true;
   }
 }
