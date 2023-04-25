@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/events/events_model.dart';
@@ -26,7 +27,7 @@ class _EventViewState extends State<EventView> {
       ),
       backgroundColor: const Color.fromARGB(31, 133, 133, 133),
       body: StreamBuilder(
-        stream: _eventService.getAll(),
+        stream: _eventService.getByDay(dateTime: DateTime.now()),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
@@ -39,7 +40,7 @@ class _EventViewState extends State<EventView> {
                     final event = events.elementAt(index);
                     return ListTile(
                       title: Text(
-                        event.start.toDate().toIso8601String(),
+                        event.title,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       textColor: Colors.amber,
