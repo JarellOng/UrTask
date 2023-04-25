@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
-import 'calendar_view.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:urtask/views/calendar_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -23,12 +23,12 @@ class _HomeViewState extends State<HomeView> {
     final textTheme = theme.textTheme;
     var borderRadius = const BorderRadius.all(Radius.circular(20));
     final padding = 20;
-    
 
     return Scaffold(
       appBar: AppBar(
         //leading: Icon(Icons.menu, size: 32, color: Colors.white),
-        title: Text(DateFormat('yMMMM').format(DateTime.now()), style: TextStyle(color: Colors.white)),
+        title: Text(DateFormat('yMMMM').format(DateTime.now()),
+            style: TextStyle(color: Colors.white)),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
           Padding(
@@ -58,9 +58,10 @@ class _HomeViewState extends State<HomeView> {
                 shape: RoundedRectangleBorder(borderRadius: borderRadius),
                 onTap: () {
                   selectDestination(1);
-                    uot = CalendarFormat.week;
-                }, 
-                contentPadding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0, left: 12.0),
+                  uot = CalendarFormat.week;
+                },
+                contentPadding: const EdgeInsets.only(
+                    top: 8.0, right: 8.0, bottom: 8.0, left: 12.0),
                 selectedColor: Colors.white,
                 selectedTileColor: primary,
               ),
@@ -76,9 +77,14 @@ class _HomeViewState extends State<HomeView> {
                 shape: RoundedRectangleBorder(borderRadius: borderRadius),
                 onTap: () {
                   selectDestination(0);
-                    uot = CalendarFormat.month;
-                  },
-                contentPadding: const EdgeInsets.only(top: 8.0, right: 8.0, bottom: 8.0, left: 12.0, ),
+                  uot = CalendarFormat.month;
+                },
+                contentPadding: const EdgeInsets.only(
+                  top: 8.0,
+                  right: 8.0,
+                  bottom: 8.0,
+                  left: 12.0,
+                ),
                 selectedColor: Colors.white,
                 selectedTileColor: primary,
               ),
@@ -92,7 +98,8 @@ class _HomeViewState extends State<HomeView> {
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
                 selected: _selectedDestination == 3,
                 onTap: () => selectDestination(3),
-                contentPadding: const EdgeInsets.only(top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
+                contentPadding: const EdgeInsets.only(
+                    top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
                 selectedColor: Colors.white,
                 selectedTileColor: primary,
               ),
@@ -105,41 +112,7 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-<<<<<<< HEAD:lib/views/home_view.dart
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: textTheme.headline4,
-            ),
-            Progress(),
-          ],
-        ),
-      ),
-=======
       body: calendar(calendarFilter: uot),
->>>>>>> fb8acdc (Add calendar_view (Calendar and Event list)):lib/view/home_view.dart
       floatingActionButton: SpeedDial(
         //Speed dial menu
         marginBottom: 10, //margin bottom
@@ -219,19 +192,4 @@ class TaskItem extends StatelessWidget {
       children: [Checkbox(value: false, onChanged: null), Text(label)],
     );
   }
-<<<<<<< HEAD:lib/views/home_view.dart
 }
-
-class Progress extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text("testing"),
-      ],
-    );
-  }
-}
-=======
-}
->>>>>>> fb8acdc (Add calendar_view (Calendar and Event list)):lib/view/home_view.dart

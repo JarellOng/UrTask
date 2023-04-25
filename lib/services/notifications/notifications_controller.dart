@@ -27,8 +27,4 @@ class EventController {
       notificationTypeField: type.toString(),
     });
   }
-
-  Future<void> getAlertDetail() {
-    
-  }
 }
