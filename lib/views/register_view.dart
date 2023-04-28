@@ -17,6 +17,8 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
   late final TextEditingController _repeatPassword;
+  bool _isHidden = true;
+  bool _isHidden2 = true;
 
   // Init State
   @override
@@ -26,6 +28,20 @@ class _RegisterViewState extends State<RegisterView> {
     _password = TextEditingController();
     _repeatPassword = TextEditingController();
     super.initState();
+  }
+
+  // Toggle Password Visibility
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
+
+  // Toggle Repeat Password Visibility
+  void _toggleRepeatPasswordVisibility() {
+    setState(() {
+      _isHidden2 = !_isHidden2;
+    });
   }
 
   // Dispose
@@ -78,24 +94,38 @@ class _RegisterViewState extends State<RegisterView> {
               ),
 
               // Password
-              TextField(
-                controller: _repeatPassword,
-                obscureText: true,
+              TextFormField(
+                controller: _password,
+                obscureText: _isHidden,
                 enableSuggestions: false,
                 autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: "Password",
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  suffixIcon: GestureDetector(
+                    onTap: _togglePasswordVisibility,
+                    child: Icon(
+                      _isHidden ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
               ),
 
               // Repeat Password
-              TextField(
-                controller: _password,
-                obscureText: true,
+              TextFormField(
+                controller: _repeatPassword,
+                obscureText: _isHidden,
                 enableSuggestions: false,
                 autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: "Repeat Password",
+                decoration: InputDecoration(
+                  hintText: 'Repeat Password',
+                  suffixIcon: GestureDetector(
+                    onTap: _toggleRepeatPasswordVisibility,
+                    child: Icon(
+                      _isHidden2 ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
               ),
 
