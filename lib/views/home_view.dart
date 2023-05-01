@@ -4,7 +4,10 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:urtask/services/categories/categories_controller.dart';
+import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/views/calendar_view.dart';
+import 'package:urtask/views/categories_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -96,8 +99,12 @@ class _HomeViewState extends State<HomeView> {
                 title: Text('Edit Category',
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
-                selected: _selectedDestination == 3,
-                onTap: () => selectDestination(3),
+                onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CategoryView(),
+              ),
+            ),
                 contentPadding: const EdgeInsets.only(
                     top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
                 selectedColor: Colors.white,
@@ -108,7 +115,9 @@ class _HomeViewState extends State<HomeView> {
               height: 1,
               thickness: 2,
             ),
-            TaskList()
+            CategoryList()
+
+
           ],
         ),
       ),
@@ -166,30 +175,58 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
-class TaskList extends StatelessWidget {
+class CategoryList extends StatefulWidget {
+  const CategoryList({super.key});
+
+  @override
+  State<CategoryList> createState() => _CategoryListState();
+}
+
+class _CategoryListState extends State<CategoryList> {
+  bool? _value = true;
+  late final CategoryController _categoryService;
+  //List<bool> checkboxValues = [];
+  //int i = 0;
+
+  @override
+  void initState() {
+    _categoryService = CategoryController();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TaskItem(label: "Birthdays"),
-        TaskItem(label: "Consumables"),
-        TaskItem(label: "Meeting"),
-        TaskItem(label: "Public Holiday"),
-        TaskItem(label: "Special Events"),
-        TaskItem(label: "Subscriptions")
-      ],
+    return StreamBuilder(
+	 stream: _categoryService.getAll(userId: "default"),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.active:
+              if (snapshot.hasData) {
+                final categories = snapshot.data as Iterable<Categories>;
+                return ListView.builder(
+                shrinkWrap: true,
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+		            final category = categories.elementAt(index);
+                  return CheckboxListTile(
+                    onChanged: (newValue) => setState(() {
+                      _value = newValue;
+                    }),
+                    
+                    value: _value,
+                    title: Text(category.name),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  );
+                },
+              );
+      	      } else {
+                return Column();
+              }
+              default:
+                return Column();
+              }
+	}, 
     );
   }
 }
 
-class TaskItem extends StatelessWidget {
-  final String label;
-  const TaskItem({Key? key, required this.label}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [Checkbox(value: false, onChanged: null), Text(label)],
-    );
-  }
-}
