@@ -8,6 +8,7 @@ import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/views/calendar_view.dart';
 import 'package:urtask/views/categories_view.dart';
+import 'package:urtask/views/event/create_event_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -100,11 +101,11 @@ class _HomeViewState extends State<HomeView> {
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
                 onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CategoryView(),
-              ),
-            ),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CategoryView(),
+                  ),
+                ),
                 contentPadding: const EdgeInsets.only(
                     top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
                 selectedColor: Colors.white,
@@ -116,8 +117,6 @@ class _HomeViewState extends State<HomeView> {
               thickness: 2,
             ),
             CategoryList()
-
-
           ],
         ),
       ),
@@ -160,7 +159,12 @@ class _HomeViewState extends State<HomeView> {
             foregroundColor: primary,
             label: 'Event',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => print('ADD EVENT'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CreateEventView(),
+              ),
+            ),
             onLongPress: () => print('SECOND CHILD LONG PRESS'),
           ),
         ],
@@ -197,36 +201,34 @@ class _CategoryListState extends State<CategoryList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-	 stream: _categoryService.getAll(userId: "default"),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.active:
-              if (snapshot.hasData) {
-                final categories = snapshot.data as Iterable<Categories>;
-                return ListView.builder(
+      stream: _categoryService.getAll(userId: "default"),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.active:
+            if (snapshot.hasData) {
+              final categories = snapshot.data as Iterable<Categories>;
+              return ListView.builder(
                 shrinkWrap: true,
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
-		            final category = categories.elementAt(index);
+                  final category = categories.elementAt(index);
                   return CheckboxListTile(
                     onChanged: (newValue) => setState(() {
                       _value = newValue;
                     }),
-                    
                     value: _value,
                     title: Text(category.name),
                     controlAffinity: ListTileControlAffinity.leading,
                   );
                 },
               );
-      	      } else {
-                return Column();
-              }
-              default:
-                return Column();
-              }
-	}, 
+            } else {
+              return Column();
+            }
+          default:
+            return Column();
+        }
+      },
     );
   }
 }
-
