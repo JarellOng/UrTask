@@ -1,0 +1,4 @@
+enum RepeatDuration {
+  specificNumber,
+  until,
+}

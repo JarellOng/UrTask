@@ -7,6 +7,7 @@ import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
+import 'package:urtask/views/event/repeat_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
 
 class CreateEventView extends StatefulWidget {
@@ -191,8 +192,19 @@ class _CreateEventViewState extends State<CreateEventView> {
           // Repeat
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text("Repeat"),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RepeatEventView(),
+                    ),
+                  );
+                },
+                child: Text("Repeat"),
+              ),
             ],
           ),
 

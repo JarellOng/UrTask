@@ -1,1 +1,4 @@
-enum NotificationType { alert, push }
+enum NotificationType {
+  alert,
+  push,
+}
