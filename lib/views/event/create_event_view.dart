@@ -7,6 +7,7 @@ import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
+import 'package:urtask/views/event/notification_event_view.dart';
 import 'package:urtask/views/event/repeat_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
 
@@ -193,7 +194,7 @@ class _CreateEventViewState extends State<CreateEventView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Repeat"),
+              const Text("Repeat"),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -203,7 +204,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                     ),
                   );
                 },
-                child: Text("Repeat"),
+                child: const Text("Repeat"),
               ),
             ],
           ),
@@ -211,8 +212,19 @@ class _CreateEventViewState extends State<CreateEventView> {
           // Notification
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text("Notification"),
+            children: [
+              const Text("Notification"),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationEventView(),
+                    ),
+                  );
+                },
+                child: const Text("Notification"),
+              ),
             ],
           ),
 

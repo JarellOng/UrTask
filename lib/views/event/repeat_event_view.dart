@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:urtask/enums/repeat_duration.dart';
+import 'package:urtask/enums/repeat_duration_enum.dart';
 import 'package:urtask/enums/repeat_type_enum.dart';
 
 class RepeatEventView extends StatefulWidget {
@@ -86,6 +86,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
             },
           ),
 
+          // Duration
           if (selectedType != RepeatType.noRepeat) ...[
             const SizedBox(height: 50),
             const Text(
