@@ -5,6 +5,7 @@ import 'package:urtask/color.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:urtask/views/calendar_view.dart';
+import 'package:urtask/views/profile_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -41,7 +42,15 @@ class _HomeViewState extends State<HomeView> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.account_circle, size: 32, color: Colors.white),
+            child: IconButton(
+              icon: Icon(Icons.account_circle, size: 32, color: Colors.white),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              ),
+            ),
           ),
         ],
       ),
