@@ -3,13 +3,13 @@ import 'package:urtask/enums/repeat_duration_enum.dart';
 import 'package:urtask/enums/repeat_type_enum.dart';
 
 class RepeatEventView extends StatefulWidget {
-  final RepeatType repeatType;
-  final RepeatDuration repeatDuration;
+  final RepeatType type;
+  final RepeatDuration duration;
 
   const RepeatEventView({
     super.key,
-    required this.repeatType,
-    required this.repeatDuration,
+    required this.type,
+    required this.duration,
   });
 
   @override
@@ -22,8 +22,8 @@ class _RepeatEventViewState extends State<RepeatEventView> {
 
   @override
   void initState() {
-    selectedType = widget.repeatType;
-    selectedDuration = widget.repeatDuration;
+    selectedType = widget.type;
+    selectedDuration = widget.duration;
     super.initState();
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
+import 'package:urtask/enums/notification_time_enum.dart';
+import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/enums/repeat_duration_enum.dart';
 import 'package:urtask/enums/repeat_type_enum.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
@@ -33,10 +35,21 @@ class _CreateEventViewState extends State<CreateEventView> {
   late final ColorController _colorService;
   bool allDay = false;
   bool important = false;
-  String category = "Meeting";
+
+  // Category
+  String categoryId = "category3";
+  String categoryName = "Meeting";
   String categoryHex = "#039be5";
+
+  // Repeat
   RepeatType selectedRepeatType = RepeatType.noRepeat;
   RepeatDuration selectedRepeatDuration = RepeatDuration.specificNumber;
+
+  // Notification
+  bool notificationFlag = true;
+  Map<NotificationTime, NotificationType> selectedNotifications = {
+    NotificationTime.tenMinsBefore: NotificationType.alert
+  };
 
   @override
   void initState() {
@@ -114,34 +127,36 @@ class _CreateEventViewState extends State<CreateEventView> {
               ],
             ),
 
-            // Start
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text("Start"),
-              ],
-            ),
+            if (allDay == false) ...[
+              // Start
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text("Start"),
+                ],
+              ),
 
-            // End
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text("End"),
-              ],
-            ),
+              // End
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Text("End"),
+                ],
+              ),
 
-            // Date Scroll
-            DateScrollView(
-              day: _eventStartDay,
-              month: _eventStartMonth,
-              year: _eventStartYear,
-            ),
+              // Date Scroll
+              DateScrollView(
+                day: _eventStartDay,
+                month: _eventStartMonth,
+                year: _eventStartYear,
+              ),
 
-            // Time Scroll
-            TimeScrollView(
-              hour: _eventStartHour,
-              minute: _eventStartMinute,
-            ),
+              // Time Scroll
+              TimeScrollView(
+                hour: _eventStartHour,
+                minute: _eventStartMinute,
+              ),
+            ],
 
             // Important
             Row(
@@ -177,7 +192,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                     );
                     if (categoryDetail.isNotEmpty) {
                       setState(() {
-                        category = categoryDetail[1];
+                        categoryId = categoryDetail[0];
+                        categoryName = categoryDetail[1];
                         categoryHex = categoryDetail[2];
                       });
                     }
@@ -185,7 +201,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                   child: Chip(
                     backgroundColor: HexColor.fromHex(categoryHex),
                     label: Text(
-                      category,
+                      categoryName,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
@@ -204,8 +220,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => RepeatEventView(
-                          repeatType: selectedRepeatType,
-                          repeatDuration: selectedRepeatDuration,
+                          type: selectedRepeatType,
+                          duration: selectedRepeatDuration,
                         ),
                       ),
                     );
@@ -219,19 +235,26 @@ class _CreateEventViewState extends State<CreateEventView> {
               ],
             ),
 
-            // Notification
+            // NOTIFICATION
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Notification"),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final notificationDetail = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const NotificationEventView(),
+                        builder: (context) => NotificationEventView(
+                          flag: notificationFlag,
+                          notifications: selectedNotifications,
+                        ),
                       ),
                     );
+                    setState(() {
+                      notificationFlag = notificationDetail[0];
+                      selectedNotifications = notificationDetail[1];
+                    });
                   },
                   child: const Text("Notification"),
                 ),
@@ -243,6 +266,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               controller: _eventDescription,
               enableSuggestions: false,
               autocorrect: false,
+              maxLines: 3,
               decoration: const InputDecoration(
                 hintText: "Description",
               ),

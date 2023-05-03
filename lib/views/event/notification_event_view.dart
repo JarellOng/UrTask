@@ -5,23 +5,47 @@ import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
 
 class NotificationEventView extends StatefulWidget {
-  const NotificationEventView({super.key});
+  final bool flag;
+  final Map<NotificationTime, NotificationType> notifications;
+
+  const NotificationEventView({
+    super.key,
+    required this.flag,
+    required this.notifications,
+  });
 
   @override
   State<NotificationEventView> createState() => _NotificationEventViewState();
 }
 
 class _NotificationEventViewState extends State<NotificationEventView> {
-  bool remindMe = true;
-  Map<NotificationTime, NotificationType> selectedNotifications = {
-    NotificationTime.tenMinsBefore: NotificationType.alert
-  };
+  late bool remindMe;
+  late Map<NotificationTime, NotificationType> selectedNotifications;
+
+  @override
+  void initState() {
+    remindMe = widget.flag;
+    selectedNotifications = widget.notifications;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(color: Colors.white),
+        leading: BackButton(
+          color: Colors.white,
+          onPressed: () {
+            if (remindMe == false) {
+              setState(() {
+                selectedNotifications.clear();
+                selectedNotifications[NotificationTime.tenMinsBefore] =
+                    NotificationType.alert;
+              });
+            }
+            Navigator.of(context).pop([remindMe, selectedNotifications]);
+          },
+        ),
         title: const Text(
           "Event Notification",
           style: TextStyle(color: Colors.white),
