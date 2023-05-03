@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
+import 'package:urtask/enums/repeat_duration_enum.dart';
+import 'package:urtask/enums/repeat_type_enum.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
@@ -29,11 +31,12 @@ class _CreateEventViewState extends State<CreateEventView> {
   late final FixedExtentScrollController _eventStartMinute;
   late final CategoryController _categoryService;
   late final ColorController _colorService;
-  int dayTest = 0;
   bool allDay = false;
   bool important = false;
   String category = "Meeting";
   String categoryHex = "#039be5";
+  RepeatType selectedRepeatType = RepeatType.noRepeat;
+  RepeatDuration selectedRepeatDuration = RepeatDuration.specificNumber;
 
   @override
   void initState() {
@@ -77,179 +80,187 @@ class _CreateEventViewState extends State<CreateEventView> {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Title
-          TextField(
-            controller: _eventTitle,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: "Title",
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Title
+            TextField(
+              controller: _eventTitle,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Title",
+              ),
             ),
-          ),
 
-          // All Day
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("All Day"),
-              Transform.scale(
-                scale: 0.8,
-                child: CupertinoSwitch(
-                  value: allDay,
-                  onChanged: (value) {
-                    setState(() {
-                      allDay = value;
-                    });
-                  },
-                  // activeTrackColor: primary,
-                  activeColor: primary,
-                ),
-              ),
-            ],
-          ),
-
-          // Start
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text("Start"),
-            ],
-          ),
-
-          // End
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text("End"),
-            ],
-          ),
-
-          // Date Scroll
-          // DateScrollView(
-          //   day: _eventStartDay,
-          //   month: _eventStartMonth,
-          //   year: _eventStartYear,
-          // ),
-
-          // Time Scroll
-          // TimeScrollView(
-          //   hour: _eventStartHour,
-          //   minute: _eventStartMinute,
-          // ),
-
-          // Important
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Important"),
-              Transform.scale(
-                scale: 0.8,
-                child: CupertinoSwitch(
-                  value: important,
-                  onChanged: (value) {
-                    setState(() {
-                      important = value;
-                    });
-                  },
-                  // activeTrackColor: primary,
-                  activeColor: primary,
-                ),
-              ),
-            ],
-          ),
-
-          // Category
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Category"),
-              TextButton(
-                onPressed: () async {
-                  final categoryDetail = await showCategoriesDialog(
-                    context,
-                    _categoryService,
-                    _colorService,
-                  );
-                  if (categoryDetail.isNotEmpty) {
-                    setState(() {
-                      category = categoryDetail[1];
-                      categoryHex = categoryDetail[2];
-                    });
-                  }
-                },
-                child: Chip(
-                  backgroundColor: HexColor.fromHex(categoryHex),
-                  label: Text(
-                    category,
-                    style: TextStyle(color: Colors.white),
+            // All Day
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("All Day"),
+                Transform.scale(
+                  scale: 0.8,
+                  child: CupertinoSwitch(
+                    value: allDay,
+                    onChanged: (value) {
+                      setState(() {
+                        allDay = value;
+                      });
+                    },
+                    // activeTrackColor: primary,
+                    activeColor: primary,
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          // Repeat
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Repeat"),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RepeatEventView(),
-                    ),
-                  );
-                },
-                child: const Text("Repeat"),
-              ),
-            ],
-          ),
-
-          // Notification
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Notification"),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const NotificationEventView(),
-                    ),
-                  );
-                },
-                child: const Text("Notification"),
-              ),
-            ],
-          ),
-
-          // Description
-          TextField(
-            controller: _eventDescription,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: "Description",
+              ],
             ),
-          ),
 
-          // Login Button
-          TextButton(
-            onPressed: () async {
-              final startDay = _eventStartDay.selectedItem;
-              // final startHour = _eventStartHour.selectedItem;
-              // final startMinute = _eventStartMinute.selectedItem;
-              print(startDay);
-              // print(startMinute);
-            },
-            child: const Text("Save"),
-          ),
-        ],
+            // Start
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text("Start"),
+              ],
+            ),
+
+            // End
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text("End"),
+              ],
+            ),
+
+            // Date Scroll
+            DateScrollView(
+              day: _eventStartDay,
+              month: _eventStartMonth,
+              year: _eventStartYear,
+            ),
+
+            // Time Scroll
+            TimeScrollView(
+              hour: _eventStartHour,
+              minute: _eventStartMinute,
+            ),
+
+            // Important
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Important"),
+                Transform.scale(
+                  scale: 0.8,
+                  child: CupertinoSwitch(
+                    value: important,
+                    onChanged: (value) {
+                      setState(() {
+                        important = value;
+                      });
+                    },
+                    activeColor: primary,
+                  ),
+                ),
+              ],
+            ),
+
+            // Category
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Category"),
+                TextButton(
+                  onPressed: () async {
+                    final categoryDetail = await showCategoriesDialog(
+                      context,
+                      _categoryService,
+                      _colorService,
+                    );
+                    if (categoryDetail.isNotEmpty) {
+                      setState(() {
+                        category = categoryDetail[1];
+                        categoryHex = categoryDetail[2];
+                      });
+                    }
+                  },
+                  child: Chip(
+                    backgroundColor: HexColor.fromHex(categoryHex),
+                    label: Text(
+                      category,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // REPEAT
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Repeat"),
+                TextButton(
+                  onPressed: () async {
+                    final repeatDetail = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RepeatEventView(
+                          repeatType: selectedRepeatType,
+                          repeatDuration: selectedRepeatDuration,
+                        ),
+                      ),
+                    );
+                    setState(() {
+                      selectedRepeatType = repeatDetail[0];
+                      selectedRepeatDuration = repeatDetail[1];
+                    });
+                  },
+                  child: const Text("Repeat"),
+                ),
+              ],
+            ),
+
+            // Notification
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Notification"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const NotificationEventView(),
+                      ),
+                    );
+                  },
+                  child: const Text("Notification"),
+                ),
+              ],
+            ),
+
+            // DESCRIPTION
+            TextField(
+              controller: _eventDescription,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Description",
+              ),
+            ),
+
+            // SAVE BUTTON
+            TextButton(
+              onPressed: () async {
+                // final startDay = _eventStartDay.selectedItem;
+                // final startHour = _eventStartHour.selectedItem;
+                // final startMinute = _eventStartMinute.selectedItem;
+                // print(startDay);
+                // print(startMinute);
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        ),
       ),
     );
   }
