@@ -50,10 +50,10 @@ Future<List<String>> showCategoriesDialog(
                                   ),
                                 );
                               } else {
-                                return const CircularProgressIndicator();
+                                return Column();
                               }
                             default:
-                              return const CircularProgressIndicator();
+                              return Column();
                           }
                         },
                       );
@@ -61,10 +61,10 @@ Future<List<String>> showCategoriesDialog(
                   ),
                 );
               } else {
-                return const CircularProgressIndicator();
+                return Column();
               }
             default:
-              return const CircularProgressIndicator();
+              return Column();
           }
         },
       );
