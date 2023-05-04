@@ -24,16 +24,24 @@ class CreateEventView extends StatefulWidget {
 
 class _CreateEventViewState extends State<CreateEventView> {
   late final EventController _eventService;
+  late final CategoryController _categoryService;
+  late final ColorController _colorService;
+
   late final TextEditingController _eventTitle;
   late final TextEditingController _eventDescription;
+
+  // All Day
+  bool allDay = false;
+
+  // Start
   late final FixedExtentScrollController _eventStartDay;
   late final FixedExtentScrollController _eventStartMonth;
   late final FixedExtentScrollController _eventStartYear;
   late final FixedExtentScrollController _eventStartHour;
   late final FixedExtentScrollController _eventStartMinute;
-  late final CategoryController _categoryService;
-  late final ColorController _colorService;
-  bool allDay = false;
+  int selectedStartDay = DateTime.now().day;
+
+  // Important
   bool important = false;
 
   // Category
@@ -96,7 +104,7 @@ class _CreateEventViewState extends State<CreateEventView> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Title
+            // TITLE
             TextField(
               controller: _eventTitle,
               enableSuggestions: false,
@@ -106,7 +114,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
             ),
 
-            // All Day
+            // ALL DAY
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -127,16 +135,24 @@ class _CreateEventViewState extends State<CreateEventView> {
               ],
             ),
 
-            if (allDay == false) ...[
-              // Start
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("Start"),
-                ],
-              ),
+            // START
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Start"),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedStartDay = _eventStartDay.selectedItem;
+                    });
+                  },
+                  child: Text(selectedStartDay.toString()),
+                )
+              ],
+            ),
 
-              // End
+            if (allDay == false) ...[
+              // END
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
