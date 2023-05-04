@@ -41,8 +41,6 @@ class _DateScrollViewState extends State<DateScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    // dayCount = selectedMonth.isEven ? 31 : 30;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -58,6 +56,9 @@ class _DateScrollViewState extends State<DateScrollView> {
                 if (selectedMonth == 1) {
                   dayCount = isLeapYear ? 29 : 28;
                   if (selectedDay >= 29) widget.day.jumpToItem(dayCount - 1);
+                  if (selectedDay == 28 && dayCount == 29) {
+                    widget.day.jumpToItem(28);
+                  }
                 } else if (selectedMonth.isEven) {
                   widget.day.jumpToItem(selectedDay);
                   dayCount = 31;
@@ -136,7 +137,11 @@ class _DateScrollViewState extends State<DateScrollView> {
                     (currentYear % 100 != 0 || currentYear % 400 == 0);
                 if (selectedMonth == 1) {
                   dayCount = isLeapYear ? 29 : 28;
-                  widget.day.jumpToItem(27);
+                  if (selectedDay == 28) {
+                    widget.day.jumpToItem(dayCount - 1);
+                  } else {
+                    widget.day.jumpToItem(selectedDay);
+                  }
                 }
                 currentYear -= selectedYear;
               });
