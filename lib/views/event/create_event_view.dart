@@ -143,7 +143,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                         }
                       });
                     },
-                    // activeTrackColor: primary,
                     activeColor: primary,
                   ),
                 ),

@@ -2,25 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/utilities/dialogs/logout_dialog.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final userId = AuthService.firebase().currentUser!.id;
+  final userEmail = AuthService.firebase().currentUser!.email;
+
+  @override
   Widget build(BuildContext context) {
-    final userId = AuthService.firebase().currentUser!.id;
-    final userEmail = AuthService.firebase().currentUser!.email;
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-            userId,
-            style: TextStyle(fontSize: 20, color: Colors.white),
+        title: Text(
+          userId,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.account_circle, size: 32, color: Colors.white),
+          onPressed: () => Navigator.pop(
+            context,
           ),
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-              icon: Icon(Icons.account_circle, size: 32, color: Colors.white),
-              onPressed: () => Navigator.pop(
-                    context,
-                  ))),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -40,9 +48,11 @@ class ProfilePage extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-                  bool shouldLogout = await showLogoutDialog(context);
+                  final shouldLogout = await showLogoutDialog(context);
                   if (shouldLogout) {
-                    await AuthService.logOut();
+                    if (mounted) {
+                      Navigator.of(context).pop(shouldLogout);
+                    }
                   }
                 },
                 child: const Text('Logout'),
