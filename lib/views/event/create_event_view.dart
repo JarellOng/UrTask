@@ -24,16 +24,44 @@ class CreateEventView extends StatefulWidget {
 
 class _CreateEventViewState extends State<CreateEventView> {
   late final EventController _eventService;
-  late final TextEditingController _eventTitle;
-  late final TextEditingController _eventDescription;
-  late final FixedExtentScrollController _eventStartDay;
-  late final FixedExtentScrollController _eventStartMonth;
-  late final FixedExtentScrollController _eventStartYear;
-  late final FixedExtentScrollController _eventStartHour;
-  late final FixedExtentScrollController _eventStartMinute;
   late final CategoryController _categoryService;
   late final ColorController _colorService;
+
+  late final TextEditingController _eventTitle;
+  late final TextEditingController _eventDescription;
+
+  // All Day
   bool allDay = false;
+
+  // Start
+  late FixedExtentScrollController _eventStartDay;
+  late FixedExtentScrollController _eventStartMonth;
+  late FixedExtentScrollController _eventStartYear;
+  late FixedExtentScrollController _eventStartHour;
+  late FixedExtentScrollController _eventStartMinute;
+  int selectedStartDay = DateTime.now().day - 1;
+  int selectedStartMonth = DateTime.now().month - 1;
+  int selectedStartYear = DateTime.now().year;
+  int selectedStartHour = DateTime.now().hour + 1;
+  int selectedStartMinute = 0;
+  bool startDateScrollToggle = false;
+  bool startTimeScrollToggle = false;
+
+  // End
+  late FixedExtentScrollController _eventEndDay;
+  late FixedExtentScrollController _eventEndMonth;
+  late FixedExtentScrollController _eventEndYear;
+  late FixedExtentScrollController _eventEndHour;
+  late FixedExtentScrollController _eventEndMinute;
+  int selectedEndDay = DateTime.now().day - 1;
+  int selectedEndMonth = DateTime.now().month - 1;
+  int selectedEndYear = DateTime.now().year;
+  int selectedEndHour = DateTime.now().hour + 2;
+  int selectedEndMinute = 0;
+  bool endDateScrollToggle = false;
+  bool endTimeScrollToggle = false;
+
+  // Important
   bool important = false;
 
   // Category
@@ -56,17 +84,6 @@ class _CreateEventViewState extends State<CreateEventView> {
     _eventService = EventController();
     _eventTitle = TextEditingController();
     _eventDescription = TextEditingController();
-    _eventStartDay = FixedExtentScrollController(
-      initialItem: DateTime.now().day - 1,
-    );
-    _eventStartMonth = FixedExtentScrollController(
-      initialItem: DateTime.now().month - 1,
-    );
-    _eventStartYear = FixedExtentScrollController();
-    _eventStartHour = FixedExtentScrollController(
-      initialItem: DateTime.now().hour + 1,
-    );
-    _eventStartMinute = FixedExtentScrollController();
     _categoryService = CategoryController();
     _colorService = ColorController();
     super.initState();
@@ -96,7 +113,7 @@ class _CreateEventViewState extends State<CreateEventView> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Title
+            // TITLE
             TextField(
               controller: _eventTitle,
               enableSuggestions: false,
@@ -106,7 +123,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
             ),
 
-            // All Day
+            // ALL DAY
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -118,6 +135,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                     onChanged: (value) {
                       setState(() {
                         allDay = value;
+                        if (startTimeScrollToggle == true) {
+                          _startTimeScrollOff();
+                        }
+                        if (endTimeScrollToggle == true) {
+                          _endTimeScrollOff();
+                        }
                       });
                     },
                     // activeTrackColor: primary,
@@ -127,34 +150,183 @@ class _CreateEventViewState extends State<CreateEventView> {
               ],
             ),
 
-            if (allDay == false) ...[
-              // Start
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("Start"),
-                ],
-              ),
+            // START
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Start"),
 
-              // End
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("End"),
+                // Date
+                if (startDateScrollToggle == false) ...[
+                  TextButton(
+                    onPressed: () {
+                      _startDateScrollOn();
+                      if (startTimeScrollToggle == true) {
+                        _startTimeScrollOff();
+                      }
+                      if (endDateScrollToggle == true) {
+                        _endDateScrollOff();
+                      }
+                      if (endTimeScrollToggle == true) {
+                        _endTimeScrollOff();
+                      }
+                    },
+                    child: Text(
+                      _dateToString(
+                        month: selectedStartMonth,
+                        day: selectedStartDay,
+                        year: selectedStartYear,
+                      ),
+                    ),
+                  )
                 ],
-              ),
+                if (startDateScrollToggle == true) ...[
+                  TextButton(
+                    onPressed: () {
+                      _startDateScrollOff();
+                    },
+                    child: const Text("..."),
+                  )
+                ],
 
+                // Time
+                if (allDay == false) ...[
+                  if (startTimeScrollToggle == false) ...[
+                    TextButton(
+                      onPressed: () {
+                        _startTimeScrollOn();
+                        if (startDateScrollToggle == true) {
+                          _startDateScrollOff();
+                        }
+                        if (endDateScrollToggle == true) {
+                          _endDateScrollOff();
+                        }
+                        if (endTimeScrollToggle == true) {
+                          _endTimeScrollOff();
+                        }
+                      },
+                      child: Text(
+                        _timeToString(
+                          hour: selectedStartHour,
+                          minute: selectedStartMinute,
+                        ),
+                      ),
+                    )
+                  ],
+                  if (startTimeScrollToggle == true) ...[
+                    TextButton(
+                      onPressed: () {
+                        _startTimeScrollOff();
+                      },
+                      child: const Text("..."),
+                    )
+                  ],
+                ],
+              ],
+            ),
+            if (startDateScrollToggle == true) ...[
               // Date Scroll
               DateScrollView(
                 day: _eventStartDay,
                 month: _eventStartMonth,
                 year: _eventStartYear,
               ),
-
+            ],
+            if (startTimeScrollToggle == true) ...[
               // Time Scroll
               TimeScrollView(
                 hour: _eventStartHour,
                 minute: _eventStartMinute,
+              ),
+            ],
+
+            // END
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("End"),
+
+                // Date
+                if (endDateScrollToggle == false) ...[
+                  TextButton(
+                    onPressed: () {
+                      _endDateScrollOn();
+                      if (startDateScrollToggle == true) {
+                        _startDateScrollOff();
+                      }
+                      if (startTimeScrollToggle == true) {
+                        _startTimeScrollOff();
+                      }
+                      if (endTimeScrollToggle == true) {
+                        _endTimeScrollOff();
+                      }
+                    },
+                    child: Text(
+                      _dateToString(
+                        month: selectedEndMonth,
+                        day: selectedEndDay,
+                        year: selectedEndYear,
+                      ),
+                    ),
+                  )
+                ],
+                if (endDateScrollToggle == true) ...[
+                  TextButton(
+                    onPressed: () {
+                      _endDateScrollOff();
+                    },
+                    child: const Text("..."),
+                  )
+                ],
+
+                // Time
+                if (allDay == false) ...[
+                  if (endTimeScrollToggle == false) ...[
+                    TextButton(
+                      onPressed: () {
+                        _endTimeScrollOn();
+                        if (startDateScrollToggle == true) {
+                          _startDateScrollOff();
+                        }
+                        if (startTimeScrollToggle == true) {
+                          _startTimeScrollOff();
+                        }
+                        if (endDateScrollToggle == true) {
+                          _endDateScrollOff();
+                        }
+                      },
+                      child: Text(
+                        _timeToString(
+                          hour: selectedEndHour,
+                          minute: selectedEndMinute,
+                        ),
+                      ),
+                    )
+                  ],
+                  if (endTimeScrollToggle == true) ...[
+                    TextButton(
+                      onPressed: () {
+                        _endTimeScrollOff();
+                      },
+                      child: const Text("..."),
+                    )
+                  ],
+                ],
+              ],
+            ),
+            if (endDateScrollToggle == true) ...[
+              // Date Scroll
+              DateScrollView(
+                day: _eventEndDay,
+                month: _eventEndMonth,
+                year: _eventEndYear,
+              ),
+            ],
+            if (endTimeScrollToggle == true) ...[
+              // Time Scroll
+              TimeScrollView(
+                hour: _eventEndHour,
+                minute: _eventEndMinute,
               ),
             ],
 
@@ -287,5 +459,173 @@ class _CreateEventViewState extends State<CreateEventView> {
         ),
       ),
     );
+  }
+
+  void _startDateScrollOn() {
+    setState(() {
+      _eventStartDay = FixedExtentScrollController(
+        initialItem: selectedStartDay,
+      );
+      _eventStartMonth = FixedExtentScrollController(
+        initialItem: selectedStartMonth,
+      );
+      _eventStartYear = FixedExtentScrollController(
+        initialItem: selectedStartYear % DateTime.now().year,
+      );
+    });
+    setState(() {
+      startDateScrollToggle = true;
+    });
+  }
+
+  void _startDateScrollOff() {
+    setState(() {
+      selectedStartDay = _eventStartDay.selectedItem;
+      selectedStartMonth = _eventStartMonth.selectedItem % 12;
+      selectedStartYear = DateTime.now().year + _eventStartYear.selectedItem;
+
+      if (selectedStartMonth == 1) {
+        if ((selectedStartYear % 4 == 0) &&
+            (selectedStartYear % 100 != 0 || selectedStartYear % 400 == 0)) {
+          selectedStartDay %= 29;
+        } else {
+          selectedStartDay %= 28;
+        }
+      } else if (selectedStartMonth.isEven && selectedStartMonth <= 6 ||
+          selectedStartMonth == 7 ||
+          selectedStartMonth == 9 ||
+          selectedStartMonth == 11) {
+        selectedStartDay %= 31;
+      } else {
+        selectedStartDay %= 30;
+      }
+    });
+    setState(() {
+      startDateScrollToggle = false;
+    });
+  }
+
+  void _startTimeScrollOn() {
+    setState(() {
+      _eventStartHour = FixedExtentScrollController(
+        initialItem: selectedStartHour,
+      );
+      _eventStartMinute = FixedExtentScrollController(
+        initialItem: selectedStartMinute,
+      );
+    });
+    setState(() {
+      startTimeScrollToggle = true;
+    });
+  }
+
+  void _startTimeScrollOff() {
+    setState(() {
+      selectedStartHour = _eventStartHour.selectedItem % 25;
+      selectedStartMinute = _eventStartMinute.selectedItem % 60;
+    });
+    setState(() {
+      startTimeScrollToggle = false;
+    });
+  }
+
+  void _endDateScrollOn() {
+    setState(() {
+      _eventEndDay = FixedExtentScrollController(
+        initialItem: selectedEndDay,
+      );
+      _eventEndMonth = FixedExtentScrollController(
+        initialItem: selectedEndMonth,
+      );
+      _eventEndYear = FixedExtentScrollController(
+        initialItem: selectedEndYear % DateTime.now().year,
+      );
+    });
+    setState(() {
+      endDateScrollToggle = true;
+    });
+  }
+
+  void _endDateScrollOff() {
+    setState(() {
+      endDateScrollToggle = false;
+    });
+    setState(() {
+      selectedEndDay = _eventEndDay.selectedItem;
+      selectedEndMonth = _eventEndMonth.selectedItem % 12;
+      selectedEndYear = DateTime.now().year + _eventEndYear.selectedItem;
+
+      if (selectedEndMonth == 1) {
+        if ((selectedEndYear % 4 == 0) &&
+            (selectedEndYear % 100 != 0 || selectedEndYear % 400 == 0)) {
+          selectedEndDay %= 29;
+        } else {
+          selectedEndDay %= 28;
+        }
+      } else if (selectedEndMonth.isEven && selectedEndMonth <= 6 ||
+          selectedEndMonth == 7 ||
+          selectedEndMonth == 9 ||
+          selectedEndMonth == 11) {
+        selectedEndDay %= 31;
+      } else {
+        selectedEndDay %= 30;
+      }
+    });
+  }
+
+  void _endTimeScrollOn() {
+    setState(() {
+      _eventEndHour = FixedExtentScrollController(
+        initialItem: selectedEndHour,
+      );
+      _eventEndMinute = FixedExtentScrollController(
+        initialItem: selectedEndMinute,
+      );
+    });
+    setState(() {
+      endTimeScrollToggle = true;
+    });
+  }
+
+  void _endTimeScrollOff() {
+    setState(() {
+      selectedEndHour = _eventEndHour.selectedItem % 25;
+      selectedEndMinute = _eventEndMinute.selectedItem % 60;
+    });
+    setState(() {
+      endTimeScrollToggle = false;
+    });
+  }
+
+  String _dateToString({
+    required int month,
+    required int day,
+    required int year,
+  }) {
+    List<String> months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    String monthName = months.elementAt(month);
+    int selectedDay = day + 1;
+    return "$monthName $selectedDay, $year";
+  }
+
+  String _timeToString({required int hour, required int minute}) {
+    String hourString = hour.toString();
+    String minuteString = minute.toString();
+    if (hour < 10) hourString = "0$hour";
+    if (minute < 10) minuteString = "0$minute";
+    return "$hourString:$minuteString";
   }
 }

@@ -17,6 +17,16 @@ class TimeScrollView extends StatefulWidget {
 }
 
 class _TimeScrollViewState extends State<TimeScrollView> {
+  late int selectedHour;
+  late int selectedMinute;
+
+  @override
+  void initState() {
+    selectedHour = widget.hour.initialItem;
+    selectedMinute = widget.minute.initialItem;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -28,13 +38,24 @@ class _TimeScrollViewState extends State<TimeScrollView> {
           width: 100,
           child: ListWheelScrollView.useDelegate(
             controller: widget.hour,
+            onSelectedItemChanged: (value) => setState(() {
+              selectedHour = value;
+            }),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildLoopingListDelegate(
               children: List<Widget>.generate(
                 25,
-                (index) => HourView(hours: index),
+                (index) {
+                  if (selectedHour == index) {
+                    return HourView(
+                      hours: index,
+                      color: Colors.black,
+                    );
+                  }
+                  return HourView(hours: index);
+                },
               ),
             ),
           ),
@@ -56,13 +77,24 @@ class _TimeScrollViewState extends State<TimeScrollView> {
           width: 100,
           child: ListWheelScrollView.useDelegate(
             controller: widget.minute,
+            onSelectedItemChanged: (value) => setState(() {
+              selectedMinute = value;
+            }),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildLoopingListDelegate(
               children: List<Widget>.generate(
                 60,
-                (index) => MinuteView(minutes: index),
+                (index) {
+                  if (selectedMinute == index) {
+                    return MinuteView(
+                      minutes: index,
+                      color: Colors.black,
+                    );
+                  }
+                  return MinuteView(minutes: index);
+                },
               ),
             ),
           ),

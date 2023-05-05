@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:urtask/views/date/day_view.dart';
 import 'package:urtask/views/date/month_view.dart';
 import 'package:urtask/views/date/year_view.dart';
-import 'package:urtask/views/time/hours_view.dart';
-import 'package:urtask/views/time/mintues_view.dart';
 
 class DateScrollView extends StatefulWidget {
   final FixedExtentScrollController day;
@@ -22,15 +20,37 @@ class DateScrollView extends StatefulWidget {
 }
 
 class _DateScrollViewState extends State<DateScrollView> {
-  int selectedMonth = DateTime.now().month - 1;
-  int selectedDay = DateTime.now().day - 1;
-  int dayCount = 31;
-  int selectedYear = 0;
+  late int selectedMonth;
+  late int selectedDay;
+  late int selectedYear;
+  late int dayCount;
+  late bool isLeapYear;
+  int currentYear = DateTime.now().year;
+
+  @override
+  void initState() {
+    selectedMonth = widget.month.initialItem;
+    selectedDay = widget.day.initialItem;
+    selectedYear = widget.year.initialItem;
+    currentYear += selectedYear;
+    isLeapYear = (currentYear % 4 == 0) &&
+        (currentYear % 100 != 0 || currentYear % 400 == 0);
+    if (selectedMonth == 1) {
+      dayCount = isLeapYear ? 29 : 28;
+    } else {
+      dayCount = selectedMonth.isEven && selectedMonth <= 6 ||
+              selectedMonth == 7 ||
+              selectedMonth == 9 ||
+              selectedMonth == 11
+          ? 31
+          : 30;
+    }
+    currentYear -= selectedYear;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    dayCount = selectedMonth.isEven ? 31 : 30;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -43,12 +63,21 @@ class _DateScrollViewState extends State<DateScrollView> {
             onSelectedItemChanged: (value) {
               setState(() {
                 selectedMonth = value;
-                if (selectedMonth.isEven) {
+                if (selectedMonth == 1) {
+                  dayCount = isLeapYear ? 29 : 28;
+                  if (selectedDay >= 29) widget.day.jumpToItem(dayCount - 1);
+                  if (selectedDay == 28 && dayCount == 29) {
+                    widget.day.jumpToItem(28);
+                  }
+                } else if (selectedMonth.isEven && selectedMonth <= 6 ||
+                    selectedMonth == 7 ||
+                    selectedMonth == 9 ||
+                    selectedMonth == 11) {
                   widget.day.jumpToItem(selectedDay);
                   dayCount = 31;
                 } else {
-                  if (selectedDay % 30 == 0) {
-                    widget.day.jumpToItem(0);
+                  if (selectedDay % 30 == 0 && selectedDay != 0) {
+                    widget.day.jumpToItem(29);
                   } else {
                     widget.day.jumpToItem(selectedDay);
                   }
@@ -116,6 +145,18 @@ class _DateScrollViewState extends State<DateScrollView> {
             onSelectedItemChanged: (value) {
               setState(() {
                 selectedYear = value;
+                currentYear += selectedYear;
+                isLeapYear = (currentYear % 4 == 0) &&
+                    (currentYear % 100 != 0 || currentYear % 400 == 0);
+                if (selectedMonth == 1) {
+                  dayCount = isLeapYear ? 29 : 28;
+                  if (selectedDay == 28) {
+                    widget.day.jumpToItem(dayCount - 1);
+                  } else {
+                    widget.day.jumpToItem(selectedDay);
+                  }
+                }
+                currentYear -= selectedYear;
               });
             },
             itemExtent: 30,
