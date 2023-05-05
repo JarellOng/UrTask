@@ -20,19 +20,23 @@ class DateScrollView extends StatefulWidget {
 }
 
 class _DateScrollViewState extends State<DateScrollView> {
-  int selectedMonth = DateTime.now().month - 1;
-  int selectedDay = DateTime.now().day - 1;
-  int dayCount = 31;
-  int selectedYear = 0;
-  int currentYear = DateTime.now().year;
+  late int selectedMonth;
+  late int selectedDay;
+  late int selectedYear;
+  late int dayCount;
   late bool isLeapYear;
+  int currentYear = DateTime.now().year;
 
   @override
   void initState() {
+    selectedMonth = widget.month.initialItem;
+    selectedDay = widget.day.initialItem;
+    selectedYear = widget.year.initialItem;
+    currentYear += selectedYear;
     isLeapYear = (currentYear % 4 == 0) &&
         (currentYear % 100 != 0 || currentYear % 400 == 0);
     if (selectedMonth == 1) {
-      dayCount = isLeapYear && selectedMonth == 1 ? 29 : 28;
+      dayCount = isLeapYear ? 29 : 28;
     } else {
       dayCount = selectedMonth.isEven && selectedMonth <= 6 ||
               selectedMonth == 7 ||
@@ -41,6 +45,7 @@ class _DateScrollViewState extends State<DateScrollView> {
           ? 31
           : 30;
     }
+    currentYear -= selectedYear;
     super.initState();
   }
 

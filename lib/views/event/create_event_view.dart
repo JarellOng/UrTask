@@ -34,70 +34,15 @@ class _CreateEventViewState extends State<CreateEventView> {
   bool allDay = false;
 
   // Start
-  late final FixedExtentScrollController _eventStartDay;
-  late final FixedExtentScrollController _eventStartMonth;
-  late final FixedExtentScrollController _eventStartYear;
-  late final FixedExtentScrollController _eventStartHour;
-  late final FixedExtentScrollController _eventStartMinute;
+  late FixedExtentScrollController _eventStartDay;
+  late FixedExtentScrollController _eventStartMonth;
+  late FixedExtentScrollController _eventStartYear;
+  late FixedExtentScrollController _eventStartHour;
+  late FixedExtentScrollController _eventStartMinute;
   int selectedStartDay = DateTime.now().day - 1;
   int selectedStartMonth = DateTime.now().month - 1;
   int selectedStartYear = DateTime.now().year;
   bool startDateScrollToggle = false;
-  void _startDateScrollOn() {
-    setState(() {
-      setState(() {
-        startDateScrollToggle = true;
-      });
-      setState(() {
-        selectedStartDay = _eventStartDay.selectedItem;
-        selectedStartMonth = _eventStartMonth.selectedItem % 12;
-        selectedStartYear = DateTime.now().year + _eventStartYear.selectedItem;
-
-        if (selectedStartMonth == 1) {
-          if ((selectedStartYear % 4 == 0) &&
-              (selectedStartYear % 100 != 0 || selectedStartYear % 400 == 0)) {
-            selectedStartDay %= 29;
-          } else {
-            selectedStartDay %= 28;
-          }
-        } else if (selectedStartMonth.isEven && selectedStartMonth <= 6 ||
-            selectedStartMonth == 7 ||
-            selectedStartMonth == 9 ||
-            selectedStartMonth == 11) {
-          selectedStartDay %= 31;
-        } else {
-          selectedStartDay %= 30;
-        }
-      });
-    });
-  }
-
-  void _startDateScrollOff() {
-    setState(() {
-      selectedStartDay = _eventStartDay.selectedItem;
-      selectedStartMonth = _eventStartMonth.selectedItem % 12;
-      selectedStartYear = DateTime.now().year + _eventStartYear.selectedItem;
-
-      if (selectedStartMonth == 1) {
-        if ((selectedStartYear % 4 == 0) &&
-            (selectedStartYear % 100 != 0 || selectedStartYear % 400 == 0)) {
-          selectedStartDay %= 29;
-        } else {
-          selectedStartDay %= 28;
-        }
-      } else if (selectedStartMonth.isEven && selectedStartMonth <= 6 ||
-          selectedStartMonth == 7 ||
-          selectedStartMonth == 9 ||
-          selectedStartMonth == 11) {
-        selectedStartDay %= 31;
-      } else {
-        selectedStartDay %= 30;
-      }
-    });
-    setState(() {
-      startDateScrollToggle = false;
-    });
-  }
 
   // Important
   bool important = false;
@@ -122,13 +67,6 @@ class _CreateEventViewState extends State<CreateEventView> {
     _eventService = EventController();
     _eventTitle = TextEditingController();
     _eventDescription = TextEditingController();
-    _eventStartDay = FixedExtentScrollController(
-      initialItem: DateTime.now().day - 1,
-    );
-    _eventStartMonth = FixedExtentScrollController(
-      initialItem: DateTime.now().month - 1,
-    );
-    _eventStartYear = FixedExtentScrollController();
     _eventStartHour = FixedExtentScrollController(
       initialItem: DateTime.now().hour + 1,
     );
@@ -376,6 +314,52 @@ class _CreateEventViewState extends State<CreateEventView> {
       ),
     );
   }
+
+  void _startDateScrollOn() {
+    setState(() {
+      setState(() {
+        _eventStartDay = FixedExtentScrollController(
+          initialItem: selectedStartDay,
+        );
+        _eventStartMonth = FixedExtentScrollController(
+          initialItem: selectedStartMonth,
+        );
+        _eventStartYear = FixedExtentScrollController(
+          initialItem: selectedStartYear % DateTime.now().year,
+        );
+      });
+      setState(() {
+        startDateScrollToggle = true;
+      });
+    });
+  }
+
+  void _startDateScrollOff() {
+    setState(() {
+      selectedStartDay = _eventStartDay.selectedItem;
+      selectedStartMonth = _eventStartMonth.selectedItem % 12;
+      selectedStartYear = DateTime.now().year + _eventStartYear.selectedItem;
+
+      if (selectedStartMonth == 1) {
+        if ((selectedStartYear % 4 == 0) &&
+            (selectedStartYear % 100 != 0 || selectedStartYear % 400 == 0)) {
+          selectedStartDay %= 29;
+        } else {
+          selectedStartDay %= 28;
+        }
+      } else if (selectedStartMonth.isEven && selectedStartMonth <= 6 ||
+          selectedStartMonth == 7 ||
+          selectedStartMonth == 9 ||
+          selectedStartMonth == 11) {
+        selectedStartDay %= 31;
+      } else {
+        selectedStartDay %= 30;
+      }
+    });
+    setState(() {
+      startDateScrollToggle = false;
+    });
+  }
 }
 
 String _dateToString({
@@ -399,5 +383,5 @@ String _dateToString({
   ];
   String monthName = months.elementAt(month);
   int selectedDay = day + 1;
-  return "$monthName $selectedDay, $year";
+  return "$monthName $selectedDay, $year | 17:00";
 }
