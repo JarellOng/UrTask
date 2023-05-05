@@ -42,7 +42,10 @@ class _CreateEventViewState extends State<CreateEventView> {
   int selectedStartDay = DateTime.now().day - 1;
   int selectedStartMonth = DateTime.now().month - 1;
   int selectedStartYear = DateTime.now().year;
+  int selectedStartHour = DateTime.now().hour + 1;
+  int selectedStartMinute = 0;
   bool startDateScrollToggle = false;
+  bool startTimeScrollToggle = false;
 
   // Important
   bool important = false;
@@ -67,10 +70,6 @@ class _CreateEventViewState extends State<CreateEventView> {
     _eventService = EventController();
     _eventTitle = TextEditingController();
     _eventDescription = TextEditingController();
-    _eventStartHour = FixedExtentScrollController(
-      initialItem: DateTime.now().hour + 1,
-    );
-    _eventStartMinute = FixedExtentScrollController();
     _categoryService = CategoryController();
     _colorService = ColorController();
     super.initState();
@@ -122,6 +121,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                     onChanged: (value) {
                       setState(() {
                         allDay = value;
+                        _startTimeScrollOff();
                       });
                     },
                     // activeTrackColor: primary,
@@ -136,10 +136,13 @@ class _CreateEventViewState extends State<CreateEventView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Start"),
+
+                // Date
                 if (startDateScrollToggle == false) ...[
                   TextButton(
                     onPressed: () {
                       _startDateScrollOn();
+                      _startTimeScrollOff();
                     },
                     child: Text(
                       _dateToString(
@@ -158,6 +161,32 @@ class _CreateEventViewState extends State<CreateEventView> {
                     child: const Text("..."),
                   )
                 ],
+
+                // Time
+                if (allDay == false) ...[
+                  if (startTimeScrollToggle == false) ...[
+                    TextButton(
+                      onPressed: () {
+                        _startTimeScrollOn();
+                        _startDateScrollOff();
+                      },
+                      child: Text(
+                        _timeToString(
+                          hour: selectedStartHour,
+                          minute: selectedStartMinute,
+                        ),
+                      ),
+                    )
+                  ],
+                  if (startTimeScrollToggle == true) ...[
+                    TextButton(
+                      onPressed: () {
+                        _startTimeScrollOff();
+                      },
+                      child: const Text("..."),
+                    )
+                  ],
+                ],
               ],
             ),
             if (startDateScrollToggle == true) ...[
@@ -168,7 +197,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 year: _eventStartYear,
               ),
             ],
-            if (allDay == false) ...[
+            if (allDay == false && startTimeScrollToggle == true) ...[
               // Time Scroll
               TimeScrollView(
                 hour: _eventStartHour,
@@ -360,28 +389,60 @@ class _CreateEventViewState extends State<CreateEventView> {
       startDateScrollToggle = false;
     });
   }
-}
 
-String _dateToString({
-  required int month,
-  required int day,
-  required int year,
-}) {
-  List<String> months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  String monthName = months.elementAt(month);
-  int selectedDay = day + 1;
-  return "$monthName $selectedDay, $year | 17:00";
+  void _startTimeScrollOn() {
+    setState(() {
+      _eventStartHour = FixedExtentScrollController(
+        initialItem: selectedStartHour,
+      );
+      _eventStartMinute = FixedExtentScrollController(
+        initialItem: selectedStartMinute,
+      );
+    });
+    setState(() {
+      startTimeScrollToggle = true;
+    });
+  }
+
+  void _startTimeScrollOff() {
+    setState(() {
+      startTimeScrollToggle = false;
+    });
+    setState(() {
+      selectedStartHour = _eventStartHour.selectedItem % 25;
+      selectedStartMinute = _eventStartMinute.selectedItem % 60;
+    });
+  }
+
+  String _dateToString({
+    required int month,
+    required int day,
+    required int year,
+  }) {
+    List<String> months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    String monthName = months.elementAt(month);
+    int selectedDay = day + 1;
+    return "$monthName $selectedDay, $year";
+  }
+
+  String _timeToString({required int hour, required int minute}) {
+    String hourString = hour.toString();
+    String minuteString = minute.toString();
+    if (hour < 10) hourString = "0$hour";
+    if (minute < 10) minuteString = "0$minute";
+    return "$hourString:$minuteString";
+  }
 }
