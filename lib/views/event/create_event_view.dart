@@ -39,7 +39,65 @@ class _CreateEventViewState extends State<CreateEventView> {
   late final FixedExtentScrollController _eventStartYear;
   late final FixedExtentScrollController _eventStartHour;
   late final FixedExtentScrollController _eventStartMinute;
-  int selectedStartDay = DateTime.now().day;
+  int selectedStartDay = DateTime.now().day - 1;
+  int selectedStartMonth = DateTime.now().month - 1;
+  int selectedStartYear = DateTime.now().year;
+  bool startDateScrollToggle = false;
+  void _startDateScrollOn() {
+    setState(() {
+      setState(() {
+        startDateScrollToggle = true;
+      });
+      setState(() {
+        selectedStartDay = _eventStartDay.selectedItem;
+        selectedStartMonth = _eventStartMonth.selectedItem % 12;
+        selectedStartYear = DateTime.now().year + _eventStartYear.selectedItem;
+
+        if (selectedStartMonth == 1) {
+          if ((selectedStartYear % 4 == 0) &&
+              (selectedStartYear % 100 != 0 || selectedStartYear % 400 == 0)) {
+            selectedStartDay %= 29;
+          } else {
+            selectedStartDay %= 28;
+          }
+        } else if (selectedStartMonth.isEven && selectedStartMonth <= 6 ||
+            selectedStartMonth == 7 ||
+            selectedStartMonth == 9 ||
+            selectedStartMonth == 11) {
+          selectedStartDay %= 31;
+        } else {
+          selectedStartDay %= 30;
+        }
+      });
+    });
+  }
+
+  void _startDateScrollOff() {
+    setState(() {
+      selectedStartDay = _eventStartDay.selectedItem;
+      selectedStartMonth = _eventStartMonth.selectedItem % 12;
+      selectedStartYear = DateTime.now().year + _eventStartYear.selectedItem;
+
+      if (selectedStartMonth == 1) {
+        if ((selectedStartYear % 4 == 0) &&
+            (selectedStartYear % 100 != 0 || selectedStartYear % 400 == 0)) {
+          selectedStartDay %= 29;
+        } else {
+          selectedStartDay %= 28;
+        }
+      } else if (selectedStartMonth.isEven && selectedStartMonth <= 6 ||
+          selectedStartMonth == 7 ||
+          selectedStartMonth == 9 ||
+          selectedStartMonth == 11) {
+        selectedStartDay %= 31;
+      } else {
+        selectedStartDay %= 30;
+      }
+    });
+    setState(() {
+      startDateScrollToggle = false;
+    });
+  }
 
   // Important
   bool important = false;
@@ -140,39 +198,53 @@ class _CreateEventViewState extends State<CreateEventView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Start"),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      selectedStartDay = _eventStartDay.selectedItem;
-                    });
-                  },
-                  child: Text(selectedStartDay.toString()),
-                )
+                if (startDateScrollToggle == false) ...[
+                  TextButton(
+                    onPressed: () {
+                      _startDateScrollOn();
+                    },
+                    child: Text(
+                      _dateToString(
+                        month: selectedStartMonth,
+                        day: selectedStartDay,
+                        year: selectedStartYear,
+                      ),
+                    ),
+                  )
+                ],
+                if (startDateScrollToggle == true) ...[
+                  TextButton(
+                    onPressed: () {
+                      _startDateScrollOff();
+                    },
+                    child: const Text("..."),
+                  )
+                ],
               ],
             ),
-
-            if (allDay == false) ...[
-              // END
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("End"),
-                ],
-              ),
-
+            if (startDateScrollToggle == true) ...[
               // Date Scroll
               DateScrollView(
                 day: _eventStartDay,
                 month: _eventStartMonth,
                 year: _eventStartYear,
               ),
-
+            ],
+            if (allDay == false) ...[
               // Time Scroll
               TimeScrollView(
                 hour: _eventStartHour,
                 minute: _eventStartMinute,
               ),
             ],
+
+            // END
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text("End"),
+              ],
+            ),
 
             // Important
             Row(
@@ -304,4 +376,28 @@ class _CreateEventViewState extends State<CreateEventView> {
       ),
     );
   }
+}
+
+String _dateToString({
+  required int month,
+  required int day,
+  required int year,
+}) {
+  List<String> months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  String monthName = months.elementAt(month);
+  int selectedDay = day + 1;
+  return "$monthName $selectedDay, $year";
 }

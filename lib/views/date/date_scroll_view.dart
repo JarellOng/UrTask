@@ -34,7 +34,12 @@ class _DateScrollViewState extends State<DateScrollView> {
     if (selectedMonth == 1) {
       dayCount = isLeapYear && selectedMonth == 1 ? 29 : 28;
     } else {
-      dayCount = selectedMonth.isEven ? 31 : 30;
+      dayCount = selectedMonth.isEven && selectedMonth <= 6 ||
+              selectedMonth == 7 ||
+              selectedMonth == 9 ||
+              selectedMonth == 11
+          ? 31
+          : 30;
     }
     super.initState();
   }
@@ -59,7 +64,10 @@ class _DateScrollViewState extends State<DateScrollView> {
                   if (selectedDay == 28 && dayCount == 29) {
                     widget.day.jumpToItem(28);
                   }
-                } else if (selectedMonth.isEven) {
+                } else if (selectedMonth.isEven && selectedMonth <= 6 ||
+                    selectedMonth == 7 ||
+                    selectedMonth == 9 ||
+                    selectedMonth == 11) {
                   widget.day.jumpToItem(selectedDay);
                   dayCount = 31;
                 } else {
