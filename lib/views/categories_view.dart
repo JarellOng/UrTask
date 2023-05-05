@@ -27,9 +27,9 @@ class _CategoryViewState extends State<CategoryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Categories"),
+        title: const Text("Event Categories", style: TextStyle(color: Colors.white)),
       ),
-      backgroundColor: const Color.fromARGB(31, 133, 133, 133),
+      //backgroundColor: const Color.fromARGB(31, 133, 133, 133),
       body: StreamBuilder(
         stream: _categoryService.getAll(userId: "default"),
         builder: (context, snapshot) {
@@ -39,6 +39,9 @@ class _CategoryViewState extends State<CategoryView> {
               if (snapshot.hasData) {
                 final categories = snapshot.data as Iterable<Categories>;
                 return ListView.builder(
+                  padding: const EdgeInsets.only(
+            top: 4, right: 12, left: 12
+          ),
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories.elementAt(index);
@@ -50,12 +53,17 @@ class _CategoryViewState extends State<CategoryView> {
                             if (snapshot.hasData) {
                               final color = snapshot.data as color_model.Colors;
                               return ListTile(
+                                leading: Icon(
+                                  Icons.circle,
+                                  color: HexColor.fromHex(color.hex),
+                                ),
                                 title: Text(
                                   category.name,
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 20),
                                 ),
-                                textColor: HexColor.fromHex(color.hex),
+                                shape: Border(bottom: BorderSide(color: Colors.black26))
                               );
                             } else {
                               return const CircularProgressIndicator();
@@ -68,12 +76,17 @@ class _CategoryViewState extends State<CategoryView> {
                   },
                 );
               } else {
-                return const CircularProgressIndicator();
+                return Column();
               }
             default:
-              return const CircularProgressIndicator();
+              return Column();
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: null,
+        tooltip: 'Increment',
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }

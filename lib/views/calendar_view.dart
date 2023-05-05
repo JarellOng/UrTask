@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:urtask/color.dart';
 import 'package:intl/intl.dart';
+import 'package:urtask/views/event_view.dart';
 
 class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;
@@ -72,91 +73,7 @@ class _CalendarViewState extends State<CalendarView> {
               child: Text(DateFormat('yMMMMd').format(selectedDay),
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600))),
         ),
-        ListView(
-          shrinkWrap: true,
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.only(left: 12.0, bottom: 8.0, right: 12.0),
-              child: ListTile(
-                leading: Transform.translate(
-                    offset: Offset(-8, -6),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: Column(children: [
-                            Text("17.00",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w600)),
-                            Text("19.00",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black45))
-                          ]),
-                        ),
-                        VerticalDivider(color: Colors.black45),
-                      ],
-                    )),
-                title: Text("Vincent's Birthday",
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                subtitle: Align(
-                  alignment: Alignment.topLeft,
-                  child: Chip(
-                    backgroundColor: Colors.orange,
-                    label: const Text('Birthday',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-                horizontalTitleGap: -2,
-                trailing:
-                    Icon(Icons.error_outlined, size: 32, color: Colors.red),
-                shape: Border(bottom: BorderSide(color: Colors.black26)),
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(left: 12.0, bottom: 8.0, right: 12.0),
-              child: ListTile(
-                leading: Transform.translate(
-                    offset: Offset(-8, -6),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: Column(children: [
-                            Text("All",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w600)),
-                            Text("Day",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black45))
-                          ]),
-                        ),
-                        VerticalDivider(color: Colors.black45),
-                      ],
-                    )),
-                title: Text("James Kumala's Favorite day",
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                subtitle: Align(
-                  alignment: Alignment.topLeft,
-                  child: Chip(
-                    backgroundColor: Colors.purple,
-                    label: const Text('Special Events',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-                horizontalTitleGap: -2,
-                shape: Border(bottom: BorderSide(color: Colors.black26)),
-              ),
-            ),
-          ],
-        )
+        EventView(selectedDay: focusedDay)
       ],
     );
   }
