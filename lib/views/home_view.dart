@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:urtask/services/auth/bloc/auth_bloc.dart';
+import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/views/calendar_view.dart';
@@ -45,15 +48,23 @@ class _HomeViewState extends State<HomeView> {
             child: Icon(Icons.event_available, size: 32, color: Colors.white),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: IconButton(
-              icon: Icon(Icons.account_circle, size: 32, color: Colors.white),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              ),
+              icon: const Icon(Icons.account_circle,
+                  size: 32, color: Colors.white),
+              onPressed: () async {
+                final isLogout = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
+                if (isLogout == true) {
+                  if (mounted) {
+                    context.read<AuthBloc>().add(const AuthEventLogOut());
+                  }
+                }
+              },
             ),
           ),
         ],
