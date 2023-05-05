@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/views/calendar_view.dart';
+import 'package:urtask/views/profile_view.dart';
 import 'package:urtask/views/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
 
@@ -45,7 +46,15 @@ class _HomeViewState extends State<HomeView> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.account_circle, size: 32, color: Colors.white),
+            child: IconButton(
+              icon: Icon(Icons.account_circle, size: 32, color: Colors.white),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfilePage(),
+                ),
+              ),
+            ),
           ),
         ],
       ),
