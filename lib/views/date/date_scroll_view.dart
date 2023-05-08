@@ -164,7 +164,7 @@ class _DateScrollViewState extends State<DateScrollView> {
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildListDelegate(
               children: List<Widget>.generate(
-                11,
+                111,
                 (index) {
                   if (selectedYear == index) {
                     return YearView(
