@@ -109,9 +109,6 @@ class _CreateEventViewState extends State<CreateEventView> {
   void dispose() {
     _eventTitle.dispose();
     _eventDescription.dispose();
-    _eventStartDay.dispose();
-    _eventStartMonth.dispose();
-    _eventStartYear.dispose();
     super.dispose();
   }
 
