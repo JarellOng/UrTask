@@ -39,6 +39,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   late FixedExtentScrollController _eventStartYear;
   late FixedExtentScrollController _eventStartHour;
   late FixedExtentScrollController _eventStartMinute;
+  late DateTime selectedStartDateTime;
   int selectedStartDay = DateTime.now().day - 1;
   int selectedStartMonth = DateTime.now().month - 1;
   int selectedStartYear = DateTime.now().year;
@@ -53,6 +54,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   late FixedExtentScrollController _eventEndYear;
   late FixedExtentScrollController _eventEndHour;
   late FixedExtentScrollController _eventEndMinute;
+  late DateTime selectedEndDateTime;
   int selectedEndDay = DateTime.now().day - 1;
   int selectedEndMonth = DateTime.now().month - 1;
   int selectedEndYear = DateTime.now().year;
@@ -72,6 +74,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   // Repeat
   RepeatType selectedRepeatType = RepeatType.noRepeat;
   RepeatDuration selectedRepeatDuration = RepeatDuration.specificNumber;
+  int selectedRepeatTypeAmount = 0;
+  int? selectedRepeatDurationAmount;
+  DateTime? selectedRepeatDurationDate;
 
   // Notification
   bool notificationFlag = true;
@@ -86,6 +91,20 @@ class _CreateEventViewState extends State<CreateEventView> {
     _eventDescription = TextEditingController();
     _categoryService = CategoryController();
     _colorService = ColorController();
+    selectedStartDateTime = DateTime(
+      selectedStartYear,
+      selectedStartMonth + 1,
+      selectedStartDay + 1,
+      selectedStartHour,
+      selectedStartMinute,
+    );
+    selectedEndDateTime = DateTime(
+      selectedEndYear,
+      selectedEndMonth + 1,
+      selectedEndDay + 1,
+      selectedEndHour,
+      selectedEndMinute,
+    );
     super.initState();
   }
 
@@ -93,9 +112,6 @@ class _CreateEventViewState extends State<CreateEventView> {
   void dispose() {
     _eventTitle.dispose();
     _eventDescription.dispose();
-    _eventStartDay.dispose();
-    _eventStartMonth.dispose();
-    _eventStartYear.dispose();
     super.dispose();
   }
 
@@ -159,7 +175,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                 if (startDateScrollToggle == false) ...[
                   TextButton(
                     onPressed: () {
-                      _startDateScrollOn();
                       if (startTimeScrollToggle == true) {
                         _startTimeScrollOff();
                       }
@@ -169,15 +184,16 @@ class _CreateEventViewState extends State<CreateEventView> {
                       if (endTimeScrollToggle == true) {
                         _endTimeScrollOff();
                       }
+                      _startDateScrollOn();
                     },
                     child: Text(
                       _dateToString(
-                        month: selectedStartMonth,
-                        day: selectedStartDay,
-                        year: selectedStartYear,
+                        month: selectedStartDateTime.month - 1,
+                        day: selectedStartDateTime.day - 1,
+                        year: selectedStartDateTime.year,
                       ),
                     ),
-                  )
+                  ),
                 ],
                 if (startDateScrollToggle == true) ...[
                   TextButton(
@@ -185,7 +201,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                       _startDateScrollOff();
                     },
                     child: const Text("..."),
-                  )
+                  ),
                 ],
 
                 // Time
@@ -193,7 +209,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                   if (startTimeScrollToggle == false) ...[
                     TextButton(
                       onPressed: () {
-                        _startTimeScrollOn();
                         if (startDateScrollToggle == true) {
                           _startDateScrollOff();
                         }
@@ -203,14 +218,15 @@ class _CreateEventViewState extends State<CreateEventView> {
                         if (endTimeScrollToggle == true) {
                           _endTimeScrollOff();
                         }
+                        _startTimeScrollOn();
                       },
                       child: Text(
                         _timeToString(
-                          hour: selectedStartHour,
-                          minute: selectedStartMinute,
+                          hour: selectedStartDateTime.hour,
+                          minute: selectedStartDateTime.minute,
                         ),
                       ),
-                    )
+                    ),
                   ],
                   if (startTimeScrollToggle == true) ...[
                     TextButton(
@@ -218,7 +234,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                         _startTimeScrollOff();
                       },
                       child: const Text("..."),
-                    )
+                    ),
                   ],
                 ],
               ],
@@ -249,7 +265,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                 if (endDateScrollToggle == false) ...[
                   TextButton(
                     onPressed: () {
-                      _endDateScrollOn();
                       if (startDateScrollToggle == true) {
                         _startDateScrollOff();
                       }
@@ -259,15 +274,16 @@ class _CreateEventViewState extends State<CreateEventView> {
                       if (endTimeScrollToggle == true) {
                         _endTimeScrollOff();
                       }
+                      _endDateScrollOn();
                     },
                     child: Text(
                       _dateToString(
-                        month: selectedEndMonth,
-                        day: selectedEndDay,
-                        year: selectedEndYear,
+                        month: selectedEndDateTime.month - 1,
+                        day: selectedEndDateTime.day - 1,
+                        year: selectedEndDateTime.year,
                       ),
                     ),
-                  )
+                  ),
                 ],
                 if (endDateScrollToggle == true) ...[
                   TextButton(
@@ -275,7 +291,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                       _endDateScrollOff();
                     },
                     child: const Text("..."),
-                  )
+                  ),
                 ],
 
                 // Time
@@ -283,7 +299,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                   if (endTimeScrollToggle == false) ...[
                     TextButton(
                       onPressed: () {
-                        _endTimeScrollOn();
                         if (startDateScrollToggle == true) {
                           _startDateScrollOff();
                         }
@@ -293,14 +308,15 @@ class _CreateEventViewState extends State<CreateEventView> {
                         if (endDateScrollToggle == true) {
                           _endDateScrollOff();
                         }
+                        _endTimeScrollOn();
                       },
                       child: Text(
                         _timeToString(
-                          hour: selectedEndHour,
-                          minute: selectedEndMinute,
+                          hour: selectedEndDateTime.hour,
+                          minute: selectedEndDateTime.minute,
                         ),
                       ),
-                    )
+                    ),
                   ],
                   if (endTimeScrollToggle == true) ...[
                     TextButton(
@@ -308,7 +324,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                         _endTimeScrollOff();
                       },
                       child: const Text("..."),
-                    )
+                    ),
                   ],
                 ],
               ],
@@ -329,7 +345,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
             ],
 
-            // Important
+            // IMPORTANT
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -349,7 +365,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ],
             ),
 
-            // Category
+            // CATEGORY
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -393,12 +409,25 @@ class _CreateEventViewState extends State<CreateEventView> {
                         builder: (context) => RepeatEventView(
                           type: selectedRepeatType,
                           duration: selectedRepeatDuration,
+                          typeAmount: selectedRepeatTypeAmount,
+                          durationAmount: selectedRepeatDurationAmount,
+                          durationDate: selectedRepeatDurationDate,
                         ),
                       ),
                     );
                     setState(() {
                       selectedRepeatType = repeatDetail[0];
                       selectedRepeatDuration = repeatDetail[1];
+                      selectedRepeatTypeAmount = repeatDetail[2];
+                      if (selectedRepeatDuration ==
+                          RepeatDuration.specificNumber) {
+                        selectedRepeatDurationAmount = repeatDetail[3];
+                        selectedRepeatDurationDate = null;
+                      } else if (selectedRepeatDuration ==
+                          RepeatDuration.until) {
+                        selectedRepeatDurationDate = repeatDetail[3];
+                        selectedRepeatDurationAmount = null;
+                      }
                     });
                   },
                   child: const Text("Repeat"),
@@ -501,6 +530,23 @@ class _CreateEventViewState extends State<CreateEventView> {
     });
     setState(() {
       startDateScrollToggle = false;
+      selectedStartDateTime = DateTime(
+        selectedStartYear,
+        selectedStartMonth + 1,
+        selectedStartDay + 1,
+        selectedStartHour,
+        selectedStartMinute,
+      );
+      if (selectedStartDateTime.isAfter(selectedEndDateTime) ||
+          selectedStartDateTime.isAtSameMomentAs(selectedEndDateTime)) {
+        selectedEndDateTime =
+            selectedStartDateTime.add(const Duration(hours: 1));
+        selectedEndDay = selectedEndDateTime.day - 1;
+        selectedEndMonth = selectedEndDateTime.month - 1;
+        selectedEndYear = selectedEndDateTime.year;
+        selectedEndHour = selectedEndDateTime.hour;
+        selectedEndMinute = selectedEndDateTime.minute;
+      }
     });
   }
 
@@ -520,11 +566,28 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   void _startTimeScrollOff() {
     setState(() {
-      selectedStartHour = _eventStartHour.selectedItem % 25;
+      selectedStartHour = _eventStartHour.selectedItem % 24;
       selectedStartMinute = _eventStartMinute.selectedItem % 60;
     });
     setState(() {
       startTimeScrollToggle = false;
+      selectedStartDateTime = DateTime(
+        selectedStartYear,
+        selectedStartMonth + 1,
+        selectedStartDay + 1,
+        selectedStartHour,
+        selectedStartMinute,
+      );
+      if (selectedStartDateTime.isAfter(selectedEndDateTime) ||
+          selectedStartDateTime.isAtSameMomentAs(selectedEndDateTime)) {
+        selectedEndDateTime =
+            selectedStartDateTime.add(const Duration(hours: 1));
+        selectedEndDay = selectedEndDateTime.day - 1;
+        selectedEndMonth = selectedEndDateTime.month - 1;
+        selectedEndYear = selectedEndDateTime.year;
+        selectedEndHour = selectedEndDateTime.hour;
+        selectedEndMinute = selectedEndDateTime.minute;
+      }
     });
   }
 
@@ -547,9 +610,6 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   void _endDateScrollOff() {
     setState(() {
-      endDateScrollToggle = false;
-    });
-    setState(() {
       selectedEndDay = _eventEndDay.selectedItem;
       selectedEndMonth = _eventEndMonth.selectedItem % 12;
       selectedEndYear = DateTime.now().year + _eventEndYear.selectedItem;
@@ -570,6 +630,26 @@ class _CreateEventViewState extends State<CreateEventView> {
         selectedEndDay %= 30;
       }
     });
+    setState(() {
+      endDateScrollToggle = false;
+      selectedEndDateTime = DateTime(
+        selectedEndYear,
+        selectedEndMonth + 1,
+        selectedEndDay + 1,
+        selectedEndHour,
+        selectedEndMinute,
+      );
+      if (selectedEndDateTime.isBefore(selectedStartDateTime) ||
+          selectedEndDateTime.isAtSameMomentAs(selectedStartDateTime)) {
+        selectedStartDateTime =
+            selectedEndDateTime.subtract(const Duration(hours: 1));
+        selectedStartDay = selectedStartDateTime.day - 1;
+        selectedStartMonth = selectedStartDateTime.month - 1;
+        selectedStartYear = selectedStartDateTime.year;
+        selectedStartHour = selectedStartDateTime.hour;
+        selectedStartMinute = selectedStartDateTime.minute;
+      }
+    });
   }
 
   void _endTimeScrollOn() {
@@ -588,11 +668,28 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   void _endTimeScrollOff() {
     setState(() {
-      selectedEndHour = _eventEndHour.selectedItem % 25;
+      selectedEndHour = _eventEndHour.selectedItem % 24;
       selectedEndMinute = _eventEndMinute.selectedItem % 60;
     });
     setState(() {
       endTimeScrollToggle = false;
+      selectedEndDateTime = DateTime(
+        selectedEndYear,
+        selectedEndMonth + 1,
+        selectedEndDay + 1,
+        selectedEndHour,
+        selectedEndMinute,
+      );
+      if (selectedEndDateTime.isBefore(selectedStartDateTime) ||
+          selectedEndDateTime.isAtSameMomentAs(selectedStartDateTime)) {
+        selectedStartDateTime =
+            selectedEndDateTime.subtract(const Duration(hours: 1));
+        selectedStartDay = selectedStartDateTime.day - 1;
+        selectedStartMonth = selectedStartDateTime.month - 1;
+        selectedStartYear = selectedStartDateTime.year;
+        selectedStartHour = selectedStartDateTime.hour;
+        selectedStartMinute = selectedStartDateTime.minute;
+      }
     });
   }
 

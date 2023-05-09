@@ -46,7 +46,7 @@ class _TimeScrollViewState extends State<TimeScrollView> {
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildLoopingListDelegate(
               children: List<Widget>.generate(
-                25,
+                24,
                 (index) {
                   if (selectedHour == index) {
                     return HourView(
