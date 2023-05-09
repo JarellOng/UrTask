@@ -74,6 +74,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   // Repeat
   RepeatType selectedRepeatType = RepeatType.noRepeat;
   RepeatDuration selectedRepeatDuration = RepeatDuration.specificNumber;
+  int selectedRepeatTypeAmount = 0;
+  int? selectedRepeatDurationAmount;
+  DateTime? selectedRepeatDurationDate;
 
   // Notification
   bool notificationFlag = true;
@@ -342,7 +345,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
             ],
 
-            // Important
+            // IMPORTANT
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -362,7 +365,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ],
             ),
 
-            // Category
+            // CATEGORY
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -406,12 +409,25 @@ class _CreateEventViewState extends State<CreateEventView> {
                         builder: (context) => RepeatEventView(
                           type: selectedRepeatType,
                           duration: selectedRepeatDuration,
+                          typeAmount: selectedRepeatTypeAmount,
+                          durationAmount: selectedRepeatDurationAmount,
+                          durationDate: selectedRepeatDurationDate,
                         ),
                       ),
                     );
                     setState(() {
                       selectedRepeatType = repeatDetail[0];
                       selectedRepeatDuration = repeatDetail[1];
+                      selectedRepeatTypeAmount = repeatDetail[2];
+                      if (selectedRepeatDuration ==
+                          RepeatDuration.specificNumber) {
+                        selectedRepeatDurationAmount = repeatDetail[3];
+                        selectedRepeatDurationDate = null;
+                      } else if (selectedRepeatDuration ==
+                          RepeatDuration.until) {
+                        selectedRepeatDurationDate = repeatDetail[3];
+                        selectedRepeatDurationAmount = null;
+                      }
                     });
                   },
                   child: const Text("Repeat"),

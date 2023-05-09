@@ -7,11 +7,17 @@ import 'package:urtask/views/date/date_scroll_view.dart';
 class RepeatEventView extends StatefulWidget {
   final RepeatType type;
   final RepeatDuration duration;
+  final int typeAmount;
+  final int? durationAmount;
+  final DateTime? durationDate;
 
   const RepeatEventView({
     super.key,
     required this.type,
     required this.duration,
+    required this.typeAmount,
+    this.durationAmount,
+    this.durationDate,
   });
 
   @override
@@ -21,6 +27,9 @@ class RepeatEventView extends StatefulWidget {
 class _RepeatEventViewState extends State<RepeatEventView> {
   RepeatType? selectedType;
   RepeatDuration? selectedDuration;
+  late int selectedTypeAmount;
+  late int? selectedDurationAmount;
+  late DateTime? selectedDurationDate;
 
   // Per Day
   late final TextEditingController perDayAmount;
@@ -49,7 +58,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   // Specific Number
   late final TextEditingController specificNumberAmount;
   late final FocusNode specificNumberFocus;
-  bool specificNumberFlag = false;
+  bool specificNumberFlag = true;
   bool specificNumberPlural = false;
 
   // Until
@@ -59,7 +68,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   late FixedExtentScrollController untilHour;
   late FixedExtentScrollController untilMinute;
   late DateTime selectedUntilDateTime;
-  int selectedUntilDay = DateTime.now().day - 1;
+  int selectedUntilDay = DateTime.now().day;
   int selectedUntilMonth = DateTime.now().month - 1;
   int selectedUntilYear = DateTime.now().year;
   bool untilDateScrollToggle = false;
@@ -69,21 +78,63 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   void initState() {
     selectedType = widget.type;
     selectedDuration = widget.duration;
-    perDayAmount = TextEditingController(text: "1");
-    perWeekAmount = TextEditingController(text: "1");
-    perMonthAmount = TextEditingController(text: "1");
-    perYearAmount = TextEditingController(text: "1");
-    specificNumberAmount = TextEditingController(text: "1");
+    selectedTypeAmount = widget.typeAmount;
+    selectedDurationAmount = widget.durationAmount;
+    selectedDurationDate = widget.durationDate;
+    if (selectedType == RepeatType.perDay) {
+      perDayAmount = TextEditingController(text: selectedTypeAmount.toString());
+      perDayFlag = true;
+    } else {
+      perDayAmount = TextEditingController(text: "1");
+    }
+    if (selectedType == RepeatType.perWeek) {
+      perWeekAmount =
+          TextEditingController(text: selectedTypeAmount.toString());
+      perWeekFlag = true;
+    } else {
+      perWeekAmount = TextEditingController(text: "1");
+    }
+    if (selectedType == RepeatType.perMonth) {
+      perMonthAmount =
+          TextEditingController(text: selectedTypeAmount.toString());
+      perMonthFlag = true;
+    } else {
+      perMonthAmount = TextEditingController(text: "1");
+    }
+    if (selectedType == RepeatType.perYear) {
+      perYearAmount =
+          TextEditingController(text: selectedTypeAmount.toString());
+      perYearFlag = true;
+    } else {
+      perYearAmount = TextEditingController(text: "1");
+    }
+    if (selectedDuration == RepeatDuration.specificNumber &&
+        selectedDurationAmount != null) {
+      specificNumberAmount =
+          TextEditingController(text: selectedDurationAmount.toString());
+    } else {
+      specificNumberAmount = TextEditingController(text: "1");
+    }
     perDayFocus = FocusNode();
     perWeekFocus = FocusNode();
     perMonthFocus = FocusNode();
     perYearFocus = FocusNode();
     specificNumberFocus = FocusNode();
-    selectedUntilDateTime = DateTime(
-      selectedUntilYear,
-      selectedUntilMonth + 1,
-      selectedUntilDay + 1,
-    );
+    if (selectedDuration == RepeatDuration.until &&
+        selectedDurationDate != null) {
+      selectedUntilDateTime = selectedDurationDate!;
+      selectedUntilDay = selectedUntilDateTime.day - 1;
+      selectedUntilMonth = selectedUntilDateTime.month - 1;
+      selectedUntilYear = selectedUntilDateTime.year;
+      untilFlag = true;
+      specificNumberFlag = false;
+    } else {
+      selectedUntilDateTime = DateTime(
+        selectedUntilYear,
+        selectedUntilMonth + 1,
+        selectedUntilDay + 1,
+      );
+    }
     super.initState();
   }
 
@@ -95,10 +146,56 @@ class _RepeatEventViewState extends State<RepeatEventView> {
           setState(() {
             selectedDuration = RepeatDuration.values.elementAt(0);
           });
-          Navigator.of(context).pop([selectedType, selectedDuration]);
+          Navigator.of(context).pop([selectedType, selectedDuration, 0, null]);
           return true;
+        } else {
+          setState(() {
+            if (selectedType == RepeatType.perDay) {
+              if (perDayAmount.text == "") {
+                perDayAmount.text = "1";
+              }
+              selectedTypeAmount = int.parse(perDayAmount.text);
+            } else if (selectedType == RepeatType.perWeek) {
+              if (perWeekAmount.text == "") {
+                perWeekAmount.text = "1";
+              }
+              selectedTypeAmount = int.parse(perWeekAmount.text);
+            } else if (selectedType == RepeatType.perMonth) {
+              if (perMonthAmount.text == "") {
+                perMonthAmount.text = "1";
+              }
+              selectedTypeAmount = int.parse(perMonthAmount.text);
+            } else if (selectedType == RepeatType.perYear) {
+              if (perYearAmount.text == "") {
+                perYearAmount.text = "1";
+              }
+              selectedTypeAmount = int.parse(perYearAmount.text);
+            }
+          });
+          if (selectedDuration == RepeatDuration.specificNumber) {
+            if (specificNumberAmount.text == "") {
+              specificNumberAmount.text = "1";
+            }
+            selectedDurationAmount = int.parse(specificNumberAmount.text);
+            Navigator.of(context).pop([
+              selectedType,
+              selectedDuration,
+              selectedTypeAmount,
+              selectedDurationAmount
+            ]);
+          } else if (selectedDuration == RepeatDuration.until) {
+            if (untilDateScrollToggle == true) {
+              _untilDateScrollOff();
+            }
+            selectedDurationDate = selectedUntilDateTime;
+            Navigator.of(context).pop([
+              selectedType,
+              selectedDuration,
+              selectedTypeAmount,
+              selectedDurationDate
+            ]);
+          }
         }
-        Navigator.of(context).pop([selectedType, selectedDuration]);
         return true;
       },
       child: Scaffold(
@@ -509,7 +606,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                       selectedDuration = value;
                       specificNumberFlag = true;
                       untilFlag = false;
-                      untilDateScrollToggle = false;
+                      if (untilDateScrollToggle == true) {
+                        _untilDateScrollOff();
+                      }
                       if (specificNumberAmount.text == "") {
                         specificNumberAmount.text = "1";
                       }
