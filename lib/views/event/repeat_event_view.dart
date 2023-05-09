@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:urtask/enums/repeat_duration_enum.dart';
 import 'package:urtask/enums/repeat_type_enum.dart';
+import 'package:urtask/views/date/date_scroll_view.dart';
 
 class RepeatEventView extends StatefulWidget {
   final RepeatType type;
@@ -45,6 +46,25 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   bool perYearFlag = false;
   bool perYearPlural = false;
 
+  // Specific Number
+  late final TextEditingController specificNumberAmount;
+  late final FocusNode specificNumberFocus;
+  bool specificNumberFlag = false;
+  bool specificNumberPlural = false;
+
+  // Until
+  late FixedExtentScrollController untilDay;
+  late FixedExtentScrollController untilMonth;
+  late FixedExtentScrollController untilYear;
+  late FixedExtentScrollController untilHour;
+  late FixedExtentScrollController untilMinute;
+  late DateTime selectedUntilDateTime;
+  int selectedUntilDay = DateTime.now().day - 1;
+  int selectedUntilMonth = DateTime.now().month - 1;
+  int selectedUntilYear = DateTime.now().year;
+  bool untilDateScrollToggle = false;
+  bool untilFlag = false;
+
   @override
   void initState() {
     selectedType = widget.type;
@@ -53,10 +73,17 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     perWeekAmount = TextEditingController(text: "1");
     perMonthAmount = TextEditingController(text: "1");
     perYearAmount = TextEditingController(text: "1");
+    specificNumberAmount = TextEditingController(text: "1");
     perDayFocus = FocusNode();
     perWeekFocus = FocusNode();
     perMonthFocus = FocusNode();
     perYearFocus = FocusNode();
+    specificNumberFocus = FocusNode();
+    selectedUntilDateTime = DateTime(
+      selectedUntilYear,
+      selectedUntilMonth + 1,
+      selectedUntilDay + 1,
+    );
     super.initState();
   }
 
@@ -102,6 +129,13 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                     perMonthFocus.unfocus();
                     perYearFlag = false;
                     perYearFocus.unfocus();
+                    if (specificNumberAmount.text == "") {
+                      specificNumberAmount.text = "1";
+                    }
+                    if (untilDateScrollToggle == true) {
+                      _untilDateScrollOff();
+                      untilDateScrollToggle = false;
+                    }
                   });
                 },
               ),
@@ -412,32 +446,205 @@ class _RepeatEventViewState extends State<RepeatEventView> {
 
                 // Specific Number
                 RadioListTile(
-                  title: const Text("Specific number of times"),
+                  title: Row(
+                    children: [
+                      if (specificNumberFlag == false) ...[
+                        const Text("Specific number of times")
+                      ],
+                      if (specificNumberFlag == true) ...[
+                        SizedBox(
+                          width: 35,
+                          child: TextFormField(
+                            controller: specificNumberAmount,
+                            focusNode: specificNumberFocus,
+                            onChanged: (value) {
+                              setState(() {
+                                specificNumberPlural =
+                                    value.isEmpty || int.parse(value) <= 1
+                                        ? false
+                                        : true;
+                              });
+                              if (value.isNotEmpty) {
+                                if (int.parse(value) <= 0) {
+                                  setState(() {
+                                    specificNumberAmount.text = "1";
+                                    specificNumberAmount.selection =
+                                        const TextSelection.collapsed(
+                                            offset: 1);
+                                    specificNumberPlural = false;
+                                  });
+                                }
+                                if (int.parse(value) > 100) {
+                                  setState(() {
+                                    specificNumberAmount.text = "100";
+                                    specificNumberAmount.selection =
+                                        const TextSelection.collapsed(
+                                            offset: 3);
+                                    specificNumberPlural = true;
+                                  });
+                                }
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(3),
+                            ],
+                          ),
+                        ),
+                        if (specificNumberPlural)
+                          const Text(" times")
+                        else
+                          const Text(" time"),
+                      ],
+                    ],
+                  ),
                   value: RepeatDuration.specificNumber,
                   groupValue: selectedDuration,
                   onChanged: (value) {
                     setState(() {
                       selectedDuration = value;
+                      specificNumberFlag = true;
+                      untilFlag = false;
+                      untilDateScrollToggle = false;
+                      if (specificNumberAmount.text == "") {
+                        specificNumberAmount.text = "1";
+                      }
                     });
                   },
                 ),
 
                 // Until
                 RadioListTile(
-                  title: const Text("Until"),
+                  title: Row(
+                    children: [
+                      const Text("Until"),
+                      if (untilFlag == true) ...[
+                        if (untilDateScrollToggle == false) ...[
+                          TextButton(
+                            onPressed: () {
+                              _untilDateScrollOn();
+                            },
+                            child: Text(
+                              _dateToString(
+                                month: selectedUntilDateTime.month - 1,
+                                day: selectedUntilDateTime.day - 1,
+                                year: selectedUntilDateTime.year,
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (untilDateScrollToggle == true) ...[
+                          TextButton(
+                            onPressed: () {
+                              _untilDateScrollOff();
+                            },
+                            child: const Text("..."),
+                          ),
+                        ],
+                      ]
+                    ],
+                  ),
                   value: RepeatDuration.until,
                   groupValue: selectedDuration,
                   onChanged: (value) {
                     setState(() {
                       selectedDuration = value;
+                      untilFlag = true;
+                      specificNumberFlag = false;
                     });
                   },
                 ),
+
+                if (untilDateScrollToggle == true) ...[
+                  // Date Scroll
+                  DateScrollView(
+                    day: untilDay,
+                    month: untilMonth,
+                    year: untilYear,
+                  ),
+                ],
               ],
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _untilDateScrollOn() {
+    setState(() {
+      untilDay = FixedExtentScrollController(
+        initialItem: selectedUntilDay,
+      );
+      untilMonth = FixedExtentScrollController(
+        initialItem: selectedUntilMonth,
+      );
+      untilYear = FixedExtentScrollController(
+        initialItem: selectedUntilYear % DateTime.now().year,
+      );
+    });
+    setState(() {
+      untilDateScrollToggle = true;
+    });
+  }
+
+  void _untilDateScrollOff() {
+    setState(() {
+      selectedUntilDay = untilDay.selectedItem;
+      selectedUntilMonth = untilMonth.selectedItem % 12;
+      selectedUntilYear = DateTime.now().year + untilYear.selectedItem;
+
+      if (selectedUntilMonth == 1) {
+        if ((selectedUntilYear % 4 == 0) &&
+            (selectedUntilYear % 100 != 0 || selectedUntilYear % 400 == 0)) {
+          selectedUntilDay %= 29;
+        } else {
+          selectedUntilDay %= 28;
+        }
+      } else if (selectedUntilMonth.isEven && selectedUntilMonth <= 6 ||
+          selectedUntilMonth == 7 ||
+          selectedUntilMonth == 9 ||
+          selectedUntilMonth == 11) {
+        selectedUntilDay %= 31;
+      } else {
+        selectedUntilDay %= 30;
+      }
+    });
+    setState(() {
+      untilDateScrollToggle = false;
+      selectedUntilDateTime = DateTime(
+        selectedUntilYear,
+        selectedUntilMonth + 1,
+        selectedUntilDay + 1,
+      );
+    });
+  }
+
+  String _dateToString({
+    required int month,
+    required int day,
+    required int year,
+  }) {
+    List<String> months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    String monthName = months.elementAt(month);
+    int selectedDay = day + 1;
+    return "$monthName $selectedDay, $year";
   }
 }
