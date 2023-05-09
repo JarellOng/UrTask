@@ -521,7 +521,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         selectedStartHour,
         selectedStartMinute,
       );
-      if (selectedStartDateTime.isAfter(selectedEndDateTime)) {
+      if (selectedStartDateTime.isAfter(selectedEndDateTime) ||
+          selectedStartDateTime.isAtSameMomentAs(selectedEndDateTime)) {
         selectedEndDateTime =
             selectedStartDateTime.add(const Duration(hours: 1));
         selectedEndDay = selectedEndDateTime.day - 1;
@@ -561,7 +562,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         selectedStartHour,
         selectedStartMinute,
       );
-      if (selectedStartDateTime.isAfter(selectedEndDateTime)) {
+      if (selectedStartDateTime.isAfter(selectedEndDateTime) ||
+          selectedStartDateTime.isAtSameMomentAs(selectedEndDateTime)) {
         selectedEndDateTime =
             selectedStartDateTime.add(const Duration(hours: 1));
         selectedEndDay = selectedEndDateTime.day - 1;
@@ -621,7 +623,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         selectedEndHour,
         selectedEndMinute,
       );
-      if (selectedEndDateTime.isBefore(selectedStartDateTime)) {
+      if (selectedEndDateTime.isBefore(selectedStartDateTime) ||
+          selectedEndDateTime.isAtSameMomentAs(selectedStartDateTime)) {
         selectedStartDateTime =
             selectedEndDateTime.subtract(const Duration(hours: 1));
         selectedStartDay = selectedStartDateTime.day - 1;
@@ -661,7 +664,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         selectedEndHour,
         selectedEndMinute,
       );
-      if (selectedEndDateTime.isBefore(selectedStartDateTime)) {
+      if (selectedEndDateTime.isBefore(selectedStartDateTime) ||
+          selectedEndDateTime.isAtSameMomentAs(selectedStartDateTime)) {
         selectedStartDateTime =
             selectedEndDateTime.subtract(const Duration(hours: 1));
         selectedStartDay = selectedStartDateTime.day - 1;
