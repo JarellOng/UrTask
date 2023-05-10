@@ -33,13 +33,16 @@ class _NotificationEventViewState extends State<NotificationEventView> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (remindMe == false) {
-          setState(() {
+        setState(() {
+          if (selectedNotifications.isEmpty) {
+            remindMe = false;
+          }
+          if (remindMe == false) {
             selectedNotifications.clear();
             selectedNotifications[NotificationTime.tenMinsBefore] =
                 NotificationType.alert;
-          });
-        }
+          }
+        });
         Navigator.of(context).pop([remindMe, selectedNotifications]);
         return true;
       },
