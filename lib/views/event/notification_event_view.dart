@@ -1,17 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
+import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
+import 'package:urtask/views/notification/custom_notification_view.dart';
 
 class NotificationEventView extends StatefulWidget {
   final bool flag;
   final Map<NotificationTime, NotificationType> notifications;
+  final Map<int, CustomNotificationUOT>? customNotification;
 
   const NotificationEventView({
     super.key,
     required this.flag,
     required this.notifications,
+    this.customNotification,
   });
 
   @override
@@ -21,11 +25,28 @@ class NotificationEventView extends StatefulWidget {
 class _NotificationEventViewState extends State<NotificationEventView> {
   late bool remindMe;
   late Map<NotificationTime, NotificationType> selectedNotifications;
+  late Map<int, CustomNotificationUOT>? customNotification;
+  late FixedExtentScrollController customNotificationAmount;
+  late FixedExtentScrollController customNotificationUot;
+  late int selectedCustomNotifcationAmount;
+  late int selectedCustomNotifcationUot;
+  bool customNotificationScrollToggle = false;
 
   @override
   void initState() {
     remindMe = widget.flag;
     selectedNotifications = widget.notifications;
+    customNotification = widget.customNotification;
+    if (widget.customNotification != null) {
+      selectedCustomNotifcationAmount = widget.customNotification!.keys.first;
+      selectedCustomNotifcationUot =
+          widget.customNotification!.values.first.index;
+    } else {
+      selectedCustomNotifcationAmount = 5;
+      selectedCustomNotifcationUot = 0;
+    }
+    customNotificationAmount = FixedExtentScrollController(initialItem: 5);
+    customNotificationUot = FixedExtentScrollController(initialItem: 0);
     super.initState();
   }
 
@@ -43,6 +64,20 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                 NotificationType.alert;
           }
         });
+        if (customNotificationScrollToggle == true) {
+          _customNotificationScrollOff();
+        }
+        if (selectedNotifications.containsKey(NotificationTime.custom)) {
+          Navigator.of(context).pop([
+            remindMe,
+            selectedNotifications,
+            {
+              selectedCustomNotifcationAmount: CustomNotificationUOT.values
+                  .elementAt(selectedCustomNotifcationUot)
+            }
+          ]);
+          return true;
+        }
         Navigator.of(context).pop([remindMe, selectedNotifications]);
         return true;
       },
@@ -318,7 +353,55 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                           .containsKey(NotificationTime.custom)
                       ? const Icon(Icons.radio_button_checked, color: primary)
                       : const Icon(Icons.radio_button_off),
-                  title: const Text("Custom"),
+                  title: Row(
+                    children: [
+                      if (!selectedNotifications
+                          .containsKey(NotificationTime.custom)) ...[
+                        const Text("Custom"),
+                      ],
+                      if (selectedNotifications
+                          .containsKey(NotificationTime.custom)) ...[
+                        if (customNotificationScrollToggle == false) ...[
+                          TextButton(
+                            onPressed: () {
+                              _customNotificationScrollOn();
+                            },
+                            child: Text(
+                              _printCustomNotification(
+                                amount: selectedCustomNotifcationAmount,
+                                uot: selectedCustomNotifcationUot,
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (customNotificationScrollToggle == true) ...[
+                          TextButton(
+                            onPressed: () {
+                              _customNotificationScrollOff();
+                            },
+                            child: const Text("..."),
+                          ),
+                        ],
+                        // TextButton(
+                        //   onPressed: () {
+                        //     setState(() {
+                        //       if (customNotificationScrollToggle == true) {
+                        //         _customNotificationScrollOff();
+                        //       } else {
+                        //         _customNotificationScrollOn();
+                        //       }
+                        //     });
+                        //   },
+                        //   child: Text(
+                        //     _printCustomNotification(
+                        //       amount: selectedCustomNotifcationAmount,
+                        //       uot: selectedCustomNotifcationUot,
+                        //     ),
+                        //   ),
+                        // )
+                      ]
+                    ],
+                  ),
                   onTap: () {
                     if (selectedNotifications
                         .containsKey(NotificationTime.custom)) {
@@ -333,6 +416,13 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     }
                   },
                 ),
+                if (customNotificationScrollToggle == true) ...[
+                  CustomNotificationScrollView(
+                    amount: customNotificationAmount,
+                    uot: customNotificationUot,
+                  ),
+                ],
+
                 if (selectedNotifications
                     .containsKey(NotificationTime.custom)) ...[
                   const Text(
@@ -372,5 +462,45 @@ class _NotificationEventViewState extends State<NotificationEventView> {
         ),
       ),
     );
+  }
+
+  void _customNotificationScrollOn() {
+    setState(() {
+      customNotificationAmount = FixedExtentScrollController(
+          initialItem: selectedCustomNotifcationAmount);
+      customNotificationUot = FixedExtentScrollController(
+          initialItem: selectedCustomNotifcationUot);
+    });
+    setState(() {
+      customNotificationScrollToggle = true;
+    });
+  }
+
+  void _customNotificationScrollOff() {
+    setState(() {
+      selectedCustomNotifcationUot = customNotificationUot.selectedItem;
+      if (selectedCustomNotifcationUot == 0) {
+        selectedCustomNotifcationAmount =
+            customNotificationAmount.selectedItem % 62;
+      } else if (selectedCustomNotifcationUot == 1) {
+        selectedCustomNotifcationAmount =
+            customNotificationAmount.selectedItem % 26;
+      } else if (selectedCustomNotifcationUot == 2) {
+        selectedCustomNotifcationAmount =
+            customNotificationAmount.selectedItem % 367;
+      }
+    });
+    setState(() {
+      customNotificationScrollToggle = false;
+    });
+  }
+
+  String _printCustomNotification({required int amount, required int uot}) {
+    if (amount == 0) {
+      return "At time of event";
+    }
+
+    final uotName = CustomNotificationUOT.values.elementAt(uot).name;
+    return "$amount $uotName before";
   }
 }
