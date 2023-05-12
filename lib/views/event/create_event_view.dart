@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
+import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/enums/repeat_duration_enum.dart';
@@ -83,6 +84,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   Map<NotificationTime, NotificationType> selectedNotifications = {
     NotificationTime.tenMinsBefore: NotificationType.alert
   };
+  Map<int, CustomNotificationUOT>? selectedCustomNotification;
 
   @override
   void initState() {
@@ -448,12 +450,22 @@ class _CreateEventViewState extends State<CreateEventView> {
                         builder: (context) => NotificationEventView(
                           flag: notificationFlag,
                           notifications: selectedNotifications,
+                          customNotification: selectedCustomNotification,
                         ),
                       ),
                     );
                     setState(() {
                       notificationFlag = notificationDetail[0];
                       selectedNotifications = notificationDetail[1];
+                      if (selectedNotifications
+                          .containsKey(NotificationTime.custom)) {
+                        final customNotificationMap = notificationDetail[2]
+                            as Map<int, CustomNotificationUOT>;
+                        selectedCustomNotification = {
+                          customNotificationMap.keys.first:
+                              customNotificationMap.values.first
+                        };
+                      }
                     });
                   },
                   child: const Text("Notification"),
