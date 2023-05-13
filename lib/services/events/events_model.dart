@@ -9,8 +9,7 @@ class Events {
   final String title;
   final Timestamp start;
   final Timestamp end;
-  final String description;
-  final bool allDay;
+  final String? description;
   final bool important;
 
   const Events({
@@ -19,9 +18,8 @@ class Events {
     required this.title,
     required this.start,
     required this.end,
-    required this.description,
-    required this.allDay,
     required this.important,
+    this.description,
   });
 
   Events.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
@@ -30,7 +28,6 @@ class Events {
         title = snapshot.data()[eventTitleField],
         start = snapshot.data()[eventStartField],
         end = snapshot.data()[eventEndField],
-        description = snapshot.data()[eventDescriptionField],
-        allDay = snapshot.data()[eventAllDayField],
-        important = snapshot.data()[eventImportantField];
+        important = snapshot.data()[eventImportantField],
+        description = snapshot.data()[eventDescriptionField];
 }

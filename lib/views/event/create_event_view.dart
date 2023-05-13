@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
@@ -29,7 +30,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   late final ColorController _colorService;
 
   late final TextEditingController _eventTitle;
+  late final FocusNode eventTitleFocus;
   late final TextEditingController _eventDescription;
+  late final FocusNode eventDescriptionFocus;
 
   // All Day
   bool allDay = false;
@@ -90,7 +93,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   void initState() {
     _eventService = EventController();
     _eventTitle = TextEditingController();
+    eventTitleFocus = FocusNode();
     _eventDescription = TextEditingController();
+    eventDescriptionFocus = FocusNode();
     _categoryService = CategoryController();
     _colorService = ColorController();
     selectedStartDateTime = DateTime(
@@ -134,6 +139,7 @@ class _CreateEventViewState extends State<CreateEventView> {
             // TITLE
             TextField(
               controller: _eventTitle,
+              focusNode: eventTitleFocus,
               enableSuggestions: false,
               autocorrect: false,
               decoration: const InputDecoration(
@@ -374,6 +380,10 @@ class _CreateEventViewState extends State<CreateEventView> {
                 const Text("Category"),
                 TextButton(
                   onPressed: () async {
+                    setState(() {
+                      eventTitleFocus.unfocus();
+                      eventDescriptionFocus.unfocus();
+                    });
                     final categoryDetail = await showCategoriesDialog(
                       context,
                       _categoryService,
@@ -405,6 +415,10 @@ class _CreateEventViewState extends State<CreateEventView> {
                 const Text("Repeat"),
                 TextButton(
                   onPressed: () async {
+                    setState(() {
+                      eventTitleFocus.unfocus();
+                      eventDescriptionFocus.unfocus();
+                    });
                     final repeatDetail = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -444,6 +458,10 @@ class _CreateEventViewState extends State<CreateEventView> {
                 const Text("Notification"),
                 TextButton(
                   onPressed: () async {
+                    setState(() {
+                      eventTitleFocus.unfocus();
+                      eventDescriptionFocus.unfocus();
+                    });
                     final notificationDetail = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -476,6 +494,7 @@ class _CreateEventViewState extends State<CreateEventView> {
             // DESCRIPTION
             TextField(
               controller: _eventDescription,
+              focusNode: eventDescriptionFocus,
               enableSuggestions: false,
               autocorrect: false,
               maxLines: 3,
@@ -487,11 +506,65 @@ class _CreateEventViewState extends State<CreateEventView> {
             // SAVE BUTTON
             TextButton(
               onPressed: () async {
-                // final startDay = _eventStartDay.selectedItem;
-                // final startHour = _eventStartHour.selectedItem;
-                // final startMinute = _eventStartMinute.selectedItem;
-                // print(startDay);
-                // print(startMinute);
+                if (startDateScrollToggle == true) {
+                  _startDateScrollOff();
+                }
+                if (startTimeScrollToggle == true) {
+                  _startTimeScrollOff();
+                }
+                if (endDateScrollToggle == true) {
+                  _endDateScrollOff();
+                }
+                if (endTimeScrollToggle == true) {
+                  _endTimeScrollOff();
+                }
+                final startTimestamp = allDay == true
+                    ? Timestamp.fromDate(
+                        DateTime(
+                          selectedStartDateTime.year,
+                          selectedStartDateTime.month,
+                          selectedStartDateTime.day,
+                        ),
+                      )
+                    : Timestamp.fromDate(
+                        DateTime(
+                          selectedStartDateTime.year,
+                          selectedStartDateTime.month,
+                          selectedStartDateTime.day,
+                          selectedStartDateTime.hour,
+                          selectedStartDateTime.minute,
+                        ),
+                      );
+                final endTimestamp = allDay == true
+                    ? Timestamp.fromDate(
+                        DateTime(
+                          selectedEndDateTime.year,
+                          selectedEndDateTime.month,
+                          selectedEndDateTime.day,
+                          23,
+                          59,
+                        ),
+                      )
+                    : Timestamp.fromDate(
+                        DateTime(
+                          selectedEndDateTime.year,
+                          selectedEndDateTime.month,
+                          selectedEndDateTime.day,
+                          selectedEndDateTime.hour,
+                          selectedEndDateTime.minute,
+                        ),
+                      );
+                _eventService.create(
+                  title: _eventTitle.text.isNotEmpty
+                      ? _eventTitle.text
+                      : "My Event",
+                  categoryId: categoryId,
+                  start: startTimestamp,
+                  end: endTimestamp,
+                  important: important,
+                  description: _eventDescription.text,
+                );
+                Navigator.of(context).pop();
               },
               child: const Text("Save"),
             ),
