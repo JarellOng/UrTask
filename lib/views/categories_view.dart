@@ -4,6 +4,8 @@ import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/utilities/extensions/hex_color.dart';
+import 'package:urtask/views/create_category_view.dart';
+import 'package:urtask/views/home_view.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -28,6 +30,17 @@ class _CategoryViewState extends State<CategoryView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Event Categories", style: TextStyle(color: Colors.white)),
+        iconTheme: IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_outlined),
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeView(),
+              ),
+            ),
+          ),
+          centerTitle: true,
       ),
       //backgroundColor: const Color.fromARGB(31, 133, 133, 133),
       body: StreamBuilder(
@@ -66,10 +79,10 @@ class _CategoryViewState extends State<CategoryView> {
                                 shape: Border(bottom: BorderSide(color: Colors.black26))
                               );
                             } else {
-                              return const CircularProgressIndicator();
+                              return Column();
                             }
                           default:
-                            return const CircularProgressIndicator();
+                            return Column();
                         }
                       },
                     );
@@ -84,7 +97,12 @@ class _CategoryViewState extends State<CategoryView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CreateCategoryView(),
+              ),
+            ),
         tooltip: 'Increment',
         child: Icon(Icons.add, color: Colors.white),
       ),

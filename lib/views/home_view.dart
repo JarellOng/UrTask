@@ -13,6 +13,7 @@ import 'package:urtask/views/calendar_view.dart';
 import 'package:urtask/views/profile_view.dart';
 import 'package:urtask/views/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
+import 'package:urtask/views/create_category_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -170,7 +171,12 @@ class _HomeViewState extends State<HomeView> {
             foregroundColor: primary,
             label: 'Event Category',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => print('ADD EVENT CATEGORY'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CreateCategoryView(),
+              ),
+            ),
             onLongPress: () => print('FIRST CHILD LONG PRESS'),
           ),
           SpeedDialChild(
