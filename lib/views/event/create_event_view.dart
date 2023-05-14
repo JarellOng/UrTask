@@ -11,7 +11,6 @@ import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
-import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
@@ -34,7 +33,6 @@ class _CreateEventViewState extends State<CreateEventView> {
   late final FocusNode eventTitleFocus;
   late final TextEditingController _eventDescription;
   late final FocusNode eventDescriptionFocus;
-  bool eventIsEdited = false;
 
   // All Day
   bool allDay = false;
@@ -135,82 +133,92 @@ class _CreateEventViewState extends State<CreateEventView> {
         ),
         centerTitle: true,
       ),
-      body: WillPopScope(
-        onWillPop: () async {
-          setState(() {
-            eventTitleFocus.unfocus();
-            eventDescriptionFocus.unfocus();
-          });
-          if (eventIsEdited ||
-              _eventTitle.text.isNotEmpty ||
-              _eventDescription.text.isNotEmpty) {
-            final shouldDiscard = await showDiscardDialog(
-              context,
-              "Are you sure you want to discard this event?",
-            );
-            if (shouldDiscard) {
-              if (mounted) {
-                Navigator.of(context).pop();
-                return true;
-              }
-            }
-            return false;
-          }
-          return true;
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // TITLE
-              TextField(
-                controller: _eventTitle,
-                focusNode: eventTitleFocus,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: "Title",
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // TITLE
+            TextField(
+              controller: _eventTitle,
+              focusNode: eventTitleFocus,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Title",
               ),
+            ),
 
-              // ALL DAY
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("All Day"),
-                  Transform.scale(
-                    scale: 0.8,
-                    child: CupertinoSwitch(
-                      value: allDay,
-                      onChanged: (value) {
-                        setState(() {
-                          allDay = value;
-                          if (startTimeScrollToggle == true) {
-                            _startTimeScrollOff();
-                          }
-                          if (endTimeScrollToggle == true) {
-                            _endTimeScrollOff();
-                          }
-                          eventIsEdited = true;
-                        });
-                      },
-                      activeColor: primary,
+            // ALL DAY
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("All Day"),
+                Transform.scale(
+                  scale: 0.8,
+                  child: CupertinoSwitch(
+                    value: allDay,
+                    onChanged: (value) {
+                      setState(() {
+                        allDay = value;
+                        if (startTimeScrollToggle == true) {
+                          _startTimeScrollOff();
+                        }
+                        if (endTimeScrollToggle == true) {
+                          _endTimeScrollOff();
+                        }
+                      });
+                    },
+                    activeColor: primary,
+                  ),
+                ),
+              ],
+            ),
+
+            // START
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Start"),
+
+                // Date
+                if (startDateScrollToggle == false) ...[
+                  TextButton(
+                    onPressed: () {
+                      if (startTimeScrollToggle == true) {
+                        _startTimeScrollOff();
+                      }
+                      if (endDateScrollToggle == true) {
+                        _endDateScrollOff();
+                      }
+                      if (endTimeScrollToggle == true) {
+                        _endTimeScrollOff();
+                      }
+                      _startDateScrollOn();
+                    },
+                    child: Text(
+                      _dateToString(
+                        month: selectedStartDateTime.month - 1,
+                        day: selectedStartDateTime.day - 1,
+                        year: selectedStartDateTime.year,
+                      ),
                     ),
                   ),
                 ],
-              ),
+                if (startDateScrollToggle == true) ...[
+                  TextButton(
+                    onPressed: () {
+                      _startDateScrollOff();
+                    },
+                    child: const Text("..."),
+                  ),
+                ],
 
-              // START
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Start"),
-
-                  // Date
-                  if (startDateScrollToggle == false) ...[
+                // Time
+                if (allDay == false) ...[
+                  if (startTimeScrollToggle == false) ...[
                     TextButton(
                       onPressed: () {
-                        if (startTimeScrollToggle == true) {
-                          _startTimeScrollOff();
+                        if (startDateScrollToggle == true) {
+                          _startDateScrollOff();
                         }
                         if (endDateScrollToggle == true) {
                           _endDateScrollOff();
@@ -218,87 +226,85 @@ class _CreateEventViewState extends State<CreateEventView> {
                         if (endTimeScrollToggle == true) {
                           _endTimeScrollOff();
                         }
-                        _startDateScrollOn();
-                        eventIsEdited = true;
+                        _startTimeScrollOn();
                       },
                       child: Text(
-                        _dateToString(
-                          month: selectedStartDateTime.month - 1,
-                          day: selectedStartDateTime.day - 1,
-                          year: selectedStartDateTime.year,
+                        _timeToString(
+                          hour: selectedStartDateTime.hour,
+                          minute: selectedStartDateTime.minute,
                         ),
                       ),
                     ),
                   ],
-                  if (startDateScrollToggle == true) ...[
+                  if (startTimeScrollToggle == true) ...[
                     TextButton(
                       onPressed: () {
-                        _startDateScrollOff();
+                        _startTimeScrollOff();
                       },
                       child: const Text("..."),
                     ),
                   ],
-
-                  // Time
-                  if (allDay == false) ...[
-                    if (startTimeScrollToggle == false) ...[
-                      TextButton(
-                        onPressed: () {
-                          if (startDateScrollToggle == true) {
-                            _startDateScrollOff();
-                          }
-                          if (endDateScrollToggle == true) {
-                            _endDateScrollOff();
-                          }
-                          if (endTimeScrollToggle == true) {
-                            _endTimeScrollOff();
-                          }
-                          _startTimeScrollOn();
-                          eventIsEdited = true;
-                        },
-                        child: Text(
-                          _timeToString(
-                            hour: selectedStartDateTime.hour,
-                            minute: selectedStartDateTime.minute,
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (startTimeScrollToggle == true) ...[
-                      TextButton(
-                        onPressed: () {
-                          _startTimeScrollOff();
-                        },
-                        child: const Text("..."),
-                      ),
-                    ],
-                  ],
                 ],
+              ],
+            ),
+            if (startDateScrollToggle == true) ...[
+              // Date Scroll
+              DateScrollView(
+                day: _eventStartDay,
+                month: _eventStartMonth,
+                year: _eventStartYear,
               ),
-              if (startDateScrollToggle == true) ...[
-                // Date Scroll
-                DateScrollView(
-                  day: _eventStartDay,
-                  month: _eventStartMonth,
-                  year: _eventStartYear,
-                ),
-              ],
-              if (startTimeScrollToggle == true) ...[
-                // Time Scroll
-                TimeScrollView(
-                  hour: _eventStartHour,
-                  minute: _eventStartMinute,
-                ),
-              ],
+            ],
+            if (startTimeScrollToggle == true) ...[
+              // Time Scroll
+              TimeScrollView(
+                hour: _eventStartHour,
+                minute: _eventStartMinute,
+              ),
+            ],
 
-              // END
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("End"),
+            // END
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("End"),
 
-                  // Date
-                  if (endDateScrollToggle == false) ...[
+                // Date
+                if (endDateScrollToggle == false) ...[
+                  TextButton(
+                    onPressed: () {
+                      if (startDateScrollToggle == true) {
+                        _startDateScrollOff();
+                      }
+                      if (startTimeScrollToggle == true) {
+                        _startTimeScrollOff();
+                      }
+                      if (endTimeScrollToggle == true) {
+                        _endTimeScrollOff();
+                      }
+                      _endDateScrollOn();
+                    },
+                    child: Text(
+                      _dateToString(
+                        month: selectedEndDateTime.month - 1,
+                        day: selectedEndDateTime.day - 1,
+                        year: selectedEndDateTime.year,
+                      ),
+                    ),
+                  ),
+                ],
+                if (endDateScrollToggle == true) ...[
+                  TextButton(
+                    onPressed: () {
+                      _endDateScrollOff();
+                    },
+                    child: const Text("..."),
+                  ),
+                ],
+
+                // Time
+                if (allDay == false) ...[
+                  if (endTimeScrollToggle == false) ...[
                     TextButton(
                       onPressed: () {
                         if (startDateScrollToggle == true) {
@@ -307,303 +313,262 @@ class _CreateEventViewState extends State<CreateEventView> {
                         if (startTimeScrollToggle == true) {
                           _startTimeScrollOff();
                         }
-                        if (endTimeScrollToggle == true) {
-                          _endTimeScrollOff();
+                        if (endDateScrollToggle == true) {
+                          _endDateScrollOff();
                         }
-                        _endDateScrollOn();
-                        eventIsEdited = true;
+                        _endTimeScrollOn();
                       },
                       child: Text(
-                        _dateToString(
-                          month: selectedEndDateTime.month - 1,
-                          day: selectedEndDateTime.day - 1,
-                          year: selectedEndDateTime.year,
+                        _timeToString(
+                          hour: selectedEndDateTime.hour,
+                          minute: selectedEndDateTime.minute,
                         ),
                       ),
                     ),
                   ],
-                  if (endDateScrollToggle == true) ...[
+                  if (endTimeScrollToggle == true) ...[
                     TextButton(
                       onPressed: () {
-                        _endDateScrollOff();
+                        _endTimeScrollOff();
                       },
                       child: const Text("..."),
                     ),
                   ],
-
-                  // Time
-                  if (allDay == false) ...[
-                    if (endTimeScrollToggle == false) ...[
-                      TextButton(
-                        onPressed: () {
-                          if (startDateScrollToggle == true) {
-                            _startDateScrollOff();
-                          }
-                          if (startTimeScrollToggle == true) {
-                            _startTimeScrollOff();
-                          }
-                          if (endDateScrollToggle == true) {
-                            _endDateScrollOff();
-                          }
-                          _endTimeScrollOn();
-                          eventIsEdited = true;
-                        },
-                        child: Text(
-                          _timeToString(
-                            hour: selectedEndDateTime.hour,
-                            minute: selectedEndDateTime.minute,
-                          ),
-                        ),
-                      ),
-                    ],
-                    if (endTimeScrollToggle == true) ...[
-                      TextButton(
-                        onPressed: () {
-                          _endTimeScrollOff();
-                        },
-                        child: const Text("..."),
-                      ),
-                    ],
-                  ],
                 ],
-              ),
-              if (endDateScrollToggle == true) ...[
-                // Date Scroll
-                DateScrollView(
-                  day: _eventEndDay,
-                  month: _eventEndMonth,
-                  year: _eventEndYear,
-                ),
               ],
-              if (endTimeScrollToggle == true) ...[
-                // Time Scroll
-                TimeScrollView(
-                  hour: _eventEndHour,
-                  minute: _eventEndMinute,
-                ),
-              ],
-
-              // IMPORTANT
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Important"),
-                  Transform.scale(
-                    scale: 0.8,
-                    child: CupertinoSwitch(
-                      value: important,
-                      onChanged: (value) {
-                        setState(() {
-                          important = value;
-                          eventIsEdited = true;
-                        });
-                      },
-                      activeColor: primary,
-                    ),
-                  ),
-                ],
-              ),
-
-              // CATEGORY
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Category"),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                      final categoryDetail = await showCategoriesDialog(
-                        context,
-                        _categoryService,
-                        _colorService,
-                      );
-                      if (categoryDetail.isNotEmpty) {
-                        setState(() {
-                          categoryId = categoryDetail[0];
-                          categoryName = categoryDetail[1];
-                          categoryHex = categoryDetail[2];
-                        });
-                      }
-                    },
-                    child: Chip(
-                      backgroundColor: HexColor.fromHex(categoryHex),
-                      label: Text(
-                        categoryName,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // REPEAT
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Repeat"),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                      final repeatDetail = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RepeatEventView(
-                            type: selectedRepeatType,
-                            duration: selectedRepeatDuration,
-                            typeAmount: selectedRepeatTypeAmount,
-                            durationAmount: selectedRepeatDurationAmount,
-                            durationDate: selectedRepeatDurationDate,
-                          ),
-                        ),
-                      );
-                      setState(() {
-                        selectedRepeatType = repeatDetail[0];
-                        selectedRepeatDuration = repeatDetail[1];
-                        selectedRepeatTypeAmount = repeatDetail[2];
-                        if (selectedRepeatDuration ==
-                            RepeatDuration.specificNumber) {
-                          selectedRepeatDurationAmount = repeatDetail[3];
-                          selectedRepeatDurationDate = null;
-                        } else if (selectedRepeatDuration ==
-                            RepeatDuration.until) {
-                          selectedRepeatDurationDate = repeatDetail[3];
-                          selectedRepeatDurationAmount = null;
-                        }
-                      });
-                    },
-                    child: const Text("Repeat"),
-                  ),
-                ],
-              ),
-
-              // NOTIFICATION
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Notification"),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                      final notificationDetail = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NotificationEventView(
-                            flag: notificationFlag,
-                            notifications: selectedNotifications,
-                            customNotification: selectedCustomNotification,
-                          ),
-                        ),
-                      );
-                      setState(() {
-                        notificationFlag = notificationDetail[0];
-                        selectedNotifications = notificationDetail[1];
-                        if (selectedNotifications
-                            .containsKey(NotificationTime.custom)) {
-                          final customNotificationMap = notificationDetail[2]
-                              as Map<int, CustomNotificationUOT>;
-                          selectedCustomNotification = {
-                            customNotificationMap.keys.first:
-                                customNotificationMap.values.first
-                          };
-                        }
-                      });
-                    },
-                    child: const Text("Notification"),
-                  ),
-                ],
-              ),
-
-              // DESCRIPTION
-              TextField(
-                controller: _eventDescription,
-                focusNode: eventDescriptionFocus,
-                enableSuggestions: false,
-                autocorrect: false,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: "Description",
-                ),
-              ),
-
-              // SAVE BUTTON
-              TextButton(
-                onPressed: () async {
-                  if (startDateScrollToggle == true) {
-                    _startDateScrollOff();
-                  }
-                  if (startTimeScrollToggle == true) {
-                    _startTimeScrollOff();
-                  }
-                  if (endDateScrollToggle == true) {
-                    _endDateScrollOff();
-                  }
-                  if (endTimeScrollToggle == true) {
-                    _endTimeScrollOff();
-                  }
-                  final startTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                            selectedStartDateTime.hour,
-                            selectedStartDateTime.minute,
-                          ),
-                        );
-                  final endTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            23,
-                            59,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            selectedEndDateTime.hour,
-                            selectedEndDateTime.minute,
-                          ),
-                        );
-                  _eventService.create(
-                    title: _eventTitle.text.isNotEmpty
-                        ? _eventTitle.text
-                        : "My Event",
-                    categoryId: categoryId,
-                    start: startTimestamp,
-                    end: endTimestamp,
-                    important: important,
-                    description: _eventDescription.text,
-                  );
-                  Navigator.of(context).pop();
-                },
-                child: const Text("Save"),
+            ),
+            if (endDateScrollToggle == true) ...[
+              // Date Scroll
+              DateScrollView(
+                day: _eventEndDay,
+                month: _eventEndMonth,
+                year: _eventEndYear,
               ),
             ],
-          ),
+            if (endTimeScrollToggle == true) ...[
+              // Time Scroll
+              TimeScrollView(
+                hour: _eventEndHour,
+                minute: _eventEndMinute,
+              ),
+            ],
+
+            // IMPORTANT
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Important"),
+                Transform.scale(
+                  scale: 0.8,
+                  child: CupertinoSwitch(
+                    value: important,
+                    onChanged: (value) {
+                      setState(() {
+                        important = value;
+                      });
+                    },
+                    activeColor: primary,
+                  ),
+                ),
+              ],
+            ),
+
+            // CATEGORY
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Category"),
+                TextButton(
+                  onPressed: () async {
+                    setState(() {
+                      eventTitleFocus.unfocus();
+                      eventDescriptionFocus.unfocus();
+                    });
+                    final categoryDetail = await showCategoriesDialog(
+                      context,
+                      _categoryService,
+                      _colorService,
+                    );
+                    if (categoryDetail.isNotEmpty) {
+                      setState(() {
+                        categoryId = categoryDetail[0];
+                        categoryName = categoryDetail[1];
+                        categoryHex = categoryDetail[2];
+                      });
+                    }
+                  },
+                  child: Chip(
+                    backgroundColor: HexColor.fromHex(categoryHex),
+                    label: Text(
+                      categoryName,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // REPEAT
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Repeat"),
+                TextButton(
+                  onPressed: () async {
+                    setState(() {
+                      eventTitleFocus.unfocus();
+                      eventDescriptionFocus.unfocus();
+                    });
+                    final repeatDetail = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RepeatEventView(
+                          type: selectedRepeatType,
+                          duration: selectedRepeatDuration,
+                          typeAmount: selectedRepeatTypeAmount,
+                          durationAmount: selectedRepeatDurationAmount,
+                          durationDate: selectedRepeatDurationDate,
+                        ),
+                      ),
+                    );
+                    setState(() {
+                      selectedRepeatType = repeatDetail[0];
+                      selectedRepeatDuration = repeatDetail[1];
+                      selectedRepeatTypeAmount = repeatDetail[2];
+                      if (selectedRepeatDuration ==
+                          RepeatDuration.specificNumber) {
+                        selectedRepeatDurationAmount = repeatDetail[3];
+                        selectedRepeatDurationDate = null;
+                      } else if (selectedRepeatDuration ==
+                          RepeatDuration.until) {
+                        selectedRepeatDurationDate = repeatDetail[3];
+                        selectedRepeatDurationAmount = null;
+                      }
+                    });
+                  },
+                  child: const Text("Repeat"),
+                ),
+              ],
+            ),
+
+            // NOTIFICATION
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Notification"),
+                TextButton(
+                  onPressed: () async {
+                    setState(() {
+                      eventTitleFocus.unfocus();
+                      eventDescriptionFocus.unfocus();
+                    });
+                    final notificationDetail = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationEventView(
+                          flag: notificationFlag,
+                          notifications: selectedNotifications,
+                          customNotification: selectedCustomNotification,
+                        ),
+                      ),
+                    );
+                    setState(() {
+                      notificationFlag = notificationDetail[0];
+                      selectedNotifications = notificationDetail[1];
+                      if (selectedNotifications
+                          .containsKey(NotificationTime.custom)) {
+                        final customNotificationMap = notificationDetail[2]
+                            as Map<int, CustomNotificationUOT>;
+                        selectedCustomNotification = {
+                          customNotificationMap.keys.first:
+                              customNotificationMap.values.first
+                        };
+                      }
+                    });
+                  },
+                  child: const Text("Notification"),
+                ),
+              ],
+            ),
+
+            // DESCRIPTION
+            TextField(
+              controller: _eventDescription,
+              focusNode: eventDescriptionFocus,
+              enableSuggestions: false,
+              autocorrect: false,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: "Description",
+              ),
+            ),
+
+            // SAVE BUTTON
+            TextButton(
+              onPressed: () async {
+                if (startDateScrollToggle == true) {
+                  _startDateScrollOff();
+                }
+                if (startTimeScrollToggle == true) {
+                  _startTimeScrollOff();
+                }
+                if (endDateScrollToggle == true) {
+                  _endDateScrollOff();
+                }
+                if (endTimeScrollToggle == true) {
+                  _endTimeScrollOff();
+                }
+                final startTimestamp = allDay == true
+                    ? Timestamp.fromDate(
+                        DateTime(
+                          selectedStartDateTime.year,
+                          selectedStartDateTime.month,
+                          selectedStartDateTime.day,
+                        ),
+                      )
+                    : Timestamp.fromDate(
+                        DateTime(
+                          selectedStartDateTime.year,
+                          selectedStartDateTime.month,
+                          selectedStartDateTime.day,
+                          selectedStartDateTime.hour,
+                          selectedStartDateTime.minute,
+                        ),
+                      );
+                final endTimestamp = allDay == true
+                    ? Timestamp.fromDate(
+                        DateTime(
+                          selectedEndDateTime.year,
+                          selectedEndDateTime.month,
+                          selectedEndDateTime.day,
+                          23,
+                          59,
+                        ),
+                      )
+                    : Timestamp.fromDate(
+                        DateTime(
+                          selectedEndDateTime.year,
+                          selectedEndDateTime.month,
+                          selectedEndDateTime.day,
+                          selectedEndDateTime.hour,
+                          selectedEndDateTime.minute,
+                        ),
+                      );
+                _eventService.create(
+                  title: _eventTitle.text.isNotEmpty
+                      ? _eventTitle.text
+                      : "My Event",
+                  categoryId: categoryId,
+                  start: startTimestamp,
+                  end: endTimestamp,
+                  important: important,
+                  description: _eventDescription.text,
+                );
+                Navigator.of(context).pop();
+              },
+              child: const Text("Save"),
+            ),
+          ],
         ),
       ),
     );
