@@ -270,6 +270,26 @@ class _EditEventViewState extends State<EditEventView> {
                       onChanged: (value) {
                         setState(() {
                           allDay = value;
+                          if (allDay == true) {
+                            selectedStartHour = 0;
+                            selectedStartMinute = 0;
+                            selectedEndHour = 23;
+                            selectedEndMinute = 59;
+                            selectedStartDateTime = DateTime(
+                              selectedStartDateTime.year,
+                              selectedStartDateTime.month,
+                              selectedStartDateTime.day,
+                              selectedStartHour,
+                              selectedStartMinute,
+                            );
+                            selectedEndDateTime = DateTime(
+                              selectedEndDateTime.year,
+                              selectedEndDateTime.month,
+                              selectedEndDateTime.day,
+                              selectedEndHour,
+                              selectedEndMinute,
+                            );
+                          }
                           if (startTimeScrollToggle == true) {
                             _startTimeScrollOff();
                           }
@@ -745,8 +765,18 @@ class _EditEventViewState extends State<EditEventView> {
       );
       if (selectedStartDateTime.isAfter(selectedEndDateTime) ||
           selectedStartDateTime.isAtSameMomentAs(selectedEndDateTime)) {
-        selectedEndDateTime =
-            selectedStartDateTime.add(const Duration(hours: 1));
+        if (allDay == false) {
+          selectedEndDateTime =
+              selectedStartDateTime.add(const Duration(hours: 1));
+        } else {
+          selectedEndDateTime = DateTime(
+            selectedStartDateTime.year,
+            selectedStartDateTime.month,
+            selectedStartDateTime.day,
+            23,
+            59,
+          );
+        }
         selectedEndDay = selectedEndDateTime.day - 1;
         selectedEndMonth = selectedEndDateTime.month - 1;
         selectedEndYear = selectedEndDateTime.year;
@@ -847,8 +877,18 @@ class _EditEventViewState extends State<EditEventView> {
       );
       if (selectedEndDateTime.isBefore(selectedStartDateTime) ||
           selectedEndDateTime.isAtSameMomentAs(selectedStartDateTime)) {
-        selectedStartDateTime =
-            selectedEndDateTime.subtract(const Duration(hours: 1));
+        if (allDay == false) {
+          selectedStartDateTime =
+              selectedEndDateTime.subtract(const Duration(hours: 1));
+        } else {
+          selectedStartDateTime = DateTime(
+            selectedEndDateTime.year,
+            selectedEndDateTime.month,
+            selectedEndDateTime.day,
+            0,
+            0,
+          );
+        }
         selectedStartDay = selectedStartDateTime.day - 1;
         selectedStartMonth = selectedStartDateTime.month - 1;
         selectedStartYear = selectedStartDateTime.year;
