@@ -51,7 +51,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   int selectedStartDay = DateTime.now().day - 1;
   int selectedStartMonth = DateTime.now().month - 1;
   int selectedStartYear = DateTime.now().year;
-  int selectedStartHour = DateTime.now().hour + 1;
+  int selectedStartHour = (DateTime.now().hour + 1) % 24;
   int selectedStartMinute = 0;
   bool startDateScrollToggle = false;
   bool startTimeScrollToggle = false;
@@ -66,7 +66,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   int selectedEndDay = DateTime.now().day - 1;
   int selectedEndMonth = DateTime.now().month - 1;
   int selectedEndYear = DateTime.now().year;
-  int selectedEndHour = DateTime.now().hour + 2;
+  int selectedEndHour = (DateTime.now().hour + 2) % 24;
   int selectedEndMinute = 0;
   bool endDateScrollToggle = false;
   bool endTimeScrollToggle = false;
@@ -103,6 +103,11 @@ class _CreateEventViewState extends State<CreateEventView> {
     _categoryService = CategoryController();
     _colorService = ColorController();
     _notificationService = NotificationController();
+    selectedStartDay =
+        selectedStartHour == 0 ? ++selectedStartDay : selectedStartDay;
+    selectedEndDay = selectedEndHour == 0 || selectedEndHour == 1
+        ? ++selectedEndDay
+        : selectedEndDay;
     selectedStartDateTime = DateTime(
       selectedStartYear,
       selectedStartMonth + 1,
