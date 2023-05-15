@@ -19,14 +19,19 @@ import 'package:urtask/views/event/notification_event_view.dart';
 import 'package:urtask/views/event/repeat_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
 
-class CreateEventView extends StatefulWidget {
-  const CreateEventView({super.key});
+class EditEventView extends StatefulWidget {
+  final String eventId;
+
+  const EditEventView({
+    super.key,
+    required this.eventId,
+  });
 
   @override
-  State<CreateEventView> createState() => _CreateEventViewState();
+  State<EditEventView> createState() => _EditEventViewState();
 }
 
-class _CreateEventViewState extends State<CreateEventView> {
+class _EditEventViewState extends State<EditEventView> {
   late final EventController _eventService;
   late final CategoryController _categoryService;
   late final ColorController _colorService;
@@ -47,7 +52,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   late FixedExtentScrollController _eventStartYear;
   late FixedExtentScrollController _eventStartHour;
   late FixedExtentScrollController _eventStartMinute;
-  late DateTime selectedStartDateTime;
+  DateTime selectedStartDateTime = DateTime.now();
   int selectedStartDay = DateTime.now().day - 1;
   int selectedStartMonth = DateTime.now().month - 1;
   int selectedStartYear = DateTime.now().year;
@@ -62,7 +67,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   late FixedExtentScrollController _eventEndYear;
   late FixedExtentScrollController _eventEndHour;
   late FixedExtentScrollController _eventEndMinute;
-  late DateTime selectedEndDateTime;
+  DateTime selectedEndDateTime = DateTime.now();
   int selectedEndDay = DateTime.now().day - 1;
   int selectedEndMonth = DateTime.now().month - 1;
   int selectedEndYear = DateTime.now().year;
@@ -88,9 +93,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   // Notification
   bool notificationFlag = true;
-  Map<NotificationTime, NotificationType> selectedNotifications = {
-    NotificationTime.tenMinsBefore: NotificationType.alert
-  };
+  Map<NotificationTime, NotificationType> selectedNotifications = {};
   Map<int, CustomNotificationUOT>? selectedCustomNotification;
 
   @override
@@ -103,20 +106,7 @@ class _CreateEventViewState extends State<CreateEventView> {
     _categoryService = CategoryController();
     _colorService = ColorController();
     _notificationService = NotificationController();
-    selectedStartDateTime = DateTime(
-      selectedStartYear,
-      selectedStartMonth + 1,
-      selectedStartDay + 1,
-      selectedStartHour,
-      selectedStartMinute,
-    );
-    selectedEndDateTime = DateTime(
-      selectedEndYear,
-      selectedEndMonth + 1,
-      selectedEndDay + 1,
-      selectedEndHour,
-      selectedEndMinute,
-    );
+    setup();
     super.initState();
   }
 
@@ -127,13 +117,106 @@ class _CreateEventViewState extends State<CreateEventView> {
     super.dispose();
   }
 
+  void setup() async {
+    final event =
+        await _eventService.get(id: widget.eventId).then((value) => value);
+    final category =
+        await _categoryService.get(id: event.categoryId).then((value) => value);
+    final color =
+        await _colorService.get(id: category.colorId).then((value) => value);
+    final notifications = await _notificationService
+        .getByEventId(id: event.id)
+        .then((value) => value);
+    setState(() {
+      _eventTitle.text = event.title;
+
+      final start = event.start.toDate();
+      selectedStartDay = start.day - 1;
+      selectedStartMonth = start.month - 1;
+      selectedStartYear = start.year;
+      selectedStartHour = start.hour;
+      selectedStartMinute = start.minute;
+      selectedStartDateTime = DateTime(
+        selectedStartYear,
+        selectedStartMonth + 1,
+        selectedStartDay + 1,
+        selectedStartHour,
+        selectedStartMinute,
+      );
+
+      final end = event.end.toDate();
+      selectedEndDay = end.day - 1;
+      selectedEndMonth = end.month - 1;
+      selectedEndYear = end.year;
+      selectedEndHour = end.hour;
+      selectedEndMinute = end.minute;
+      selectedEndDateTime = DateTime(
+        selectedEndYear,
+        selectedEndMonth + 1,
+        selectedEndDay + 1,
+        selectedEndHour,
+        selectedEndMinute,
+      );
+
+      if (selectedStartHour == 0 &&
+          selectedStartMinute == 0 &&
+          selectedEndHour == 23 &&
+          selectedEndMinute == 59) {
+        allDay = true;
+      }
+
+      important = event.important;
+
+      categoryId = category.id;
+      categoryName = category.name;
+      categoryHex = color.hex;
+
+      if (notifications.isNotEmpty) {
+        notificationFlag = true;
+        for (var element in notifications) {
+          final difference =
+              element.dateTime.toDate().difference(event.start.toDate());
+          if (difference.inSeconds == 0) {
+            selectedNotifications[NotificationTime.timeOfEvent] = element.type;
+          } else if (difference.inMinutes == -10) {
+            selectedNotifications[NotificationTime.tenMinsBefore] =
+                element.type;
+          } else if (difference.inHours == -1) {
+            selectedNotifications[NotificationTime.hourBefore] = element.type;
+          } else if (difference.inDays == -1) {
+            selectedNotifications[NotificationTime.dayBefore] = element.type;
+          } else {
+            selectedNotifications[NotificationTime.custom] = element.type;
+            if (difference.inMinutes >= -60) {
+              selectedCustomNotification = {
+                difference.inMinutes.abs(): CustomNotificationUOT.minutes
+              };
+            } else if (difference.inHours >= -24) {
+              selectedCustomNotification = {
+                difference.inHours.abs(): CustomNotificationUOT.hours
+              };
+            } else if (difference.inDays >= -365) {
+              selectedCustomNotification = {
+                difference.inDays.abs(): CustomNotificationUOT.days
+              };
+            }
+          }
+        }
+      } else {
+        notificationFlag = false;
+      }
+
+      _eventDescription.text = event.description ?? "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(color: Colors.white),
         title: const Text(
-          "Create Event",
+          "Edit Event",
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -144,21 +227,21 @@ class _CreateEventViewState extends State<CreateEventView> {
             eventTitleFocus.unfocus();
             eventDescriptionFocus.unfocus();
           });
-          if (eventIsEdited ||
-              _eventTitle.text.isNotEmpty ||
-              _eventDescription.text.isNotEmpty) {
-            final shouldDiscard = await showDiscardDialog(
-              context,
-              "Are you sure you want to discard this event?",
-            );
-            if (shouldDiscard) {
-              if (mounted) {
-                Navigator.of(context).pop();
-                return true;
-              }
-            }
-            return false;
-          }
+          // if (eventIsEdited ||
+          //     _eventTitle.text.isNotEmpty ||
+          //     _eventDescription.text.isNotEmpty) {
+          //   final shouldDiscard = await showDiscardDialog(
+          //     context,
+          //     "Are you sure you want to discard this event?",
+          //   );
+          //   if (shouldDiscard) {
+          //     if (mounted) {
+          //       Navigator.of(context).pop();
+          //       return true;
+          //     }
+          //   }
+          //   return false;
+          // }
           return true;
         },
         child: SingleChildScrollView(
@@ -591,7 +674,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             selectedEndDateTime.minute,
                           ),
                         );
-                  final createdEvent = await _eventService.create(
+                  _eventService.create(
                     title: _eventTitle.text.isNotEmpty
                         ? _eventTitle.text
                         : "My Event",
@@ -601,62 +684,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                     important: important,
                     description: _eventDescription.text,
                   );
-                  if (notificationFlag == true) {
-                    selectedNotifications.forEach((key, value) {
-                      if (key == NotificationTime.timeOfEvent) {
-                        _notificationService.create(
-                          eventId: createdEvent,
-                          dateTime: startTimestamp,
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.tenMinsBefore) {
-                        _notificationService.create(
-                          eventId: createdEvent,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(minutes: 10))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.hourBefore) {
-                        _notificationService.create(
-                          eventId: createdEvent,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(hours: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.dayBefore) {
-                        _notificationService.create(
-                          eventId: createdEvent,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(days: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.custom) {
-                        final customAmount =
-                            selectedCustomNotification!.keys.first;
-                        late Duration customDuration;
-                        if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.minutes) {
-                          customDuration = Duration(minutes: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.hours) {
-                          customDuration = Duration(hours: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.days) {
-                          customDuration = Duration(days: customAmount);
-                        }
-                        _notificationService.create(
-                          eventId: createdEvent,
-                          dateTime: Timestamp.fromDate(
-                              startTimestamp.toDate().subtract(customDuration)),
-                          type: value.name,
-                        );
-                      }
-                    });
-                  }
-                  if (mounted) {}
                   Navigator.of(context).pop();
                 },
                 child: const Text("Save"),

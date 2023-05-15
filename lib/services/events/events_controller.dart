@@ -15,7 +15,7 @@ class EventController {
   EventController._sharedInstance();
   factory EventController() => _shared;
 
-  Future<void> create({
+  Future<String> create({
     required String title,
     required String categoryId,
     required Timestamp start,
@@ -24,7 +24,7 @@ class EventController {
     String? description,
   }) async {
     final events = await _getCollection();
-    await events.add({
+    final test = await events.add({
       eventTitleField: title,
       eventCategoryIdField: categoryId,
       eventStartField: start,
@@ -32,6 +32,7 @@ class EventController {
       eventImportantField: important,
       eventDescriptionField: description
     });
+    return test.id;
   }
 
   Future<Events> get({required String id}) async {

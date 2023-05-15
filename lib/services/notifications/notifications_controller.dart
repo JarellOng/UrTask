@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/notifications/notifications_constants.dart';
+import 'package:urtask/services/notifications/notifications_model.dart';
 
-class EventController {
+class NotificationController {
   final calendarController = CalendarController();
   final calendars = FirebaseFirestore.instance.collection("calendar");
   Future<CollectionReference<Map<String, dynamic>>> _getCollection() async {
@@ -11,21 +13,30 @@ class EventController {
     return calendars.doc(calendar.id).collection(notificationCollectionId);
   }
 
-  static final EventController _shared = EventController._sharedInstance();
-  EventController._sharedInstance();
-  factory EventController() => _shared;
+  static final NotificationController _shared =
+      NotificationController._sharedInstance();
+  NotificationController._sharedInstance();
+  factory NotificationController() => _shared;
 
   Future<void> create({
     required String eventId,
-    required DateTime dateTime,
-    required NotificationType type,
+    required Timestamp dateTime,
+    required String type,
   }) async {
     final notifications = await _getCollection();
     await notifications.add({
       notificationEventIdField: eventId,
-      notificationDateTimeField: dateTime.millisecondsSinceEpoch,
-      notificationTypeField: type.toString(),
+      notificationDateTimeField: dateTime,
+      notificationTypeField: type,
     });
+  }
+
+  Future<Iterable<Notifications>> getByEventId({required String id}) async {
+    final notifications = await _getCollection();
+    final querySnapshot = await notifications
+        .where(notificationEventIdField, isEqualTo: id)
+        .get();
+    return querySnapshot.docs.map((doc) => Notifications.fromSnapshot(doc));
   }
 
   // TODO: Make Schedule Functions
