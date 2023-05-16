@@ -5,26 +5,25 @@ import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/services/notifications/notifications_constants.dart';
 
 @immutable
-class Notfications {
+class Notifications {
   final String id;
   final String eventId;
-  final DateTime dateTime;
-  final Enum type;
+  final Timestamp dateTime;
+  final NotificationType type;
 
-  const Notfications({
+  const Notifications({
     required this.id,
     required this.eventId,
     required this.dateTime,
     required this.type,
   });
 
-  Notfications.fromSnapshot(
+  Notifications.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       : id = snapshot.id,
         eventId = snapshot.data()[notificationEventIdField],
-        dateTime = DateTime.fromMillisecondsSinceEpoch(
-            snapshot.data()[notificationDateTimeField]),
+        dateTime = snapshot.data()[notificationDateTimeField],
         type = NotificationType.values.firstWhere((element) =>
-            element.toString() ==
-            "NotificationType.${snapshot.data()[notificationTypeField]}");
+            element.name.toString() ==
+            "${snapshot.data()[notificationTypeField]}");
 }

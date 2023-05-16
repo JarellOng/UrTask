@@ -382,23 +382,6 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                             child: const Text("..."),
                           ),
                         ],
-                        // TextButton(
-                        //   onPressed: () {
-                        //     setState(() {
-                        //       if (customNotificationScrollToggle == true) {
-                        //         _customNotificationScrollOff();
-                        //       } else {
-                        //         _customNotificationScrollOn();
-                        //       }
-                        //     });
-                        //   },
-                        //   child: Text(
-                        //     _printCustomNotification(
-                        //       amount: selectedCustomNotifcationAmount,
-                        //       uot: selectedCustomNotifcationUot,
-                        //     ),
-                        //   ),
-                        // )
                       ]
                     ],
                   ),
@@ -407,6 +390,9 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                         .containsKey(NotificationTime.custom)) {
                       setState(() {
                         selectedNotifications.remove(NotificationTime.custom);
+                        if (customNotificationScrollToggle == true) {
+                          _customNotificationScrollOff();
+                        }
                       });
                     } else {
                       setState(() {
