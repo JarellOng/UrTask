@@ -580,7 +580,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                   if (endTimeScrollToggle == true) {
                     _endTimeScrollOff();
                   }
-                  final startTimestamp = allDay == true
+                  Timestamp startTimestamp = allDay == true
                       ? Timestamp.fromDate(
                           DateTime(
                             selectedStartDateTime.year,
@@ -597,7 +597,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             selectedStartDateTime.minute,
                           ),
                         );
-                  final endTimestamp = allDay == true
+                  Timestamp endTimestamp = allDay == true
                       ? Timestamp.fromDate(
                           DateTime(
                             selectedEndDateTime.year,
@@ -616,6 +616,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                             selectedEndDateTime.minute,
                           ),
                         );
+
+                  // Create Event
                   final createdEvent = await _eventService.create(
                     title: _eventTitle.text.isNotEmpty
                         ? _eventTitle.text
@@ -626,6 +628,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                     important: important,
                     description: _eventDescription.text,
                   );
+
+                  // Create Notifications
                   if (notificationFlag == true) {
                     selectedNotifications.forEach((key, value) {
                       if (key == NotificationTime.timeOfEvent) {
@@ -681,8 +685,87 @@ class _CreateEventViewState extends State<CreateEventView> {
                       }
                     });
                   }
-                  if (mounted) {}
-                  Navigator.of(context).pop();
+
+                  // Create Duplicate Events
+                  if (selectedRepeatType != RepeatType.noRepeat) {
+                    Duration? repeatDurationArithmetic;
+                    if (selectedRepeatType == RepeatType.perDay) {
+                      repeatDurationArithmetic =
+                          Duration(days: selectedRepeatTypeAmount);
+                    } else if (selectedRepeatType == RepeatType.perWeek) {
+                      repeatDurationArithmetic =
+                          Duration(days: 7 * selectedRepeatTypeAmount);
+                    }
+
+                    if (selectedRepeatDuration ==
+                        RepeatDuration.specificNumber) {
+                      for (var i = 0; i < selectedRepeatDurationAmount!; i++) {
+                        if (repeatDurationArithmetic != null) {
+                          startTimestamp = Timestamp.fromDate(startTimestamp
+                              .toDate()
+                              .add(repeatDurationArithmetic));
+                          endTimestamp = Timestamp.fromDate(endTimestamp
+                              .toDate()
+                              .add(repeatDurationArithmetic));
+                        } else {
+                          final startDateTime = startTimestamp.toDate();
+                          final endDateTime = endTimestamp.toDate();
+                          if (selectedRepeatType == RepeatType.perMonth) {
+                            startTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                startDateTime.year,
+                                startDateTime.month + 1,
+                                startDateTime.day,
+                                startDateTime.hour,
+                                startDateTime.minute,
+                              ),
+                            );
+                            endTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                endDateTime.year,
+                                endDateTime.month + 1,
+                                endDateTime.day,
+                                endDateTime.hour,
+                                endDateTime.minute,
+                              ),
+                            );
+                          } else if (selectedRepeatType == RepeatType.perYear) {
+                            startTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                startDateTime.year + 1,
+                                startDateTime.month,
+                                startDateTime.day,
+                                startDateTime.hour,
+                                startDateTime.minute,
+                              ),
+                            );
+                            endTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                endDateTime.year + 1,
+                                endDateTime.month,
+                                endDateTime.day,
+                                endDateTime.hour,
+                                endDateTime.minute,
+                              ),
+                            );
+                          }
+                        }
+                        await _eventService.create(
+                          title: _eventTitle.text.isNotEmpty
+                              ? _eventTitle.text
+                              : "My Event",
+                          categoryId: categoryId,
+                          start: startTimestamp,
+                          end: endTimestamp,
+                          important: important,
+                          description: _eventDescription.text,
+                        );
+                      }
+                    }
+                  }
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: const Text("Save"),
               ),
