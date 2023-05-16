@@ -53,22 +53,23 @@ class EventController {
             )));
   }
 
-  // TODO: Add Appropriate Start and End Datatypes
   Future<void> update({
     required String id,
-    required String categoryId,
     required String title,
-    required String description,
-    required bool allDay,
+    required String categoryId,
+    required Timestamp start,
+    required Timestamp end,
     required bool important,
+    String? description,
   }) async {
     final events = await _getCollection();
     await events.doc(id).update({
-      eventCategoryIdField: categoryId,
       eventTitleField: title,
-      eventDescriptionField: description,
-      eventAllDayField: allDay,
-      eventImportantField: important
+      eventCategoryIdField: categoryId,
+      eventStartField: start,
+      eventEndField: end,
+      eventImportantField: important,
+      eventDescriptionField: description
     });
   }
 

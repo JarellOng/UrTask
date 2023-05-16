@@ -39,5 +39,12 @@ class NotificationController {
     return querySnapshot.docs.map((doc) => Notifications.fromSnapshot(doc));
   }
 
+  Future<void> bulkDelete({required List<String> ids}) async {
+    final events = await _getCollection();
+    for (var i = 0; i < ids.length; i++) {
+      await events.doc(ids[i]).delete();
+    }
+  }
+
   // TODO: Make Schedule Functions
 }
