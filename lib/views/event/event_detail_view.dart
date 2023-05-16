@@ -10,6 +10,7 @@ import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
+import 'package:urtask/utilities/dialogs/delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
@@ -605,135 +606,162 @@ class _EventDetailViewState extends State<EventDetailView> {
                 ),
               ),
 
-              // SAVE BUTTON
-              TextButton(
-                onPressed: () async {
-                  if (startDateScrollToggle == true) {
-                    _startDateScrollOff();
-                  }
-                  if (startTimeScrollToggle == true) {
-                    _startTimeScrollOff();
-                  }
-                  if (endDateScrollToggle == true) {
-                    _endDateScrollOff();
-                  }
-                  if (endTimeScrollToggle == true) {
-                    _endTimeScrollOff();
-                  }
-                  final startTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                            selectedStartDateTime.hour,
-                            selectedStartDateTime.minute,
-                          ),
-                        );
-                  final endTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            23,
-                            59,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            selectedEndDateTime.hour,
-                            selectedEndDateTime.minute,
-                          ),
-                        );
-
-                  // Update Event
-                  await _eventService.update(
-                    id: _eventId,
-                    title: _eventTitle.text.isNotEmpty
-                        ? _eventTitle.text
-                        : "My Event",
-                    categoryId: categoryId,
-                    start: startTimestamp,
-                    end: endTimestamp,
-                    important: important,
-                    description: _eventDescription.text,
-                  );
-
-                  // Update Notification
-                  await _notificationService.bulkDelete(
-                      ids: storedNotificationIds);
-                  if (notificationFlag == true) {
-                    selectedNotifications.forEach((key, value) {
-                      if (key == NotificationTime.timeOfEvent) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: startTimestamp,
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.tenMinsBefore) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(minutes: 10))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.hourBefore) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(hours: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.dayBefore) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(days: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.custom) {
-                        final customAmount =
-                            selectedCustomNotification!.keys.first;
-                        late Duration customDuration;
-                        if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.minutes) {
-                          customDuration = Duration(minutes: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.hours) {
-                          customDuration = Duration(hours: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.days) {
-                          customDuration = Duration(days: customAmount);
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // DELETE BUTTON
+                  TextButton(
+                    onPressed: () async {
+                      final shouldDelete = await showDeleteDialog(
+                        context,
+                        "Are you sure you want to delete this event?",
+                      );
+                      if (shouldDelete) {
+                        await _eventService.delete(id: _eventId);
+                        await _notificationService.bulkDelete(
+                            ids: storedNotificationIds);
+                        if (mounted) {
+                          Navigator.of(context).pop();
                         }
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(
-                              startTimestamp.toDate().subtract(customDuration)),
-                          type: value.name,
-                        );
                       }
-                    });
-                  }
+                    },
+                    child: const Text("Delete"),
+                  ),
 
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
-                child: const Text("Save"),
+                  // SAVE BUTTON
+                  TextButton(
+                    onPressed: () async {
+                      if (startDateScrollToggle == true) {
+                        _startDateScrollOff();
+                      }
+                      if (startTimeScrollToggle == true) {
+                        _startTimeScrollOff();
+                      }
+                      if (endDateScrollToggle == true) {
+                        _endDateScrollOff();
+                      }
+                      if (endTimeScrollToggle == true) {
+                        _endTimeScrollOff();
+                      }
+                      final startTimestamp = allDay == true
+                          ? Timestamp.fromDate(
+                              DateTime(
+                                selectedStartDateTime.year,
+                                selectedStartDateTime.month,
+                                selectedStartDateTime.day,
+                              ),
+                            )
+                          : Timestamp.fromDate(
+                              DateTime(
+                                selectedStartDateTime.year,
+                                selectedStartDateTime.month,
+                                selectedStartDateTime.day,
+                                selectedStartDateTime.hour,
+                                selectedStartDateTime.minute,
+                              ),
+                            );
+                      final endTimestamp = allDay == true
+                          ? Timestamp.fromDate(
+                              DateTime(
+                                selectedEndDateTime.year,
+                                selectedEndDateTime.month,
+                                selectedEndDateTime.day,
+                                23,
+                                59,
+                              ),
+                            )
+                          : Timestamp.fromDate(
+                              DateTime(
+                                selectedEndDateTime.year,
+                                selectedEndDateTime.month,
+                                selectedEndDateTime.day,
+                                selectedEndDateTime.hour,
+                                selectedEndDateTime.minute,
+                              ),
+                            );
+
+                      // Update Event
+                      await _eventService.update(
+                        id: _eventId,
+                        title: _eventTitle.text.isNotEmpty
+                            ? _eventTitle.text
+                            : "My Event",
+                        categoryId: categoryId,
+                        start: startTimestamp,
+                        end: endTimestamp,
+                        important: important,
+                        description: _eventDescription.text,
+                      );
+
+                      // Update Notification
+                      await _notificationService.bulkDelete(
+                          ids: storedNotificationIds);
+                      if (notificationFlag == true) {
+                        selectedNotifications.forEach((key, value) {
+                          if (key == NotificationTime.timeOfEvent) {
+                            _notificationService.create(
+                              eventId: _eventId,
+                              dateTime: startTimestamp,
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.tenMinsBefore) {
+                            _notificationService.create(
+                              eventId: _eventId,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(const Duration(minutes: 10))),
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.hourBefore) {
+                            _notificationService.create(
+                              eventId: _eventId,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(const Duration(hours: 1))),
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.dayBefore) {
+                            _notificationService.create(
+                              eventId: _eventId,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(const Duration(days: 1))),
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.custom) {
+                            final customAmount =
+                                selectedCustomNotification!.keys.first;
+                            late Duration customDuration;
+                            if (selectedCustomNotification!.values.first ==
+                                CustomNotificationUOT.minutes) {
+                              customDuration = Duration(minutes: customAmount);
+                            } else if (selectedCustomNotification!
+                                    .values.first ==
+                                CustomNotificationUOT.hours) {
+                              customDuration = Duration(hours: customAmount);
+                            } else if (selectedCustomNotification!
+                                    .values.first ==
+                                CustomNotificationUOT.days) {
+                              customDuration = Duration(days: customAmount);
+                            }
+                            _notificationService.create(
+                              eventId: _eventId,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(customDuration)),
+                              type: value.name,
+                            );
+                          }
+                        });
+                      }
+
+                      if (mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text("Save"),
+                  ),
+                ],
               ),
             ],
           ),
