@@ -10,24 +10,25 @@ import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
+import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
 
-class EditEventView extends StatefulWidget {
+class EventDetailView extends StatefulWidget {
   final String eventId;
 
-  const EditEventView({
+  const EventDetailView({
     super.key,
     required this.eventId,
   });
 
   @override
-  State<EditEventView> createState() => _EditEventViewState();
+  State<EventDetailView> createState() => _EventDetailViewState();
 }
 
-class _EditEventViewState extends State<EditEventView> {
+class _EventDetailViewState extends State<EventDetailView> {
   late final EventController _eventService;
   late final CategoryController _categoryService;
   late final ColorController _colorService;
@@ -213,7 +214,7 @@ class _EditEventViewState extends State<EditEventView> {
       appBar: AppBar(
         leading: const BackButton(color: Colors.white),
         title: const Text(
-          "Edit Event",
+          "Event Detail",
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -224,21 +225,19 @@ class _EditEventViewState extends State<EditEventView> {
             eventTitleFocus.unfocus();
             eventDescriptionFocus.unfocus();
           });
-          // if (eventIsEdited ||
-          //     _eventTitle.text.isNotEmpty ||
-          //     _eventDescription.text.isNotEmpty) {
-          //   final shouldDiscard = await showDiscardDialog(
-          //     context,
-          //     "Are you sure you want to discard this event?",
-          //   );
-          //   if (shouldDiscard) {
-          //     if (mounted) {
-          //       Navigator.of(context).pop();
-          //       return true;
-          //     }
-          //   }
-          //   return false;
-          // }
+          if (eventIsEdited) {
+            final shouldDiscard = await showDiscardDialog(
+              context,
+              "Are you sure you want to discard your changes on this event?",
+            );
+            if (shouldDiscard) {
+              if (mounted) {
+                Navigator.of(context).pop();
+                return true;
+              }
+            }
+            return false;
+          }
           return true;
         },
         child: SingleChildScrollView(
@@ -248,6 +247,11 @@ class _EditEventViewState extends State<EditEventView> {
               TextField(
                 controller: _eventTitle,
                 focusNode: eventTitleFocus,
+                onChanged: (value) {
+                  setState(() {
+                    eventIsEdited = true;
+                  });
+                },
                 enableSuggestions: false,
                 autocorrect: false,
                 decoration: const InputDecoration(
@@ -588,6 +592,11 @@ class _EditEventViewState extends State<EditEventView> {
               TextField(
                 controller: _eventDescription,
                 focusNode: eventDescriptionFocus,
+                onChanged: (value) {
+                  setState(() {
+                    eventIsEdited;
+                  });
+                },
                 enableSuggestions: false,
                 autocorrect: false,
                 maxLines: 3,

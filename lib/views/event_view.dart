@@ -7,7 +7,7 @@ import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/services/events/events_model.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
-import 'package:urtask/views/event/edit_event_view.dart';
+import 'package:urtask/views/event/event_detail_view.dart';
 
 class EventView extends StatefulWidget {
   final DateTime selectedDay;
@@ -56,7 +56,7 @@ class _EventViewState extends State<EventView> {
                       final eventDetail = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditEventView(
+                          builder: (context) => EventDetailView(
                             eventId: event.id,
                           ),
                         ),
