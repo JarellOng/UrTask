@@ -33,6 +33,7 @@ class _EditEventViewState extends State<EditEventView> {
   late final ColorController _colorService;
   late final NotificationController _notificationService;
 
+  String _eventId = "";
   late final TextEditingController _eventTitle;
   late final FocusNode eventTitleFocus;
   late final TextEditingController _eventDescription;
@@ -81,6 +82,7 @@ class _EditEventViewState extends State<EditEventView> {
   String categoryHex = "#039be5";
 
   // Notification
+  List<String> storedNotificationIds = [];
   bool notificationFlag = true;
   Map<NotificationTime, NotificationType> selectedNotifications = {};
   Map<int, CustomNotificationUOT>? selectedCustomNotification;
@@ -117,6 +119,8 @@ class _EditEventViewState extends State<EditEventView> {
         .getByEventId(id: event.id)
         .then((value) => value);
     setState(() {
+      _eventId = event.id;
+
       _eventTitle.text = event.title;
 
       final start = event.start.toDate();
@@ -160,6 +164,7 @@ class _EditEventViewState extends State<EditEventView> {
       categoryName = category.name;
       categoryHex = color.hex;
 
+      storedNotificationIds = notifications.map((e) => e.id).toList();
       if (notifications.isNotEmpty) {
         notificationFlag = true;
         for (var element in notifications) {
@@ -193,6 +198,9 @@ class _EditEventViewState extends State<EditEventView> {
         }
       } else {
         notificationFlag = false;
+        selectedNotifications = {
+          NotificationTime.tenMinsBefore: NotificationType.alert
+        };
       }
 
       _eventDescription.text = event.description ?? "";
@@ -639,7 +647,10 @@ class _EditEventViewState extends State<EditEventView> {
                             selectedEndDateTime.minute,
                           ),
                         );
-                  _eventService.create(
+
+                  // Update Event
+                  await _eventService.update(
+                    id: _eventId,
                     title: _eventTitle.text.isNotEmpty
                         ? _eventTitle.text
                         : "My Event",
@@ -649,7 +660,69 @@ class _EditEventViewState extends State<EditEventView> {
                     important: important,
                     description: _eventDescription.text,
                   );
-                  Navigator.of(context).pop();
+
+                  // Update Notification
+                  await _notificationService.bulkDelete(
+                      ids: storedNotificationIds);
+                  if (notificationFlag == true) {
+                    selectedNotifications.forEach((key, value) {
+                      if (key == NotificationTime.timeOfEvent) {
+                        _notificationService.create(
+                          eventId: _eventId,
+                          dateTime: startTimestamp,
+                          type: value.name,
+                        );
+                      } else if (key == NotificationTime.tenMinsBefore) {
+                        _notificationService.create(
+                          eventId: _eventId,
+                          dateTime: Timestamp.fromDate(startTimestamp
+                              .toDate()
+                              .subtract(const Duration(minutes: 10))),
+                          type: value.name,
+                        );
+                      } else if (key == NotificationTime.hourBefore) {
+                        _notificationService.create(
+                          eventId: _eventId,
+                          dateTime: Timestamp.fromDate(startTimestamp
+                              .toDate()
+                              .subtract(const Duration(hours: 1))),
+                          type: value.name,
+                        );
+                      } else if (key == NotificationTime.dayBefore) {
+                        _notificationService.create(
+                          eventId: _eventId,
+                          dateTime: Timestamp.fromDate(startTimestamp
+                              .toDate()
+                              .subtract(const Duration(days: 1))),
+                          type: value.name,
+                        );
+                      } else if (key == NotificationTime.custom) {
+                        final customAmount =
+                            selectedCustomNotification!.keys.first;
+                        late Duration customDuration;
+                        if (selectedCustomNotification!.values.first ==
+                            CustomNotificationUOT.minutes) {
+                          customDuration = Duration(minutes: customAmount);
+                        } else if (selectedCustomNotification!.values.first ==
+                            CustomNotificationUOT.hours) {
+                          customDuration = Duration(hours: customAmount);
+                        } else if (selectedCustomNotification!.values.first ==
+                            CustomNotificationUOT.days) {
+                          customDuration = Duration(days: customAmount);
+                        }
+                        _notificationService.create(
+                          eventId: _eventId,
+                          dateTime: Timestamp.fromDate(
+                              startTimestamp.toDate().subtract(customDuration)),
+                          type: value.name,
+                        );
+                      }
+                    });
+                  }
+
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: const Text("Save"),
               ),
