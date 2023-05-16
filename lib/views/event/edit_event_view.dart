@@ -5,18 +5,14 @@ import 'package:urtask/color.dart';
 import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
-import 'package:urtask/enums/repeat_duration_enum.dart';
-import 'package:urtask/enums/repeat_type_enum.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
-import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
-import 'package:urtask/views/event/repeat_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
 
 class EditEventView extends StatefulWidget {
@@ -83,13 +79,6 @@ class _EditEventViewState extends State<EditEventView> {
   String categoryId = "category3";
   String categoryName = "Meeting";
   String categoryHex = "#039be5";
-
-  // Repeat
-  RepeatType selectedRepeatType = RepeatType.noRepeat;
-  RepeatDuration selectedRepeatDuration = RepeatDuration.specificNumber;
-  int selectedRepeatTypeAmount = 0;
-  int? selectedRepeatDurationAmount;
-  DateTime? selectedRepeatDurationDate;
 
   // Notification
   bool notificationFlag = true;
@@ -542,50 +531,6 @@ class _EditEventViewState extends State<EditEventView> {
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
-                  ),
-                ],
-              ),
-
-              // REPEAT
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Repeat"),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                      final repeatDetail = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RepeatEventView(
-                            type: selectedRepeatType,
-                            duration: selectedRepeatDuration,
-                            typeAmount: selectedRepeatTypeAmount,
-                            durationAmount: selectedRepeatDurationAmount,
-                            durationDate: selectedRepeatDurationDate,
-                          ),
-                        ),
-                      );
-                      setState(() {
-                        selectedRepeatType = repeatDetail[0];
-                        selectedRepeatDuration = repeatDetail[1];
-                        selectedRepeatTypeAmount = repeatDetail[2];
-                        if (selectedRepeatDuration ==
-                            RepeatDuration.specificNumber) {
-                          selectedRepeatDurationAmount = repeatDetail[3];
-                          selectedRepeatDurationDate = null;
-                        } else if (selectedRepeatDuration ==
-                            RepeatDuration.until) {
-                          selectedRepeatDurationDate = repeatDetail[3];
-                          selectedRepeatDurationAmount = null;
-                        }
-                      });
-                    },
-                    child: const Text("Repeat"),
                   ),
                 ],
               ),
