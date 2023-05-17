@@ -33,7 +33,7 @@ class _EventViewState extends State<EventView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _eventService.getByDay(dateTime: widget.selectedDay),
+      stream: _eventService.getByDate(dateTime: widget.selectedDay),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:

@@ -24,6 +24,13 @@ class _HomeViewState extends State<HomeView> {
   int _counter = 0;
   int _selectedDestination = 0;
   var uot = CalendarFormat.month;
+  late final TextEditingController today;
+
+  @override
+  void initState() {
+    today = TextEditingController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +50,24 @@ class _HomeViewState extends State<HomeView> {
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(Icons.search, size: 32, color: Colors.white),
           ),
+
+          // Show Today
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.event_available, size: 32, color: Colors.white),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: IconButton(
+              icon: const Icon(
+                Icons.event_available,
+                size: 32,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  today.text = "Today";
+                });
+              },
+            ),
           ),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: IconButton(
@@ -140,7 +161,7 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      body: CalendarView(calendarFilter: uot),
+      body: CalendarView(calendarFilter: uot, today: today),
       floatingActionButton: SpeedDial(
         //Speed dial menu
         marginBottom: 10, //margin bottom

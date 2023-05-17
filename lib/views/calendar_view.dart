@@ -6,7 +6,12 @@ import 'package:urtask/views/event_view.dart';
 
 class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;
-  const CalendarView({super.key, required this.calendarFilter});
+  final TextEditingController today;
+  const CalendarView({
+    super.key,
+    required this.calendarFilter,
+    required this.today,
+  });
 
   @override
   State<CalendarView> createState() => _CalendarViewState();
@@ -14,7 +19,7 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   DateTime selectedDay = DateTime.now();
-  DateTime focusedDay = DateTime.now();
+  // DateTime focusedDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +30,7 @@ class _CalendarViewState extends State<CalendarView> {
             top: 20.0,
           ),
           child: TableCalendar(
-            focusedDay: focusedDay,
+            focusedDay: _showToday() ?? selectedDay,
             firstDay: DateTime.utc(2010, 10, 16),
             lastDay: DateTime.utc(2025, 10, 16),
             rowHeight: 45,
@@ -41,9 +46,13 @@ class _CalendarViewState extends State<CalendarView> {
             onDaySelected: (DateTime selectDay, DateTime focusDay) {
               setState(() {
                 selectedDay = selectDay;
-                focusedDay = focusDay;
+                // focusedDay = focusDay;
               });
-              print(focusedDay);
+            },
+            onPageChanged: (focusedDay) {
+              setState(() {
+                selectedDay = focusedDay;
+              });
             },
             selectedDayPredicate: (DateTime date) {
               return isSameDay(selectedDay, date);
@@ -73,8 +82,19 @@ class _CalendarViewState extends State<CalendarView> {
               child: Text(DateFormat('yMMMMd').format(selectedDay),
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600))),
         ),
-        EventView(selectedDay: focusedDay)
+        EventView(selectedDay: selectedDay)
       ],
     );
+  }
+
+  DateTime? _showToday() {
+    if (widget.today.text == "Today" && selectedDay != DateTime.now()) {
+      setState(() {
+        selectedDay = DateTime.now();
+      });
+      widget.today.text = "";
+      return selectedDay;
+    }
+    return null;
   }
 }
