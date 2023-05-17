@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/events/events_constants.dart';
 import 'package:urtask/services/events/events_model.dart';
+import 'package:urtask/services/notifications/notifications_controller.dart';
 
 class EventController {
   final calendarController = CalendarController();
+  final notificationController = NotificationController();
   final calendars = FirebaseFirestore.instance.collection("calendar");
   Future<CollectionReference<Map<String, dynamic>>> _getCollection() async {
     final calendar = await calendarController.get();
@@ -18,21 +20,23 @@ class EventController {
   Future<String> create({
     required String title,
     required String categoryId,
+    String? groupId,
     required Timestamp start,
     required Timestamp end,
     required bool important,
     String? description,
   }) async {
     final events = await _getCollection();
-    final test = await events.add({
+    final event = await events.add({
       eventTitleField: title,
       eventCategoryIdField: categoryId,
+      eventGroupIdField: groupId,
       eventStartField: start,
       eventEndField: end,
       eventImportantField: important,
       eventDescriptionField: description
     });
-    return test.id;
+    return event.id;
   }
 
   Future<Events> get({required String id}) async {
@@ -76,6 +80,19 @@ class EventController {
   Future<void> delete({required String id}) async {
     final events = await _getCollection();
     await events.doc(id).delete();
+  }
+
+  Future<void> bulkDeleteByGroupId({required String id}) async {
+    final events = await _getCollection();
+    final querySnapshot =
+        await events.where(eventGroupIdField, isEqualTo: id).get();
+    for (var element in querySnapshot.docs) {
+      await events.doc(element.id).delete();
+      final notificationIds = await notificationController
+          .getByEventId(id: element.id)
+          .then((value) => value.map((e) => e.id).toList());
+      await notificationController.bulkDelete(ids: notificationIds);
+    }
   }
 
   static bool _isBetweenDate({

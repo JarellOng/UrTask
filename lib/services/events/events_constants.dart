@@ -1,4 +1,5 @@
 const eventCategoryIdField = "categoryId";
+const eventGroupIdField = "groupId";
 const eventTitleField = "title";
 const eventStartField = "start";
 const eventEndField = "end";
