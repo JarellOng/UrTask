@@ -42,7 +42,7 @@ class EventController {
     return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc)).first;
   }
 
-  Stream<Iterable<Events>> getByDay({required DateTime dateTime}) async* {
+  Stream<Iterable<Events>> getByDate({required DateTime dateTime}) async* {
     final events = await _getCollection();
     yield* events.snapshots().map((data) => data.docs
         .map((doc) => Events.fromSnapshot(doc))
@@ -83,19 +83,14 @@ class EventController {
     required DateTime end,
     required DateTime compare,
   }) {
-    final startDay = start.day;
-    final startMonth = start.month;
-    final startYear = start.year;
-    final endDay = end.day;
-    final endMonth = end.month;
-    final endYear = end.year;
-    final compareDay = compare.day;
-    final compareMonth = compare.month;
-    final compareYear = compare.year;
+    final startDate = DateTime(start.year, start.month, start.day);
+    final endDate = DateTime(end.year, end.month, end.day);
+    final compareDate = DateTime(compare.year, compare.month, compare.day);
 
-    if (!(startDay <= compareDay && endDay >= compareDay)) return false;
-    if (!(startMonth <= compareMonth && endMonth >= compareMonth)) return false;
-    if (!(startYear <= compareYear && endYear >= compareYear)) return false;
-    return true;
+    if (startDate.isAfter(compareDate) || endDate.isBefore(compareDate)) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
