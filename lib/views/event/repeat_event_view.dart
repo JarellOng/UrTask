@@ -10,6 +10,7 @@ class RepeatEventView extends StatefulWidget {
   final int typeAmount;
   final int? durationAmount;
   final DateTime? durationDate;
+  final DateTime start;
 
   const RepeatEventView({
     super.key,
@@ -18,6 +19,7 @@ class RepeatEventView extends StatefulWidget {
     required this.typeAmount,
     this.durationAmount,
     this.durationDate,
+    required this.start,
   });
 
   @override
@@ -68,9 +70,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   late FixedExtentScrollController untilHour;
   late FixedExtentScrollController untilMinute;
   late DateTime selectedUntilDateTime;
-  int selectedUntilDay = DateTime.now().day;
-  int selectedUntilMonth = DateTime.now().month - 1;
-  int selectedUntilYear = DateTime.now().year;
+  late int selectedUntilDay;
+  late int selectedUntilMonth;
+  late int selectedUntilYear;
   bool untilDateScrollToggle = false;
   bool untilFlag = false;
 
@@ -81,6 +83,17 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     selectedTypeAmount = widget.typeAmount;
     selectedDurationAmount = widget.durationAmount;
     selectedDurationDate = widget.durationDate;
+
+    final eventStart = widget.start;
+    final untilInitialLimit = DateTime(
+      eventStart.year,
+      eventStart.month,
+      eventStart.day,
+    ).add(const Duration(days: 1));
+    selectedUntilDay = untilInitialLimit.day - 1;
+    selectedUntilMonth = untilInitialLimit.month - 1;
+    selectedUntilYear = untilInitialLimit.year;
+
     if (selectedType == RepeatType.perDay) {
       perDayAmount = TextEditingController(text: selectedTypeAmount.toString());
       perDayFlag = true;
@@ -692,6 +705,13 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   }
 
   void _untilDateScrollOff() {
+    final eventStart = widget.start;
+    final untilMinLimit = DateTime(
+      eventStart.year,
+      eventStart.month,
+      eventStart.day + 1,
+    );
+
     setState(() {
       selectedUntilDay = untilDay.selectedItem;
       selectedUntilMonth = untilMonth.selectedItem % 12;
@@ -720,6 +740,16 @@ class _RepeatEventViewState extends State<RepeatEventView> {
         selectedUntilMonth + 1,
         selectedUntilDay + 1,
       );
+      if (selectedUntilDateTime.isBefore(untilMinLimit)) {
+        selectedUntilYear = untilMinLimit.year;
+        selectedUntilMonth = untilMinLimit.month - 1;
+        selectedUntilDay = untilMinLimit.day - 1;
+        selectedUntilDateTime = DateTime(
+          selectedUntilYear,
+          selectedUntilMonth + 1,
+          selectedUntilDay + 1,
+        );
+      }
     });
   }
 
