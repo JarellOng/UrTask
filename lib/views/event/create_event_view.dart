@@ -645,11 +645,15 @@ class _CreateEventViewState extends State<CreateEventView> {
                         );
 
                   // Create Event
+                  final eventGroupId = selectedRepeatType != RepeatType.noRepeat
+                      ? "repeat${DateTime.now()}"
+                      : null;
                   final createdEvent = await _eventService.create(
                     title: _eventTitle.text.isNotEmpty
                         ? _eventTitle.text
                         : "My Event",
                     categoryId: categoryId,
+                    groupId: eventGroupId,
                     start: startTimestamp,
                     end: endTimestamp,
                     important: important,
@@ -777,16 +781,78 @@ class _CreateEventViewState extends State<CreateEventView> {
                             );
                           }
                         }
-                        await _eventService.create(
+                        final createdRepeatEvent = await _eventService.create(
                           title: _eventTitle.text.isNotEmpty
                               ? _eventTitle.text
                               : "My Event",
                           categoryId: categoryId,
+                          groupId: eventGroupId,
                           start: startTimestamp,
                           end: endTimestamp,
                           important: important,
                           description: _eventDescription.text,
                         );
+
+                        // Create Notifications
+                        if (notificationFlag == true) {
+                          selectedNotifications.forEach((key, value) {
+                            if (key == NotificationTime.timeOfEvent) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: startTimestamp,
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.tenMinsBefore) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(const Duration(minutes: 10))),
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.hourBefore) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(const Duration(hours: 1))),
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.dayBefore) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(const Duration(days: 1))),
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.custom) {
+                              final customAmount =
+                                  selectedCustomNotification!.keys.first;
+                              late Duration customDuration;
+                              if (selectedCustomNotification!.values.first ==
+                                  CustomNotificationUOT.minutes) {
+                                customDuration =
+                                    Duration(minutes: customAmount);
+                              } else if (selectedCustomNotification!
+                                      .values.first ==
+                                  CustomNotificationUOT.hours) {
+                                customDuration = Duration(hours: customAmount);
+                              } else if (selectedCustomNotification!
+                                      .values.first ==
+                                  CustomNotificationUOT.days) {
+                                customDuration = Duration(days: customAmount);
+                              }
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(customDuration)),
+                                type: value.name,
+                              );
+                            }
+                          });
+                        }
                       }
                     } else if (selectedRepeatDuration == RepeatDuration.until) {
                       while (!startTimestamp
@@ -855,16 +921,77 @@ class _CreateEventViewState extends State<CreateEventView> {
                                 minutes: 59,
                               ),
                             ))) break;
-                        await _eventService.create(
+                        final createdRepeatEvent = await _eventService.create(
                           title: _eventTitle.text.isNotEmpty
                               ? _eventTitle.text
                               : "My Event",
                           categoryId: categoryId,
+                          groupId: eventGroupId,
                           start: startTimestamp,
                           end: endTimestamp,
                           important: important,
                           description: _eventDescription.text,
                         );
+                        // Create Notifications
+                        if (notificationFlag == true) {
+                          selectedNotifications.forEach((key, value) {
+                            if (key == NotificationTime.timeOfEvent) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: startTimestamp,
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.tenMinsBefore) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(const Duration(minutes: 10))),
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.hourBefore) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(const Duration(hours: 1))),
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.dayBefore) {
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(const Duration(days: 1))),
+                                type: value.name,
+                              );
+                            } else if (key == NotificationTime.custom) {
+                              final customAmount =
+                                  selectedCustomNotification!.keys.first;
+                              late Duration customDuration;
+                              if (selectedCustomNotification!.values.first ==
+                                  CustomNotificationUOT.minutes) {
+                                customDuration =
+                                    Duration(minutes: customAmount);
+                              } else if (selectedCustomNotification!
+                                      .values.first ==
+                                  CustomNotificationUOT.hours) {
+                                customDuration = Duration(hours: customAmount);
+                              } else if (selectedCustomNotification!
+                                      .values.first ==
+                                  CustomNotificationUOT.days) {
+                                customDuration = Duration(days: customAmount);
+                              }
+                              _notificationService.create(
+                                eventId: createdRepeatEvent,
+                                dateTime: Timestamp.fromDate(startTimestamp
+                                    .toDate()
+                                    .subtract(customDuration)),
+                                type: value.name,
+                              );
+                            }
+                          });
+                        }
                       }
                     }
                   }

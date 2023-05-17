@@ -12,6 +12,7 @@ import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/utilities/dialogs/delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
+import 'package:urtask/utilities/dialogs/event_group_delete_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
@@ -36,6 +37,7 @@ class _EventDetailViewState extends State<EventDetailView> {
   late final NotificationController _notificationService;
 
   String _eventId = "";
+  String? _eventGroupId;
   late final TextEditingController _eventTitle;
   late final FocusNode eventTitleFocus;
   late final TextEditingController _eventDescription;
@@ -122,6 +124,8 @@ class _EventDetailViewState extends State<EventDetailView> {
         .then((value) => value);
     setState(() {
       _eventId = event.id;
+
+      _eventGroupId = event.groupId;
 
       _eventTitle.text = event.title;
 
@@ -617,11 +621,30 @@ class _EventDetailViewState extends State<EventDetailView> {
                         "Are you sure you want to delete this event?",
                       );
                       if (shouldDelete) {
-                        await _eventService.delete(id: _eventId);
-                        await _notificationService.bulkDelete(
-                            ids: storedNotificationIds);
-                        if (mounted) {
-                          Navigator.of(context).pop();
+                        if (_eventGroupId != null && mounted) {
+                          final shouldDeleteAllRepeatedEvents =
+                              await showEventGroupDeleteDialog(context);
+                          if (shouldDeleteAllRepeatedEvents == true) {
+                            await _eventService.bulkDeleteByGroupId(
+                                id: _eventGroupId!);
+                            if (mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          } else if (shouldDeleteAllRepeatedEvents == false) {
+                            await _eventService.delete(id: _eventId);
+                            await _notificationService.bulkDelete(
+                                ids: storedNotificationIds);
+                            if (mounted) {
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        } else {
+                          await _eventService.delete(id: _eventId);
+                          await _notificationService.bulkDelete(
+                              ids: storedNotificationIds);
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                          }
                         }
                       }
                     },
