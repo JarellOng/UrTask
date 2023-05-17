@@ -479,6 +479,32 @@ class _CreateEventViewState extends State<CreateEventView> {
                         eventTitleFocus.unfocus();
                         eventDescriptionFocus.unfocus();
                         eventIsEdited = true;
+                        if (startDateScrollToggle == true) {
+                          _startDateScrollOff();
+                        }
+                        if (startTimeScrollToggle == true) {
+                          _startTimeScrollOff();
+                        }
+                        if (endDateScrollToggle == true) {
+                          _endDateScrollOff();
+                        }
+                        if (endTimeScrollToggle == true) {
+                          _endTimeScrollOn();
+                        }
+                        if (selectedRepeatDurationDate != null &&
+                            selectedRepeatDurationDate!.isBefore(
+                              DateTime(
+                                selectedStartDateTime.year,
+                                selectedStartDateTime.month,
+                                selectedStartDateTime.day,
+                              ),
+                            )) {
+                          selectedRepeatDurationDate = DateTime(
+                            selectedStartDateTime.year,
+                            selectedStartDateTime.month,
+                            selectedStartDateTime.day,
+                          ).add(const Duration(days: 1));
+                        }
                       });
                       final repeatDetail = await Navigator.push(
                         context,
@@ -489,6 +515,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             typeAmount: selectedRepeatTypeAmount,
                             durationAmount: selectedRepeatDurationAmount,
                             durationDate: selectedRepeatDurationDate,
+                            start: selectedStartDateTime,
                           ),
                         ),
                       );
@@ -714,7 +741,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             startTimestamp = Timestamp.fromDate(
                               DateTime(
                                 startDateTime.year,
-                                startDateTime.month + 1,
+                                startDateTime.month + selectedRepeatTypeAmount,
                                 startDateTime.day,
                                 startDateTime.hour,
                                 startDateTime.minute,
@@ -723,7 +750,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             endTimestamp = Timestamp.fromDate(
                               DateTime(
                                 endDateTime.year,
-                                endDateTime.month + 1,
+                                endDateTime.month + selectedRepeatTypeAmount,
                                 endDateTime.day,
                                 endDateTime.hour,
                                 endDateTime.minute,
@@ -732,7 +759,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                           } else if (selectedRepeatType == RepeatType.perYear) {
                             startTimestamp = Timestamp.fromDate(
                               DateTime(
-                                startDateTime.year + 1,
+                                startDateTime.year + selectedRepeatTypeAmount,
                                 startDateTime.month,
                                 startDateTime.day,
                                 startDateTime.hour,
@@ -741,7 +768,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             );
                             endTimestamp = Timestamp.fromDate(
                               DateTime(
-                                endDateTime.year + 1,
+                                endDateTime.year + selectedRepeatTypeAmount,
                                 endDateTime.month,
                                 endDateTime.day,
                                 endDateTime.hour,
@@ -761,8 +788,87 @@ class _CreateEventViewState extends State<CreateEventView> {
                           description: _eventDescription.text,
                         );
                       }
+                    } else if (selectedRepeatDuration == RepeatDuration.until) {
+                      while (!startTimestamp
+                          .toDate()
+                          .isAfter(selectedRepeatDurationDate!.add(
+                            const Duration(
+                              hours: 23,
+                              minutes: 59,
+                            ),
+                          ))) {
+                        if (repeatDurationArithmetic != null) {
+                          startTimestamp = Timestamp.fromDate(startTimestamp
+                              .toDate()
+                              .add(repeatDurationArithmetic));
+                          endTimestamp = Timestamp.fromDate(endTimestamp
+                              .toDate()
+                              .add(repeatDurationArithmetic));
+                        } else {
+                          final startDateTime = startTimestamp.toDate();
+                          final endDateTime = endTimestamp.toDate();
+                          if (selectedRepeatType == RepeatType.perMonth) {
+                            startTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                startDateTime.year,
+                                startDateTime.month + selectedRepeatTypeAmount,
+                                startDateTime.day,
+                                startDateTime.hour,
+                                startDateTime.minute,
+                              ),
+                            );
+                            endTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                endDateTime.year,
+                                endDateTime.month + selectedRepeatTypeAmount,
+                                endDateTime.day,
+                                endDateTime.hour,
+                                endDateTime.minute,
+                              ),
+                            );
+                          } else if (selectedRepeatType == RepeatType.perYear) {
+                            startTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                startDateTime.year + selectedRepeatTypeAmount,
+                                startDateTime.month,
+                                startDateTime.day,
+                                startDateTime.hour,
+                                startDateTime.minute,
+                              ),
+                            );
+                            endTimestamp = Timestamp.fromDate(
+                              DateTime(
+                                endDateTime.year + selectedRepeatTypeAmount,
+                                endDateTime.month,
+                                endDateTime.day,
+                                endDateTime.hour,
+                                endDateTime.minute,
+                              ),
+                            );
+                          }
+                        }
+                        if (startTimestamp
+                            .toDate()
+                            .isAfter(selectedRepeatDurationDate!.add(
+                              const Duration(
+                                hours: 23,
+                                minutes: 59,
+                              ),
+                            ))) break;
+                        await _eventService.create(
+                          title: _eventTitle.text.isNotEmpty
+                              ? _eventTitle.text
+                              : "My Event",
+                          categoryId: categoryId,
+                          start: startTimestamp,
+                          end: endTimestamp,
+                          important: important,
+                          description: _eventDescription.text,
+                        );
+                      }
                     }
                   }
+
                   if (mounted) {
                     Navigator.of(context).pop();
                   }
