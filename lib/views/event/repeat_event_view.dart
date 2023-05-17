@@ -220,6 +220,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
+          elevation: 0,
         ),
         body: SingleChildScrollView(
           child: Column(
