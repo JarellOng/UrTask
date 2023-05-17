@@ -22,6 +22,7 @@ Future showColorsDialog(
                   (index) {
                     final color = colors.elementAt(index);
                     List<String> selectedColor = [
+                      color.id,
                       color.name,
                       color.hex
                     ];

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
@@ -17,6 +18,7 @@ class CategoryView extends StatefulWidget {
 class _CategoryViewState extends State<CategoryView> {
   late final CategoryController _categoryService;
   late final ColorController _colorService;
+  final userId = AuthService.firebase().currentUser!.id;
 
   @override
   void initState() {
@@ -44,7 +46,7 @@ class _CategoryViewState extends State<CategoryView> {
       ),
       //backgroundColor: const Color.fromARGB(31, 133, 133, 133),
       body: StreamBuilder(
-        stream: _categoryService.getAll(userId: "default"),
+        stream: _categoryService.getAll(userId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:

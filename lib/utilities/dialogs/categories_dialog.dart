@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/utilities/extensions/hex_color.dart';
-
+final userId = AuthService.firebase().currentUser!.id;
 Future<List<String>> showCategoriesDialog(
   BuildContext context,
   CategoryController categoryService,
@@ -14,7 +15,7 @@ Future<List<String>> showCategoriesDialog(
     context: context,
     builder: (BuildContext context) {
       return StreamBuilder(
-        stream: categoryService.getAll(userId: "default"),
+        stream: categoryService.getAll(userId: userId),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:
