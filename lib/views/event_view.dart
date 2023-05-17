@@ -134,8 +134,10 @@ class _EventViewState extends State<EventView> {
                               }
                             })),
                     horizontalTitleGap: -2,
-                    trailing:
-                        Icon(Icons.error_outlined, size: 32, color: Colors.red),
+                    trailing: event.important
+                        ? Icon(Icons.error_outlined,
+                            size: 32, color: Colors.red)
+                        : null,
                     shape: Border(bottom: BorderSide(color: Colors.black26)),
                   );
                 },

@@ -5,14 +5,17 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
+import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/views/calendar_view.dart';
 import 'package:urtask/views/profile_view.dart';
 import 'package:urtask/views/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
+import 'package:urtask/views/create_category_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -38,6 +41,7 @@ class _HomeViewState extends State<HomeView> {
     final textTheme = theme.textTheme;
     var borderRadius = const BorderRadius.all(Radius.circular(20));
     final padding = 20;
+    final userId = AuthService.firebase().currentUser!.id;
 
     return Scaffold(
       appBar: AppBar(
@@ -191,7 +195,12 @@ class _HomeViewState extends State<HomeView> {
             foregroundColor: primary,
             label: 'Event Category',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => print('ADD EVENT CATEGORY'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CreateCategoryView(),
+              ),
+            ),
             onLongPress: () => print('FIRST CHILD LONG PRESS'),
           ),
           SpeedDialChild(
@@ -242,7 +251,7 @@ class _CategoryListState extends State<CategoryList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _categoryService.getAll(userId: "default"),
+      stream: _categoryService.getAll(userId: userId),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.active:
