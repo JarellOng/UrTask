@@ -295,21 +295,22 @@ class _CreateEventViewState extends State<CreateEventView> {
                       ],
                       if (startDateScrollToggle == true) ...[
                         TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 234, 220, 220),
+                          style: TextButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 234, 220, 220),
+                          ),
+                          onPressed: () {
+                            _startDateScrollOff();
+                          },
+                          child: const SizedBox(
+                            width: 115,
+                            child: Text(
+                              "...",
+                              style: TextStyle(fontSize: 18),
+                              textAlign: TextAlign.center,
                             ),
-                            onPressed: () {
-                              _startDateScrollOff();
-                            },
-                            child: const SizedBox(
-                              width: 115,
-                              child: Text(
-                                "...",
-                                style: TextStyle(fontSize: 18),
-                                textAlign: TextAlign.center,
-                              ),
-                            )),
+                          ),
+                        ),
                       ],
 
                       // Time
@@ -362,6 +363,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                           ),
                         ],
                       ],
+
+                      const SizedBox(width: 5),
                     ],
                   ),
                 ],
@@ -493,6 +496,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                           ),
                         ],
                       ],
+
+                      const SizedBox(width: 5),
                     ],
                   ),
                 ],
@@ -563,7 +568,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
               const SizedBox(height: 10),
               const Icon(Icons.event),
-
+              const SizedBox(height: 10),
               // CATEGORY
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -577,40 +582,55 @@ class _CreateEventViewState extends State<CreateEventView> {
                       ),
                     ],
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                      final categoryDetail = await showCategoriesDialog(
-                        context,
-                        _categoryService,
-                        _colorService,
-                      );
-                      if (categoryDetail.isNotEmpty) {
-                        setState(() {
-                          categoryId = categoryDetail[0];
-                          categoryName = categoryDetail[1];
-                          categoryHex = categoryDetail[2];
-                        });
-                      }
-                    },
-                    child: Chip(
-                      backgroundColor: HexColor.fromHex(categoryHex),
-                      label: Text(
-                        categoryName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 175,
+                        child: ListTile(
+                          dense: true,
+                          title: Text(
+                            categoryName,
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                          tileColor: HexColor.fromHex(categoryHex),
+                          minLeadingWidth: 10,
+                          shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                width: 1,
+                                color: Color.fromARGB(255, 125, 121, 121),
+                              ),
+                              borderRadius: BorderRadius.circular(20)),
+                          visualDensity: const VisualDensity(vertical: -4),
+                          onTap: () async {
+                            setState(() {
+                              eventTitleFocus.unfocus();
+                              eventDescriptionFocus.unfocus();
+                              eventIsEdited = true;
+                            });
+                            final categoryDetail = await showCategoriesDialog(
+                              context,
+                              _categoryService,
+                              _colorService,
+                            );
+                            if (categoryDetail.isNotEmpty) {
+                              setState(() {
+                                categoryId = categoryDetail[0];
+                                categoryName = categoryDetail[1];
+                                categoryHex = categoryDetail[2];
+                              });
+                            }
+                          },
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                    ],
                   ),
                 ],
               ),
 
+              const SizedBox(height: 10),
               const Divider(
                 indent: 10,
                 endIndent: 10,
@@ -634,77 +654,82 @@ class _CreateEventViewState extends State<CreateEventView> {
                       ),
                     ],
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                        if (startDateScrollToggle == true) {
-                          _startDateScrollOff();
-                        }
-                        if (startTimeScrollToggle == true) {
-                          _startTimeScrollOff();
-                        }
-                        if (endDateScrollToggle == true) {
-                          _endDateScrollOff();
-                        }
-                        if (endTimeScrollToggle == true) {
-                          _endTimeScrollOn();
-                        }
-                        if (selectedRepeatDurationDate != null &&
-                            selectedRepeatDurationDate!.isBefore(
-                              DateTime(
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          setState(() {
+                            eventTitleFocus.unfocus();
+                            eventDescriptionFocus.unfocus();
+                            eventIsEdited = true;
+                            if (startDateScrollToggle == true) {
+                              _startDateScrollOff();
+                            }
+                            if (startTimeScrollToggle == true) {
+                              _startTimeScrollOff();
+                            }
+                            if (endDateScrollToggle == true) {
+                              _endDateScrollOff();
+                            }
+                            if (endTimeScrollToggle == true) {
+                              _endTimeScrollOn();
+                            }
+                            if (selectedRepeatDurationDate != null &&
+                                selectedRepeatDurationDate!.isBefore(
+                                  DateTime(
+                                    selectedStartDateTime.year,
+                                    selectedStartDateTime.month,
+                                    selectedStartDateTime.day,
+                                  ),
+                                )) {
+                              selectedRepeatDurationDate = DateTime(
                                 selectedStartDateTime.year,
                                 selectedStartDateTime.month,
                                 selectedStartDateTime.day,
+                              ).add(const Duration(days: 1));
+                            }
+                          });
+                          final repeatDetail = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RepeatEventView(
+                                type: selectedRepeatType,
+                                duration: selectedRepeatDuration,
+                                typeAmount: selectedRepeatTypeAmount,
+                                durationAmount: selectedRepeatDurationAmount,
+                                durationDate: selectedRepeatDurationDate,
+                                start: selectedStartDateTime,
                               ),
-                            )) {
-                          selectedRepeatDurationDate = DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                          ).add(const Duration(days: 1));
-                        }
-                      });
-                      final repeatDetail = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RepeatEventView(
+                            ),
+                          );
+                          setState(() {
+                            selectedRepeatType = repeatDetail[0];
+                            selectedRepeatDuration = repeatDetail[1];
+                            selectedRepeatTypeAmount = repeatDetail[2];
+                            if (selectedRepeatDuration ==
+                                RepeatDuration.specificNumber) {
+                              selectedRepeatDurationAmount = repeatDetail[3];
+                              selectedRepeatDurationDate = null;
+                            } else if (selectedRepeatDuration ==
+                                RepeatDuration.until) {
+                              selectedRepeatDurationDate = repeatDetail[3];
+                              selectedRepeatDurationAmount = null;
+                            }
+                          });
+                        },
+                        child: Text(
+                          _printSelectedRepeat(
                             type: selectedRepeatType,
-                            duration: selectedRepeatDuration,
                             typeAmount: selectedRepeatTypeAmount,
+                            duration: selectedRepeatDuration,
                             durationAmount: selectedRepeatDurationAmount,
                             durationDate: selectedRepeatDurationDate,
-                            start: selectedStartDateTime,
                           ),
+                          style: const TextStyle(fontSize: 18),
                         ),
-                      );
-                      setState(() {
-                        selectedRepeatType = repeatDetail[0];
-                        selectedRepeatDuration = repeatDetail[1];
-                        selectedRepeatTypeAmount = repeatDetail[2];
-                        if (selectedRepeatDuration ==
-                            RepeatDuration.specificNumber) {
-                          selectedRepeatDurationAmount = repeatDetail[3];
-                          selectedRepeatDurationDate = null;
-                        } else if (selectedRepeatDuration ==
-                            RepeatDuration.until) {
-                          selectedRepeatDurationDate = repeatDetail[3];
-                          selectedRepeatDurationAmount = null;
-                        }
-                      });
-                    },
-                    child: Text(
-                      _printSelectedRepeat(
-                        type: selectedRepeatType,
-                        typeAmount: selectedRepeatTypeAmount,
-                        duration: selectedRepeatDuration,
-                        durationAmount: selectedRepeatDurationAmount,
-                        durationDate: selectedRepeatDurationDate,
                       ),
-                      style: const TextStyle(fontSize: 18),
-                    ),
+                      const SizedBox(width: 5)
+                    ],
                   ),
                 ],
               ),
@@ -732,44 +757,50 @@ class _CreateEventViewState extends State<CreateEventView> {
                       ),
                     ],
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() {
-                        eventTitleFocus.unfocus();
-                        eventDescriptionFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                      final notificationDetail = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NotificationEventView(
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: () async {
+                          setState(() {
+                            eventTitleFocus.unfocus();
+                            eventDescriptionFocus.unfocus();
+                            eventIsEdited = true;
+                          });
+                          final notificationDetail = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NotificationEventView(
+                                flag: notificationFlag,
+                                notifications: selectedNotifications,
+                                customNotification: selectedCustomNotification,
+                              ),
+                            ),
+                          );
+                          setState(() {
+                            notificationFlag = notificationDetail[0];
+                            selectedNotifications = notificationDetail[1];
+                            if (selectedNotifications
+                                .containsKey(NotificationTime.custom)) {
+                              final customNotificationMap =
+                                  notificationDetail[2]
+                                      as Map<int, CustomNotificationUOT>;
+                              selectedCustomNotification = {
+                                customNotificationMap.keys.first:
+                                    customNotificationMap.values.first
+                              };
+                            }
+                          });
+                        },
+                        child: Text(
+                          _printSelectedNotifications(
                             flag: notificationFlag,
-                            notifications: selectedNotifications,
-                            customNotification: selectedCustomNotification,
+                            selectedNotifications: selectedNotifications,
                           ),
+                          style: const TextStyle(fontSize: 18),
                         ),
-                      );
-                      setState(() {
-                        notificationFlag = notificationDetail[0];
-                        selectedNotifications = notificationDetail[1];
-                        if (selectedNotifications
-                            .containsKey(NotificationTime.custom)) {
-                          final customNotificationMap = notificationDetail[2]
-                              as Map<int, CustomNotificationUOT>;
-                          selectedCustomNotification = {
-                            customNotificationMap.keys.first:
-                                customNotificationMap.values.first
-                          };
-                        }
-                      });
-                    },
-                    child: Text(
-                      _printSelectedNotifications(
-                        flag: notificationFlag,
-                        selectedNotifications: selectedNotifications,
                       ),
-                      style: const TextStyle(fontSize: 18),
-                    ),
+                      const SizedBox(width: 5),
+                    ],
                   ),
                 ],
               ),

@@ -5,6 +5,7 @@ import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/utilities/extensions/hex_color.dart';
+
 final userId = AuthService.firebase().currentUser!.id;
 Future<List<String>> showCategoriesDialog(
   BuildContext context,
@@ -22,6 +23,9 @@ Future<List<String>> showCategoriesDialog(
               if (snapshot.hasData) {
                 final categories = snapshot.data as Iterable<Categories>;
                 return SimpleDialog(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
                   children: List<Widget>.generate(
                     categories.length,
                     (index) {
@@ -39,35 +43,33 @@ Future<List<String>> showCategoriesDialog(
                                   category.name,
                                   color.hex
                                 ];
-                                return Column(
-                                  children: [
-                                    SimpleDialogOption(
-                                      onPressed: () => Navigator.of(context)
-                                          .pop(selectedCategory),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.circle,
-                                            color: HexColor.fromHex(color.hex),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Text(
-                                            categories.elementAt(index).name,
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                            ),
-                                          ),
-                                        ],
+                                return SizedBox(
+                                  width: 300,
+                                  child: SimpleDialogOption(
+                                    onPressed: () => Navigator.of(context)
+                                        .pop(selectedCategory),
+                                    padding: const EdgeInsets.only(
+                                        top: 0, left: 12, right: 12),
+                                    child: ListTile(
+                                      dense: true,
+                                      leading: Icon(
+                                        Icons.circle,
+                                        color: HexColor.fromHex(color.hex),
+                                      ),
+                                      title: Text(
+                                        categories.elementAt(index).name,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      shape: const Border(
+                                        bottom: BorderSide(
+                                          color: Color.fromARGB(
+                                              255, 125, 121, 121),
+                                        ),
                                       ),
                                     ),
-                                    const Divider(
-                                      indent: 10,
-                                      endIndent: 10,
-                                      height: 1,
-                                      thickness: 1,
-                                      color: Color.fromARGB(255, 125, 121, 121),
-                                    ),
-                                  ],
+                                  ),
                                 );
                               } else {
                                 return Column();
