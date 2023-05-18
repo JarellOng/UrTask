@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
@@ -6,6 +5,8 @@ import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/services/events/events_model.dart';
+import 'package:urtask/services/notifications/notifications_controller.dart';
+import 'package:urtask/services/notifications/notifications_model.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/event/event_detail_view.dart';
 
@@ -21,12 +22,14 @@ class _EventViewState extends State<EventView> {
   late final EventController _eventService;
   late final CategoryController _categoryController;
   late final ColorController _colorService;
+  late final NotificationController _notificationService;
 
   @override
   void initState() {
     _eventService = EventController();
     _categoryController = CategoryController();
     _colorService = ColorController();
+    _notificationService = NotificationController();
     super.initState();
   }
 
@@ -53,14 +56,39 @@ class _EventViewState extends State<EventView> {
                   final event = events.elementAt(index);
                   return ListTile(
                     onTap: () async {
-                      final eventDetail = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EventDetailView(
-                            eventId: event.id,
+                      late String colorHex;
+                      final futures = await Future.wait([
+                        _categoryController.get(id: event.categoryId),
+                        _notificationService.getByEventId(id: event.id),
+                      ]);
+                      final category = futures[0] as Categories;
+                      final categoryName = category.name;
+                      final colorId = category.colorId;
+                      await _colorService.get(id: colorId).then((value) {
+                        colorHex = value.hex;
+                      });
+                      final notifications =
+                          futures[1] as Iterable<Notifications>;
+                      if (mounted) {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventDetailView(
+                              eventId: event.id,
+                              groupId: event.groupId,
+                              title: event.title,
+                              start: event.start,
+                              end: event.end,
+                              important: event.important,
+                              description: event.description,
+                              categoryId: event.categoryId,
+                              categoryName: categoryName,
+                              categoryHex: colorHex,
+                              notifications: notifications,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     },
                     leading: Transform.translate(
                         offset: Offset(-8, -6),
@@ -150,5 +178,22 @@ class _EventViewState extends State<EventView> {
         }
       },
     );
+  }
+
+  Future<Categories> setupCategory({required String id}) async {
+    final category = await _categoryController.get(id: id);
+    return category;
+  }
+
+  Future<color_model.Colors> setupColor({required String id}) async {
+    final color = await _colorService.get(id: id);
+    return color;
+  }
+
+  Future<Iterable<Notifications>> setupNotification({
+    required String eventId,
+  }) async {
+    final notifications = await _notificationService.getByEventId(id: eventId);
+    return notifications;
   }
 }

@@ -35,6 +35,7 @@ class NotificationController {
     final notifications = await _getCollection();
     final querySnapshot = await notifications
         .where(notificationEventIdField, isEqualTo: id)
+        .limit(5)
         .get();
     return querySnapshot.docs.map((doc) => Notifications.fromSnapshot(doc));
   }

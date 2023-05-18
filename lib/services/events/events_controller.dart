@@ -42,7 +42,7 @@ class EventController {
   Future<Events> get({required String id}) async {
     final events = await _getCollection();
     final querySnapshot =
-        await events.where(FieldPath.documentId, isEqualTo: id).get();
+        await events.where(FieldPath.documentId, isEqualTo: id).limit(1).get();
     return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc)).first;
   }
 

@@ -24,10 +24,30 @@ import 'package:urtask/views/time/time_scroll_view.dart';
 
 class EventDetailView extends StatefulWidget {
   final String eventId;
+  final String? groupId;
+  final String title;
+  final Timestamp start;
+  final Timestamp end;
+  final bool important;
+  final String? description;
+  final String categoryId;
+  final String categoryName;
+  final String categoryHex;
+  final Iterable<Notifications> notifications;
 
   const EventDetailView({
     super.key,
     required this.eventId,
+    this.groupId,
+    required this.title,
+    required this.start,
+    required this.end,
+    required this.important,
+    this.description,
+    required this.categoryId,
+    required this.categoryName,
+    required this.categoryHex,
+    required this.notifications,
   });
 
   @override
@@ -105,118 +125,90 @@ class _EventDetailViewState extends State<EventDetailView> {
     _categoryService = CategoryController();
     _colorService = ColorController();
     _notificationService = NotificationController();
+
+    // Event
     _eventId = widget.eventId;
-    setupEvent().then(
-      (event) {
-        setState(() {
-          _eventGroupId = event.groupId;
-
-          _eventTitle.text = event.title;
-
-          final start = event.start.toDate();
-          selectedStartDay = start.day - 1;
-          selectedStartMonth = start.month - 1;
-          selectedStartYear = start.year;
-          selectedStartHour = start.hour;
-          selectedStartMinute = start.minute;
-          selectedStartDateTime = DateTime(
-            selectedStartYear,
-            selectedStartMonth + 1,
-            selectedStartDay + 1,
-            selectedStartHour,
-            selectedStartMinute,
-          );
-
-          final end = event.end.toDate();
-          selectedEndDay = end.day - 1;
-          selectedEndMonth = end.month - 1;
-          selectedEndYear = end.year;
-          selectedEndHour = end.hour;
-          selectedEndMinute = end.minute;
-          selectedEndDateTime = DateTime(
-            selectedEndYear,
-            selectedEndMonth + 1,
-            selectedEndDay + 1,
-            selectedEndHour,
-            selectedEndMinute,
-          );
-
-          if (selectedStartHour == 0 &&
-              selectedStartMinute == 0 &&
-              selectedEndHour == 23 &&
-              selectedEndMinute == 59) {
-            allDay = true;
-          }
-
-          important = event.important;
-
-          categoryId = event.categoryId;
-
-          _eventDescription.text = event.description ?? "";
-
-          setupCategory(id: categoryId).then((category) {
-            setState(() {
-              categoryName = category.name;
-
-              setupColor(id: category.colorId).then((color) {
-                setState(() {
-                  categoryHex = color.hex;
-                });
-              });
-            });
-          });
-
-          setupNotification(eventId: event.id).then((value) {
-            setState(() {
-              storedNotificationIds = value.map((e) => e.id).toList();
-              if (value.isNotEmpty) {
-                notificationFlag = true;
-                for (var element in value) {
-                  final difference = element.dateTime
-                      .toDate()
-                      .difference(event.start.toDate());
-                  if (difference.inSeconds == 0) {
-                    selectedNotifications[NotificationTime.timeOfEvent] =
-                        element.type;
-                  } else if (difference.inMinutes == -10) {
-                    selectedNotifications[NotificationTime.tenMinsBefore] =
-                        element.type;
-                  } else if (difference.inHours == -1) {
-                    selectedNotifications[NotificationTime.hourBefore] =
-                        element.type;
-                  } else if (difference.inDays == -1) {
-                    selectedNotifications[NotificationTime.dayBefore] =
-                        element.type;
-                  } else {
-                    selectedNotifications[NotificationTime.custom] =
-                        element.type;
-                    if (difference.inMinutes >= -60) {
-                      selectedCustomNotification = {
-                        difference.inMinutes.abs():
-                            CustomNotificationUOT.minutes
-                      };
-                    } else if (difference.inHours >= -24) {
-                      selectedCustomNotification = {
-                        difference.inHours.abs(): CustomNotificationUOT.hours
-                      };
-                    } else if (difference.inDays >= -365) {
-                      selectedCustomNotification = {
-                        difference.inDays.abs(): CustomNotificationUOT.days
-                      };
-                    }
-                  }
-                }
-              } else {
-                notificationFlag = false;
-                selectedNotifications = {
-                  NotificationTime.tenMinsBefore: NotificationType.alert
-                };
-              }
-            });
-          });
-        });
-      },
+    _eventGroupId = widget.groupId;
+    _eventTitle.text = widget.title;
+    final start = widget.start.toDate();
+    selectedStartDay = start.day - 1;
+    selectedStartMonth = start.month - 1;
+    selectedStartYear = start.year;
+    selectedStartHour = start.hour;
+    selectedStartMinute = start.minute;
+    selectedStartDateTime = DateTime(
+      selectedStartYear,
+      selectedStartMonth + 1,
+      selectedStartDay + 1,
+      selectedStartHour,
+      selectedStartMinute,
     );
+    final end = widget.end.toDate();
+    selectedEndDay = end.day - 1;
+    selectedEndMonth = end.month - 1;
+    selectedEndYear = end.year;
+    selectedEndHour = end.hour;
+    selectedEndMinute = end.minute;
+    selectedEndDateTime = DateTime(
+      selectedEndYear,
+      selectedEndMonth + 1,
+      selectedEndDay + 1,
+      selectedEndHour,
+      selectedEndMinute,
+    );
+    if (selectedStartHour == 0 &&
+        selectedStartMinute == 0 &&
+        selectedEndHour == 23 &&
+        selectedEndMinute == 59) {
+      allDay = true;
+    }
+    important = widget.important;
+    _eventDescription.text = widget.description ?? "";
+
+    // Category
+    categoryId = widget.categoryId;
+    categoryName = widget.categoryName;
+    categoryHex = widget.categoryHex;
+
+    // Notifications
+    storedNotificationIds = widget.notifications.map((e) => e.id).toList();
+    if (widget.notifications.isNotEmpty) {
+      notificationFlag = true;
+      for (var element in widget.notifications) {
+        final difference =
+            element.dateTime.toDate().difference(widget.start.toDate());
+        if (difference.inSeconds == 0) {
+          selectedNotifications[NotificationTime.timeOfEvent] = element.type;
+        } else if (difference.inMinutes == -10) {
+          selectedNotifications[NotificationTime.tenMinsBefore] = element.type;
+        } else if (difference.inHours == -1) {
+          selectedNotifications[NotificationTime.hourBefore] = element.type;
+        } else if (difference.inDays == -1) {
+          selectedNotifications[NotificationTime.dayBefore] = element.type;
+        } else {
+          selectedNotifications[NotificationTime.custom] = element.type;
+          if (difference.inMinutes >= -60) {
+            selectedCustomNotification = {
+              difference.inMinutes.abs(): CustomNotificationUOT.minutes
+            };
+          } else if (difference.inHours >= -24) {
+            selectedCustomNotification = {
+              difference.inHours.abs(): CustomNotificationUOT.hours
+            };
+          } else if (difference.inDays >= -365) {
+            selectedCustomNotification = {
+              difference.inDays.abs(): CustomNotificationUOT.days
+            };
+          }
+        }
+      }
+    } else {
+      notificationFlag = false;
+      selectedNotifications = {
+        NotificationTime.tenMinsBefore: NotificationType.alert
+      };
+    }
+
     super.initState();
   }
 

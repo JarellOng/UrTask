@@ -10,7 +10,7 @@ class ColorController {
 
   Future<Colors> get({required String id}) async {
     final querySnapshot =
-        await colors.where(FieldPath.documentId, isEqualTo: id).get();
+        await colors.where(FieldPath.documentId, isEqualTo: id).limit(1).get();
     return querySnapshot.docs.map((doc) => Colors.fromSnapshot(doc)).first;
   }
 
