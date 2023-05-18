@@ -16,9 +16,9 @@ class CreateCategoryView extends StatefulWidget {
 }
 
 class _CreateCategoryViewState extends State<CreateCategoryView> {
-   late final ColorController _colorService;
-   late final CategoryController _categoryService;
-   late final TextEditingController _eventCategoryTitle;
+  late final ColorController _colorService;
+  late final CategoryController _categoryService;
+  late final TextEditingController _eventCategoryTitle;
 
   String colorId = "color1";
   String colorName = "Tomato";
@@ -26,7 +26,6 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   final userId = AuthService.firebase().currentUser!.id;
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
-  
 
   @override
   void initState() {
@@ -36,7 +35,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
     eventTitleFocus = FocusNode();
     super.initState();
   }
-  
+
   @override
   void dispose() {
     _eventCategoryTitle.dispose();
@@ -57,8 +56,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
           setState(() {
             eventTitleFocus.unfocus();
           });
-          if (
-              eventIsEdited || _eventCategoryTitle.text.isNotEmpty) {
+          if (eventIsEdited || _eventCategoryTitle.text.isNotEmpty) {
             final shouldDiscard = await showDiscardDialog(
               context,
               "Are you sure you want to discard this event?",
@@ -66,11 +64,11 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
             if (shouldDiscard) {
               if (mounted) {
                 Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CategoryView(),
-            ),
-          );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CategoryView(),
+                  ),
+                );
                 return true;
               }
             }
@@ -81,87 +79,90 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
         child: Column(
           children: [
             Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _eventCategoryTitle,
-                  focusNode: eventTitleFocus,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  maxLines: 2,
-                  decoration: const InputDecoration(
-                      hintText: "Event Category Name",
-                      hintStyle: TextStyle(fontSize: 18)),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Text("Color:", style: TextStyle(fontSize: 20)),
+                    TextField(
+                      controller: _eventCategoryTitle,
+                      focusNode: eventTitleFocus,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                          hintText: "Event Category Name",
+                          hintStyle: TextStyle(fontSize: 18)),
                     ),
-                    Container(
-                        width: 200,
-                        child: ListTile(
-                          title: Text(colorName, style: TextStyle(fontSize: 20)),
-                          leading: Icon(
-                            Icons.circle,
-                            color: HexColor.fromHex(colorHex),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(width: 0.5),
-                            borderRadius: BorderRadius.circular(20)
-                          ),
-                          visualDensity: VisualDensity(vertical: -4),
-                          onTap: () async {
-                            setState(() {
-                        eventTitleFocus.unfocus();
-                        eventIsEdited = true;
-                      });
-                            final colorDetail = await showColorsDialog(context, _colorService);
-                            if (colorDetail.isNotEmpty) {
-                        setState(() {
-                          colorId = colorDetail[0];
-                          colorName = colorDetail[1];
-                          colorHex = colorDetail[2];
-                        });
-                      }
-                    },
-                        ))
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text("Color:", style: TextStyle(fontSize: 20)),
+                        ),
+                        Container(
+                            width: 200,
+                            child: ListTile(
+                              title: Text(colorName,
+                                  style: TextStyle(fontSize: 20)),
+                              leading: Icon(
+                                Icons.circle,
+                                color: HexColor.fromHex(colorHex),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(width: 0.5),
+                                  borderRadius: BorderRadius.circular(20)),
+                              visualDensity: VisualDensity(vertical: -4),
+                              onTap: () async {
+                                setState(() {
+                                  eventTitleFocus.unfocus();
+                                  eventIsEdited = true;
+                                });
+                                final colorDetail = await showColorsDialog(
+                                    context, _colorService);
+                                if (colorDetail.isNotEmpty) {
+                                  setState(() {
+                                    colorId = colorDetail[0];
+                                    colorName = colorDetail[1];
+                                    colorHex = colorDetail[2];
+                                  });
+                                }
+                              },
+                            ))
+                      ],
+                    ),
                   ],
-                ),
-              ],
-            )),
-            Transform.translate(offset: Offset(0,460),
-            child: Divider(
+                )),
+            Transform.translate(
+              offset: Offset(0, 460),
+              child: Divider(
                 height: 1,
                 thickness: 2,
-              ),)
-            
+              ),
+            )
           ],
         ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.only(bottom: 6, left: 100, right: 100),
-        
         child: TextButton(
-              onPressed: () async {
-               _categoryService.create(userId: userId, colorId: colorId, name: _eventCategoryTitle.text.isNotEmpty
-                      ? _eventCategoryTitle.text
-                      : "My Category");
-                      Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CategoryView(),
-            ),
-          );
-              },
-              child: const Text("Save", style: TextStyle(fontSize: 18)),
-            ),
+          onPressed: () async {
+            _categoryService.create(
+                userId: userId,
+                colorId: colorId,
+                name: _eventCategoryTitle.text.isNotEmpty
+                    ? _eventCategoryTitle.text
+                    : "My Category");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CategoryView(),
+              ),
+            );
+          },
+          child: const Text("Save", style: TextStyle(fontSize: 18)),
+        ),
       ),
-          
     );
   }
 }

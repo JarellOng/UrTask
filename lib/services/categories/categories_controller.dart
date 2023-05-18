@@ -23,8 +23,10 @@ class CategoryController {
   }
 
   Future<Categories> get({required String id}) async {
-    final querySnapshot =
-        await categories.where(FieldPath.documentId, isEqualTo: id).get();
+    final querySnapshot = await categories
+        .where(FieldPath.documentId, isEqualTo: id)
+        .limit(1)
+        .get();
     return querySnapshot.docs.map((doc) => Categories.fromSnapshot(doc)).first;
   }
 
