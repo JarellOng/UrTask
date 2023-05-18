@@ -170,6 +170,7 @@ class _CreateEventViewState extends State<CreateEventView> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              // TITLE
               SizedBox(
                 width: 350,
                 child: TextField(
@@ -187,7 +188,6 @@ class _CreateEventViewState extends State<CreateEventView> {
                   ),
                 ),
               ),
-              // TITLE
 
               const Divider(
                 indent: 10,
@@ -203,13 +203,15 @@ class _CreateEventViewState extends State<CreateEventView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(children: const [
-                    SizedBox(width: 20),
-                    Text(
-                      "All Day",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ]),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "All Day",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                   Transform.scale(
                     scale: 0.7,
                     child: CupertinoSwitch(
@@ -303,7 +305,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                             _startDateScrollOff();
                           },
                           child: const SizedBox(
-                            width: 115,
+                            width: 110,
                             child: Text(
                               "...",
                               style: TextStyle(fontSize: 18),
@@ -429,7 +431,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                       ],
                       if (endDateScrollToggle == true) ...[
                         SizedBox(
-                          width: 115,
+                          width: 125,
                           child: TextButton(
                             style: TextButton.styleFrom(
                               backgroundColor:
