@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:urtask/color.dart';
 import 'package:urtask/enums/repeat_duration_enum.dart';
 import 'package:urtask/enums/repeat_type_enum.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
@@ -219,13 +220,17 @@ class _RepeatEventViewState extends State<RepeatEventView> {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
+          elevation: 0,
         ),
         body: SingleChildScrollView(
           child: Column(
             children: [
               // No Repeat
               RadioListTile(
-                title: const Text("Don't repeat"),
+                title: const Text(
+                  "Don't repeat",
+                  style: TextStyle(fontSize: 18),
+                ),
                 value: RepeatType.noRepeat,
                 groupValue: selectedType,
                 onChanged: (value) {
@@ -250,18 +255,42 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 },
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+
               // Per Day
               RadioListTile(
                 title: Row(
                   children: [
-                    if (perDayFlag == false) ...[const Text("Everyday")],
+                    if (perDayFlag == false) ...[
+                      const Text(
+                        "Everyday",
+                        style: TextStyle(fontSize: 18),
+                      )
+                    ],
                     if (perDayFlag == true) ...[
-                      const Text("Every "),
+                      const Text(
+                        "Every ",
+                        style: TextStyle(fontSize: 18),
+                      ),
                       SizedBox(
-                        width: 35,
+                        width: 40,
                         child: TextFormField(
                           controller: perDayAmount,
                           focusNode: perDayFocus,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                           onChanged: (value) {
                             setState(() {
                               perDayPlural =
@@ -299,9 +328,15 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                         ),
                       ),
                       if (perDayPlural)
-                        const Text(" days")
+                        const Text(
+                          " days",
+                          style: TextStyle(fontSize: 18),
+                        )
                       else
-                        const Text(" day"),
+                        const Text(
+                          " day",
+                          style: TextStyle(fontSize: 18),
+                        ),
                     ],
                   ],
                 ),
@@ -324,18 +359,42 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 },
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+
               // Per Week
               RadioListTile(
                 title: Row(
                   children: [
-                    if (perWeekFlag == false) ...[const Text("Every week")],
+                    if (perWeekFlag == false) ...[
+                      const Text(
+                        "Every week",
+                        style: TextStyle(fontSize: 18),
+                      )
+                    ],
                     if (perWeekFlag == true) ...[
-                      const Text("Every "),
+                      const Text(
+                        "Every ",
+                        style: TextStyle(fontSize: 18),
+                      ),
                       SizedBox(
                         width: 35,
                         child: TextFormField(
                           controller: perWeekAmount,
                           focusNode: perWeekFocus,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                           onChanged: (value) {
                             setState(() {
                               perWeekPlural =
@@ -373,9 +432,15 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                         ),
                       ),
                       if (perWeekPlural)
-                        const Text(" weeks")
+                        const Text(
+                          " weeks",
+                          style: TextStyle(fontSize: 18),
+                        )
                       else
-                        const Text(" week"),
+                        const Text(
+                          " week",
+                          style: TextStyle(fontSize: 18),
+                        ),
                     ],
                   ],
                 ),
@@ -398,18 +463,42 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 },
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+
               // Per Month
               RadioListTile(
                 title: Row(
                   children: [
-                    if (perMonthFlag == false) ...[const Text("Every month")],
+                    if (perMonthFlag == false) ...[
+                      const Text(
+                        "Every month",
+                        style: TextStyle(fontSize: 18),
+                      )
+                    ],
                     if (perMonthFlag == true) ...[
-                      const Text("Every "),
+                      const Text(
+                        "Every ",
+                        style: TextStyle(fontSize: 18),
+                      ),
                       SizedBox(
                         width: 35,
                         child: TextFormField(
                           controller: perMonthAmount,
                           focusNode: perMonthFocus,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                           onChanged: (value) {
                             setState(() {
                               perMonthPlural =
@@ -447,9 +536,15 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                         ),
                       ),
                       if (perMonthPlural)
-                        const Text(" months")
+                        const Text(
+                          " months",
+                          style: TextStyle(fontSize: 18),
+                        )
                       else
-                        const Text(" month"),
+                        const Text(
+                          " month",
+                          style: TextStyle(fontSize: 18),
+                        ),
                     ],
                   ],
                 ),
@@ -472,18 +567,42 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 },
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+
               // Per Year
               RadioListTile(
                 title: Row(
                   children: [
-                    if (perYearFlag == false) ...[const Text("Every year")],
+                    if (perYearFlag == false) ...[
+                      const Text(
+                        "Every year",
+                        style: TextStyle(fontSize: 18),
+                      )
+                    ],
                     if (perYearFlag == true) ...[
-                      const Text("Every "),
+                      const Text(
+                        "Every ",
+                        style: TextStyle(fontSize: 18),
+                      ),
                       SizedBox(
                         width: 35,
                         child: TextFormField(
                           controller: perYearAmount,
                           focusNode: perYearFocus,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
                           onChanged: (value) {
                             setState(() {
                               perYearPlural =
@@ -521,9 +640,15 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                         ),
                       ),
                       if (perYearPlural)
-                        const Text(" years")
+                        const Text(
+                          " years",
+                          style: TextStyle(fontSize: 18),
+                        )
                       else
-                        const Text(" year"),
+                        const Text(
+                          " year",
+                          style: TextStyle(fontSize: 18),
+                        ),
                     ],
                   ],
                 ),
@@ -546,12 +671,37 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 },
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+
               // Duration
               if (selectedType != RepeatType.noRepeat) ...[
                 const SizedBox(height: 50),
-                const Text(
-                  "Duration",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Row(
+                  children: const [
+                    SizedBox(width: 20),
+                    Text(
+                      "Duration",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
                 ),
 
                 // Specific Number
@@ -559,7 +709,10 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                   title: Row(
                     children: [
                       if (specificNumberFlag == false) ...[
-                        const Text("Specific number of times")
+                        const Text(
+                          "Specific number of times",
+                          style: TextStyle(fontSize: 18),
+                        )
                       ],
                       if (specificNumberFlag == true) ...[
                         SizedBox(
@@ -567,6 +720,14 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           child: TextFormField(
                             controller: specificNumberAmount,
                             focusNode: specificNumberFocus,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: primary,
+                            ),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                            ),
                             onChanged: (value) {
                               setState(() {
                                 specificNumberPlural =
@@ -606,9 +767,15 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           ),
                         ),
                         if (specificNumberPlural)
-                          const Text(" times")
+                          const Text(
+                            " times",
+                            style: TextStyle(fontSize: 18),
+                          )
                         else
-                          const Text(" time"),
+                          const Text(
+                            " time",
+                            style: TextStyle(fontSize: 18),
+                          ),
                       ],
                     ],
                   ),
@@ -629,11 +796,22 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                   },
                 ),
 
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
+
                 // Until
                 RadioListTile(
                   title: Row(
                     children: [
-                      const Text("Until"),
+                      const Text(
+                        "Until",
+                        style: TextStyle(fontSize: 18),
+                      ),
                       if (untilFlag == true) ...[
                         if (untilDateScrollToggle == false) ...[
                           TextButton(
@@ -646,15 +824,26 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                                 day: selectedUntilDateTime.day - 1,
                                 year: selectedUntilDateTime.year,
                               ),
+                              style: const TextStyle(fontSize: 18),
                             ),
                           ),
                         ],
                         if (untilDateScrollToggle == true) ...[
-                          TextButton(
-                            onPressed: () {
-                              _untilDateScrollOff();
-                            },
-                            child: const Text("..."),
+                          SizedBox(
+                            width: 115,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 234, 220, 220),
+                              ),
+                              onPressed: () {
+                                _untilDateScrollOff();
+                              },
+                              child: const Text(
+                                "...",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
                           ),
                         ],
                       ]
@@ -678,7 +867,16 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                     month: untilMonth,
                     year: untilYear,
                   ),
+                  const SizedBox(height: 20)
                 ],
+
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
               ],
             ],
           ),

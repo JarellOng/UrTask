@@ -65,7 +65,7 @@ class _TimeScrollViewState extends State<TimeScrollView> {
         const Text(
           ":",
           style: TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),

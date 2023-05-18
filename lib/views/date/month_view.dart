@@ -19,7 +19,7 @@ class MonthView extends StatelessWidget {
         child: Text(
           _month(count: month),
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
           ),
         ),

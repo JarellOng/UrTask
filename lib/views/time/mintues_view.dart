@@ -19,7 +19,7 @@ class MinuteView extends StatelessWidget {
         child: Text(
           minutes < 10 ? '0$minutes' : minutes.toString(),
           style: TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
           ),
         ),

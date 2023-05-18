@@ -12,21 +12,32 @@ Future<T?> showGenericDialog<T>({
     context: context,
     builder: (context) {
       return AlertDialog(
-        content: Text(content),
-        actions: options.keys.map((optionTitle) {
-          final T value = options[optionTitle];
-          return TextButton(
-            onPressed: () {
-              if (value != null) {
-                Navigator.of(context).pop(value);
-              } else {
-                Navigator.of(context).pop();
-              }
-            },
-            child: Text(optionTitle),
-          );
-        }).toList(),
-      );
+          content: Text(
+            content,
+            style: const TextStyle(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: options.keys.map((optionTitle) {
+                final T value = options[optionTitle];
+                return TextButton(
+                  onPressed: () {
+                    if (value != null) {
+                      Navigator.of(context).pop(value);
+                    } else {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Text(
+                    optionTitle,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                );
+              }).toList(),
+            )
+          ]);
     },
   );
 }

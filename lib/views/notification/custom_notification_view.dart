@@ -76,7 +76,7 @@ class _CustomNotificationScrollViewState
         // Unit of Time
         SizedBox(
           height: 105,
-          width: 100,
+          width: 120,
           child: ListWheelScrollView.useDelegate(
             controller: widget.uot,
             onSelectedItemChanged: (value) => setState(() {

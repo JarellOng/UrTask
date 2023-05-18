@@ -56,7 +56,7 @@ class _DateScrollViewState extends State<DateScrollView> {
       children: [
         // Month
         SizedBox(
-          height: 90,
+          height: 105,
           width: 90,
           child: ListWheelScrollView.useDelegate(
             controller: widget.month,
@@ -85,7 +85,7 @@ class _DateScrollViewState extends State<DateScrollView> {
                 }
               });
             },
-            itemExtent: 30,
+            itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildLoopingListDelegate(
@@ -107,7 +107,7 @@ class _DateScrollViewState extends State<DateScrollView> {
 
         // Day
         SizedBox(
-          height: 90,
+          height: 105,
           width: 90,
           child: ListWheelScrollView.useDelegate(
             controller: widget.day,
@@ -116,7 +116,7 @@ class _DateScrollViewState extends State<DateScrollView> {
                 selectedDay = value;
               });
             },
-            itemExtent: 30,
+            itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildLoopingListDelegate(
@@ -138,7 +138,7 @@ class _DateScrollViewState extends State<DateScrollView> {
 
         // Year
         SizedBox(
-          height: 90,
+          height: 105,
           width: 90,
           child: ListWheelScrollView.useDelegate(
             controller: widget.year,
@@ -159,7 +159,7 @@ class _DateScrollViewState extends State<DateScrollView> {
                 currentYear -= selectedYear;
               });
             },
-            itemExtent: 30,
+            itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
             childDelegate: ListWheelChildListDelegate(

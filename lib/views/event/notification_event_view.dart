@@ -1,3 +1,4 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:urtask/color.dart';
@@ -89,15 +90,27 @@ class _NotificationEventViewState extends State<NotificationEventView> {
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
+          elevation: 0,
         ),
         body: SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(height: 10),
               // REMIND ME
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Remind me!"),
+                  Row(
+                    children: const [
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        "Remind me!",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                   Transform.scale(
                     scale: 0.8,
                     child: CupertinoSwitch(
@@ -107,21 +120,32 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                           remindMe = value;
                         });
                       },
-                      // activeTrackColor: primary,
                       activeColor: primary,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
 
               if (remindMe == true) ...[
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
+
                 // TIME OF EVENT
                 ListTile(
                   leading: selectedNotifications
                           .containsKey(NotificationTime.timeOfEvent)
                       ? const Icon(Icons.radio_button_checked, color: primary)
                       : const Icon(Icons.radio_button_off),
-                  title: const Text("At time of event"),
+                  title: const Text(
+                    "At time of event",
+                    style: TextStyle(fontSize: 18),
+                  ),
                   onTap: () {
                     if (selectedNotifications
                         .containsKey(NotificationTime.timeOfEvent)) {
@@ -139,14 +163,29 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.timeOfEvent)) ...[
-                  const Text(
-                    "Notifcation Type:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  const DottedLine(lineLength: 350),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Notifcation Type:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
 
                   // Alert
                   RadioListTile(
-                    title: const Text("Alert"),
+                    dense: true,
+                    title: const Text(
+                      "Alert",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.timeOfEvent],
@@ -160,7 +199,11 @@ class _NotificationEventViewState extends State<NotificationEventView> {
 
                   // Push
                   RadioListTile(
-                    title: const Text("Push notification"),
+                    dense: true,
+                    title: const Text(
+                      "Push notification",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.timeOfEvent],
@@ -173,13 +216,24 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                   ),
                 ],
 
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
+
                 // 10 MINUTES BEFORE
                 ListTile(
                   leading: selectedNotifications
                           .containsKey(NotificationTime.tenMinsBefore)
                       ? const Icon(Icons.radio_button_checked, color: primary)
                       : const Icon(Icons.radio_button_off),
-                  title: const Text("10 minutes before"),
+                  title: const Text(
+                    "10 minutes before",
+                    style: TextStyle(fontSize: 18),
+                  ),
                   onTap: () {
                     if (selectedNotifications
                         .containsKey(NotificationTime.tenMinsBefore)) {
@@ -197,14 +251,29 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.tenMinsBefore)) ...[
-                  const Text(
-                    "Notifcation Type:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  const DottedLine(lineLength: 350),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Notifcation Type:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
 
                   // Alert
                   RadioListTile(
-                    title: const Text("Alert"),
+                    dense: true,
+                    title: const Text(
+                      "Alert",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.tenMinsBefore],
@@ -218,7 +287,11 @@ class _NotificationEventViewState extends State<NotificationEventView> {
 
                   // Push
                   RadioListTile(
-                    title: const Text("Push notification"),
+                    dense: true,
+                    title: const Text(
+                      "Push notification",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.tenMinsBefore],
@@ -231,13 +304,24 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                   ),
                 ],
 
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
+
                 // 1 HOUR BEFORE
                 ListTile(
                   leading: selectedNotifications
                           .containsKey(NotificationTime.hourBefore)
                       ? const Icon(Icons.radio_button_checked, color: primary)
                       : const Icon(Icons.radio_button_off),
-                  title: const Text("1 hour before"),
+                  title: const Text(
+                    "1 hour before",
+                    style: TextStyle(fontSize: 18),
+                  ),
                   onTap: () {
                     if (selectedNotifications
                         .containsKey(NotificationTime.hourBefore)) {
@@ -255,14 +339,29 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.hourBefore)) ...[
-                  const Text(
-                    "Notifcation Type:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  const DottedLine(lineLength: 350),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Notifcation Type:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
 
                   // Alert
                   RadioListTile(
-                    title: const Text("Alert"),
+                    dense: true,
+                    title: const Text(
+                      "Alert",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.hourBefore],
@@ -276,7 +375,11 @@ class _NotificationEventViewState extends State<NotificationEventView> {
 
                   // Push
                   RadioListTile(
-                    title: const Text("Push notification"),
+                    dense: true,
+                    title: const Text(
+                      "Push notification",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.hourBefore],
@@ -289,13 +392,24 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                   ),
                 ],
 
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
+
                 // 1 DAY BEFORE
                 ListTile(
                   leading: selectedNotifications
                           .containsKey(NotificationTime.dayBefore)
                       ? const Icon(Icons.radio_button_checked, color: primary)
                       : const Icon(Icons.radio_button_off),
-                  title: const Text("1 day before"),
+                  title: const Text(
+                    "1 day before",
+                    style: TextStyle(fontSize: 18),
+                  ),
                   onTap: () {
                     if (selectedNotifications
                         .containsKey(NotificationTime.dayBefore)) {
@@ -313,14 +427,29 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.dayBefore)) ...[
-                  const Text(
-                    "Notifcation Type:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  const DottedLine(lineLength: 350),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Notifcation Type:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
 
                   // Alert
                   RadioListTile(
-                    title: const Text("Alert"),
+                    dense: true,
+                    title: const Text(
+                      "Alert",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.dayBefore],
@@ -334,7 +463,11 @@ class _NotificationEventViewState extends State<NotificationEventView> {
 
                   // Push
                   RadioListTile(
-                    title: const Text("Push notification"),
+                    dense: true,
+                    title: const Text(
+                      "Push notification",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.dayBefore],
@@ -347,6 +480,14 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                   ),
                 ],
 
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
+
                 // CUSTOM
                 ListTile(
                   leading: selectedNotifications
@@ -357,7 +498,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     children: [
                       if (!selectedNotifications
                           .containsKey(NotificationTime.custom)) ...[
-                        const Text("Custom"),
+                        const Text(
+                          "Custom",
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ],
                       if (selectedNotifications
                           .containsKey(NotificationTime.custom)) ...[
@@ -371,15 +515,23 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                                 amount: selectedCustomNotifcationAmount,
                                 uot: selectedCustomNotifcationUot,
                               ),
+                              style: const TextStyle(fontSize: 18),
                             ),
                           ),
                         ],
                         if (customNotificationScrollToggle == true) ...[
                           TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 234, 220, 220),
+                            ),
                             onPressed: () {
                               _customNotificationScrollOff();
                             },
-                            child: const Text("..."),
+                            child: const Text(
+                              "...",
+                              style: TextStyle(fontSize: 18),
+                            ),
                           ),
                         ],
                       ]
@@ -407,18 +559,34 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     amount: customNotificationAmount,
                     uot: customNotificationUot,
                   ),
+                  const SizedBox(height: 20)
                 ],
 
                 if (selectedNotifications
                     .containsKey(NotificationTime.custom)) ...[
-                  const Text(
-                    "Notifcation Type:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  const DottedLine(lineLength: 350),
+                  const SizedBox(height: 15),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Notifcation Type:",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
 
                   // Alert
                   RadioListTile(
-                    title: const Text("Alert"),
+                    dense: true,
+                    title: const Text(
+                      "Alert",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.alert,
                     groupValue: selectedNotifications[NotificationTime.custom],
                     onChanged: (value) {
@@ -431,7 +599,11 @@ class _NotificationEventViewState extends State<NotificationEventView> {
 
                   // Push
                   RadioListTile(
-                    title: const Text("Push notification"),
+                    dense: true,
+                    title: const Text(
+                      "Push notification",
+                      style: TextStyle(fontSize: 18),
+                    ),
                     value: NotificationType.push,
                     groupValue: selectedNotifications[NotificationTime.custom],
                     onChanged: (value) {
@@ -442,6 +614,14 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     },
                   ),
                 ],
+
+                const Divider(
+                  indent: 10,
+                  endIndent: 10,
+                  height: 1,
+                  thickness: 1,
+                  color: Color.fromARGB(255, 125, 121, 121),
+                ),
               ],
             ],
           ),
