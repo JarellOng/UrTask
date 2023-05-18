@@ -521,6 +521,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                         ],
                         if (customNotificationScrollToggle == true) ...[
                           TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 234, 220, 220),
+                            ),
                             onPressed: () {
                               _customNotificationScrollOff();
                             },

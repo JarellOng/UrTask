@@ -19,7 +19,7 @@ class HourView extends StatelessWidget {
         child: Text(
           hours < 10 ? '0$hours' : hours.toString(),
           style: TextStyle(
-            fontSize: 25,
+            fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
           ),
         ),

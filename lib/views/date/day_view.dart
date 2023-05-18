@@ -19,7 +19,7 @@ class DayView extends StatelessWidget {
         child: Text(
           (day + 1).toString(),
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
           ),
         ),

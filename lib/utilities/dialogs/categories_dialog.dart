@@ -38,16 +38,35 @@ Future<List<String>> showCategoriesDialog(
                                   category.name,
                                   color.hex
                                 ];
-                                return SimpleDialogOption(
-                                  onPressed: () => Navigator.of(context)
-                                      .pop(selectedCategory),
-                                  child: Text(
-                                    categories.elementAt(index).name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: HexColor.fromHex(color.hex),
+                                return Column(
+                                  children: [
+                                    SimpleDialogOption(
+                                      onPressed: () => Navigator.of(context)
+                                          .pop(selectedCategory),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.circle,
+                                            color: HexColor.fromHex(color.hex),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(
+                                            categories.elementAt(index).name,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                    const Divider(
+                                      indent: 10,
+                                      endIndent: 10,
+                                      height: 1,
+                                      thickness: 1,
+                                      color: Color.fromARGB(255, 125, 121, 121),
+                                    ),
+                                  ],
                                 );
                               } else {
                                 return Column();

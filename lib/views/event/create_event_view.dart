@@ -142,6 +142,7 @@ class _CreateEventViewState extends State<CreateEventView> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
+        elevation: 0,
       ),
       body: WillPopScope(
         onWillPop: () async {
@@ -169,24 +170,48 @@ class _CreateEventViewState extends State<CreateEventView> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // TITLE
-              TextField(
-                controller: _eventTitle,
-                focusNode: eventTitleFocus,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: const InputDecoration(
-                  hintText: "Title",
+              SizedBox(
+                width: 350,
+                child: TextField(
+                  controller: _eventTitle,
+                  focusNode: eventTitleFocus,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  decoration: const InputDecoration(
+                    hintText: "Title",
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
+              // TITLE
+
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+              const SizedBox(height: 10),
+              const Icon(Icons.access_alarm),
 
               // ALL DAY
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("All Day"),
+                  Row(children: const [
+                    SizedBox(width: 20),
+                    Text(
+                      "All Day",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ]),
                   Transform.scale(
-                    scale: 0.8,
+                    scale: 0.7,
                     child: CupertinoSwitch(
                       value: allDay,
                       onChanged: (value) {
@@ -231,78 +256,117 @@ class _CreateEventViewState extends State<CreateEventView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Start"),
-
-                  // Date
-                  if (startDateScrollToggle == false) ...[
-                    TextButton(
-                      onPressed: () {
-                        if (startTimeScrollToggle == true) {
-                          _startTimeScrollOff();
-                        }
-                        if (endDateScrollToggle == true) {
-                          _endDateScrollOff();
-                        }
-                        if (endTimeScrollToggle == true) {
-                          _endTimeScrollOff();
-                        }
-                        _startDateScrollOn();
-                        eventIsEdited = true;
-                      },
-                      child: Text(
-                        _dateToString(
-                          month: selectedStartDateTime.month - 1,
-                          day: selectedStartDateTime.day - 1,
-                          year: selectedStartDateTime.year,
-                        ),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Start",
+                        style: TextStyle(fontSize: 18),
                       ),
-                    ),
-                  ],
-                  if (startDateScrollToggle == true) ...[
-                    TextButton(
-                      onPressed: () {
-                        _startDateScrollOff();
-                      },
-                      child: const Text("..."),
-                    ),
-                  ],
-
-                  // Time
-                  if (allDay == false) ...[
-                    if (startTimeScrollToggle == false) ...[
-                      TextButton(
-                        onPressed: () {
-                          if (startDateScrollToggle == true) {
-                            _startDateScrollOff();
-                          }
-                          if (endDateScrollToggle == true) {
-                            _endDateScrollOff();
-                          }
-                          if (endTimeScrollToggle == true) {
-                            _endTimeScrollOff();
-                          }
-                          _startTimeScrollOn();
-                          eventIsEdited = true;
-                        },
-                        child: Text(
-                          _timeToString(
-                            hour: selectedStartDateTime.hour,
-                            minute: selectedStartDateTime.minute,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      // Date
+                      if (startDateScrollToggle == false) ...[
+                        TextButton(
+                          onPressed: () {
+                            if (startTimeScrollToggle == true) {
+                              _startTimeScrollOff();
+                            }
+                            if (endDateScrollToggle == true) {
+                              _endDateScrollOff();
+                            }
+                            if (endTimeScrollToggle == true) {
+                              _endTimeScrollOff();
+                            }
+                            _startDateScrollOn();
+                            eventIsEdited = true;
+                          },
+                          child: Text(
+                            _dateToString(
+                              month: selectedStartDateTime.month - 1,
+                              day: selectedStartDateTime.day - 1,
+                              year: selectedStartDateTime.year,
+                            ),
+                            style: const TextStyle(fontSize: 18),
                           ),
                         ),
-                      ),
+                      ],
+                      if (startDateScrollToggle == true) ...[
+                        TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 234, 220, 220),
+                            ),
+                            onPressed: () {
+                              _startDateScrollOff();
+                            },
+                            child: const SizedBox(
+                              width: 115,
+                              child: Text(
+                                "...",
+                                style: TextStyle(fontSize: 18),
+                                textAlign: TextAlign.center,
+                              ),
+                            )),
+                      ],
+
+                      // Time
+                      if (allDay == false) ...[
+                        const Text(
+                          "|",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                        ),
+                        if (startTimeScrollToggle == false) ...[
+                          TextButton(
+                            onPressed: () {
+                              if (startDateScrollToggle == true) {
+                                _startDateScrollOff();
+                              }
+                              if (endDateScrollToggle == true) {
+                                _endDateScrollOff();
+                              }
+                              if (endTimeScrollToggle == true) {
+                                _endTimeScrollOff();
+                              }
+                              _startTimeScrollOn();
+                              eventIsEdited = true;
+                            },
+                            child: Text(
+                              _timeToString(
+                                hour: selectedStartDateTime.hour,
+                                minute: selectedStartDateTime.minute,
+                              ),
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                        if (startTimeScrollToggle == true) ...[
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 234, 220, 220),
+                            ),
+                            onPressed: () {
+                              _startTimeScrollOff();
+                            },
+                            child: const Text(
+                              "...",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ],
                     ],
-                    if (startTimeScrollToggle == true) ...[
-                      TextButton(
-                        onPressed: () {
-                          _startTimeScrollOff();
-                        },
-                        child: const Text("..."),
-                      ),
-                    ],
-                  ],
+                  ),
                 ],
               ),
+
               if (startDateScrollToggle == true) ...[
                 // Date Scroll
                 DateScrollView(
@@ -323,76 +387,114 @@ class _CreateEventViewState extends State<CreateEventView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("End"),
-
-                  // Date
-                  if (endDateScrollToggle == false) ...[
-                    TextButton(
-                      onPressed: () {
-                        if (startDateScrollToggle == true) {
-                          _startDateScrollOff();
-                        }
-                        if (startTimeScrollToggle == true) {
-                          _startTimeScrollOff();
-                        }
-                        if (endTimeScrollToggle == true) {
-                          _endTimeScrollOff();
-                        }
-                        _endDateScrollOn();
-                        eventIsEdited = true;
-                      },
-                      child: Text(
-                        _dateToString(
-                          month: selectedEndDateTime.month - 1,
-                          day: selectedEndDateTime.day - 1,
-                          year: selectedEndDateTime.year,
-                        ),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "End",
+                        style: TextStyle(fontSize: 18),
                       ),
-                    ),
-                  ],
-                  if (endDateScrollToggle == true) ...[
-                    TextButton(
-                      onPressed: () {
-                        _endDateScrollOff();
-                      },
-                      child: const Text("..."),
-                    ),
-                  ],
-
-                  // Time
-                  if (allDay == false) ...[
-                    if (endTimeScrollToggle == false) ...[
-                      TextButton(
-                        onPressed: () {
-                          if (startDateScrollToggle == true) {
-                            _startDateScrollOff();
-                          }
-                          if (startTimeScrollToggle == true) {
-                            _startTimeScrollOff();
-                          }
-                          if (endDateScrollToggle == true) {
-                            _endDateScrollOff();
-                          }
-                          _endTimeScrollOn();
-                          eventIsEdited = true;
-                        },
-                        child: Text(
-                          _timeToString(
-                            hour: selectedEndDateTime.hour,
-                            minute: selectedEndDateTime.minute,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      // Date
+                      if (endDateScrollToggle == false) ...[
+                        TextButton(
+                          onPressed: () {
+                            if (startDateScrollToggle == true) {
+                              _startDateScrollOff();
+                            }
+                            if (startTimeScrollToggle == true) {
+                              _startTimeScrollOff();
+                            }
+                            if (endTimeScrollToggle == true) {
+                              _endTimeScrollOff();
+                            }
+                            _endDateScrollOn();
+                            eventIsEdited = true;
+                          },
+                          child: Text(
+                            _dateToString(
+                              month: selectedEndDateTime.month - 1,
+                              day: selectedEndDateTime.day - 1,
+                              year: selectedEndDateTime.year,
+                            ),
+                            style: const TextStyle(fontSize: 18),
                           ),
                         ),
-                      ),
+                      ],
+                      if (endDateScrollToggle == true) ...[
+                        SizedBox(
+                          width: 115,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 234, 220, 220),
+                            ),
+                            onPressed: () {
+                              _endDateScrollOff();
+                            },
+                            child: const Text(
+                              "...",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+
+                      // Time
+                      if (allDay == false) ...[
+                        const Text(
+                          "|",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: primary,
+                          ),
+                        ),
+                        if (endTimeScrollToggle == false) ...[
+                          TextButton(
+                            onPressed: () {
+                              if (startDateScrollToggle == true) {
+                                _startDateScrollOff();
+                              }
+                              if (startTimeScrollToggle == true) {
+                                _startTimeScrollOff();
+                              }
+                              if (endDateScrollToggle == true) {
+                                _endDateScrollOff();
+                              }
+                              _endTimeScrollOn();
+                              eventIsEdited = true;
+                            },
+                            child: Text(
+                              _timeToString(
+                                hour: selectedEndDateTime.hour,
+                                minute: selectedEndDateTime.minute,
+                              ),
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                        if (endTimeScrollToggle == true) ...[
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 234, 220, 220),
+                            ),
+                            onPressed: () {
+                              _endTimeScrollOff();
+                            },
+                            child: const Text(
+                              "...",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ],
                     ],
-                    if (endTimeScrollToggle == true) ...[
-                      TextButton(
-                        onPressed: () {
-                          _endTimeScrollOff();
-                        },
-                        child: const Text("..."),
-                      ),
-                    ],
-                  ],
+                  ),
                 ],
               ),
               if (endDateScrollToggle == true) ...[
@@ -402,6 +504,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                   month: _eventEndMonth,
                   year: _eventEndYear,
                 ),
+                const SizedBox(height: 10),
               ],
               if (endTimeScrollToggle == true) ...[
                 // Time Scroll
@@ -409,15 +512,34 @@ class _CreateEventViewState extends State<CreateEventView> {
                   hour: _eventEndHour,
                   minute: _eventEndMinute,
                 ),
+                const SizedBox(height: 10),
               ],
+
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+              const SizedBox(height: 10),
+              const Icon(Icons.warning_rounded),
 
               // IMPORTANT
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Important"),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Important",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                   Transform.scale(
-                    scale: 0.8,
+                    scale: 0.7,
                     child: CupertinoSwitch(
                       value: important,
                       onChanged: (value) {
@@ -432,11 +554,29 @@ class _CreateEventViewState extends State<CreateEventView> {
                 ],
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+              const SizedBox(height: 10),
+              const Icon(Icons.event),
+
               // CATEGORY
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Category"),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Category",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                   TextButton(
                     onPressed: () async {
                       setState(() {
@@ -461,18 +601,39 @@ class _CreateEventViewState extends State<CreateEventView> {
                       backgroundColor: HexColor.fromHex(categoryHex),
                       label: Text(
                         categoryName,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+              const SizedBox(height: 10),
+              const Icon(Icons.repeat),
+
               // REPEAT
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Repeat"),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Repeat",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                   TextButton(
                     onPressed: () async {
                       setState(() {
@@ -534,16 +695,43 @@ class _CreateEventViewState extends State<CreateEventView> {
                         }
                       });
                     },
-                    child: const Text("Repeat"),
+                    child: Text(
+                      _printSelectedRepeat(
+                        type: selectedRepeatType,
+                        typeAmount: selectedRepeatTypeAmount,
+                        duration: selectedRepeatDuration,
+                        durationAmount: selectedRepeatDurationAmount,
+                        durationDate: selectedRepeatDurationDate,
+                      ),
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
+
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+              const SizedBox(height: 10),
+              const Icon(Icons.notifications_none),
 
               // NOTIFICATION
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Notification"),
+                  Row(
+                    children: const [
+                      SizedBox(width: 20),
+                      Text(
+                        "Notification",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
                   TextButton(
                     onPressed: () async {
                       setState(() {
@@ -575,80 +763,241 @@ class _CreateEventViewState extends State<CreateEventView> {
                         }
                       });
                     },
-                    child: const Text("Notification"),
+                    child: Text(
+                      _printSelectedNotifications(
+                        flag: notificationFlag,
+                        selectedNotifications: selectedNotifications,
+                      ),
+                      style: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
 
+              const Divider(
+                indent: 10,
+                endIndent: 10,
+                height: 1,
+                thickness: 1,
+                color: Color.fromARGB(255, 125, 121, 121),
+              ),
+              const SizedBox(height: 10),
+              const Icon(Icons.event_note),
+
               // DESCRIPTION
-              TextField(
-                controller: _eventDescription,
-                focusNode: eventDescriptionFocus,
-                enableSuggestions: false,
-                autocorrect: false,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: "Description",
+              SizedBox(
+                width: 350,
+                child: TextField(
+                  controller: _eventDescription,
+                  focusNode: eventDescriptionFocus,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  maxLines: 3,
+                  style: const TextStyle(fontSize: 18),
+                  decoration: const InputDecoration(
+                    hintText: "Description",
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
 
-              // SAVE BUTTON
-              TextButton(
-                onPressed: () async {
-                  if (startDateScrollToggle == true) {
-                    _startDateScrollOff();
-                  }
-                  if (startTimeScrollToggle == true) {
-                    _startTimeScrollOff();
-                  }
-                  if (endDateScrollToggle == true) {
-                    _endDateScrollOff();
-                  }
-                  if (endTimeScrollToggle == true) {
-                    _endTimeScrollOff();
-                  }
-                  Timestamp startTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                            selectedStartDateTime.hour,
-                            selectedStartDateTime.minute,
-                          ),
-                        );
-                  Timestamp endTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            23,
-                            59,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            selectedEndDateTime.hour,
-                            selectedEndDateTime.minute,
-                          ),
-                        );
+      // SAVE BUTTON
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.black, width: 1.0),
+          ),
+        ),
+        child: TextButton(
+          onPressed: () async {
+            if (startDateScrollToggle == true) {
+              _startDateScrollOff();
+            }
+            if (startTimeScrollToggle == true) {
+              _startTimeScrollOff();
+            }
+            if (endDateScrollToggle == true) {
+              _endDateScrollOff();
+            }
+            if (endTimeScrollToggle == true) {
+              _endTimeScrollOff();
+            }
+            Timestamp startTimestamp = allDay == true
+                ? Timestamp.fromDate(
+                    DateTime(
+                      selectedStartDateTime.year,
+                      selectedStartDateTime.month,
+                      selectedStartDateTime.day,
+                    ),
+                  )
+                : Timestamp.fromDate(
+                    DateTime(
+                      selectedStartDateTime.year,
+                      selectedStartDateTime.month,
+                      selectedStartDateTime.day,
+                      selectedStartDateTime.hour,
+                      selectedStartDateTime.minute,
+                    ),
+                  );
+            Timestamp endTimestamp = allDay == true
+                ? Timestamp.fromDate(
+                    DateTime(
+                      selectedEndDateTime.year,
+                      selectedEndDateTime.month,
+                      selectedEndDateTime.day,
+                      23,
+                      59,
+                    ),
+                  )
+                : Timestamp.fromDate(
+                    DateTime(
+                      selectedEndDateTime.year,
+                      selectedEndDateTime.month,
+                      selectedEndDateTime.day,
+                      selectedEndDateTime.hour,
+                      selectedEndDateTime.minute,
+                    ),
+                  );
 
-                  // Create Event
-                  final eventGroupId = selectedRepeatType != RepeatType.noRepeat
-                      ? "repeat${DateTime.now()}"
-                      : null;
-                  final createdEvent = await _eventService.create(
+            // Create Event
+            final eventGroupId = selectedRepeatType != RepeatType.noRepeat
+                ? "repeat${DateTime.now()}"
+                : null;
+            final createdEvent = await _eventService.create(
+              title:
+                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
+              categoryId: categoryId,
+              groupId: eventGroupId,
+              start: startTimestamp,
+              end: endTimestamp,
+              important: important,
+              description: _eventDescription.text,
+            );
+
+            // Create Notifications
+            if (notificationFlag == true) {
+              selectedNotifications.forEach(
+                (key, value) {
+                  if (key == NotificationTime.timeOfEvent) {
+                    _notificationService.create(
+                      eventId: createdEvent,
+                      dateTime: startTimestamp,
+                      type: value.name,
+                    );
+                  } else if (key == NotificationTime.tenMinsBefore) {
+                    _notificationService.create(
+                      eventId: createdEvent,
+                      dateTime: Timestamp.fromDate(startTimestamp
+                          .toDate()
+                          .subtract(const Duration(minutes: 10))),
+                      type: value.name,
+                    );
+                  } else if (key == NotificationTime.hourBefore) {
+                    _notificationService.create(
+                      eventId: createdEvent,
+                      dateTime: Timestamp.fromDate(startTimestamp
+                          .toDate()
+                          .subtract(const Duration(hours: 1))),
+                      type: value.name,
+                    );
+                  } else if (key == NotificationTime.dayBefore) {
+                    _notificationService.create(
+                      eventId: createdEvent,
+                      dateTime: Timestamp.fromDate(startTimestamp
+                          .toDate()
+                          .subtract(const Duration(days: 1))),
+                      type: value.name,
+                    );
+                  } else if (key == NotificationTime.custom) {
+                    final customAmount = selectedCustomNotification!.keys.first;
+                    late Duration customDuration;
+                    if (selectedCustomNotification!.values.first ==
+                        CustomNotificationUOT.minutes) {
+                      customDuration = Duration(minutes: customAmount);
+                    } else if (selectedCustomNotification!.values.first ==
+                        CustomNotificationUOT.hours) {
+                      customDuration = Duration(hours: customAmount);
+                    } else if (selectedCustomNotification!.values.first ==
+                        CustomNotificationUOT.days) {
+                      customDuration = Duration(days: customAmount);
+                    }
+                    _notificationService.create(
+                      eventId: createdEvent,
+                      dateTime: Timestamp.fromDate(
+                          startTimestamp.toDate().subtract(customDuration)),
+                      type: value.name,
+                    );
+                  }
+                },
+              );
+            }
+
+            // Create Duplicate Events
+            if (selectedRepeatType != RepeatType.noRepeat) {
+              Duration? repeatDurationArithmetic;
+              if (selectedRepeatType == RepeatType.perDay) {
+                repeatDurationArithmetic =
+                    Duration(days: selectedRepeatTypeAmount);
+              } else if (selectedRepeatType == RepeatType.perWeek) {
+                repeatDurationArithmetic =
+                    Duration(days: 7 * selectedRepeatTypeAmount);
+              }
+
+              if (selectedRepeatDuration == RepeatDuration.specificNumber) {
+                for (var i = 0; i < selectedRepeatDurationAmount!; i++) {
+                  if (repeatDurationArithmetic != null) {
+                    startTimestamp = Timestamp.fromDate(
+                        startTimestamp.toDate().add(repeatDurationArithmetic));
+                    endTimestamp = Timestamp.fromDate(
+                        endTimestamp.toDate().add(repeatDurationArithmetic));
+                  } else {
+                    final startDateTime = startTimestamp.toDate();
+                    final endDateTime = endTimestamp.toDate();
+                    if (selectedRepeatType == RepeatType.perMonth) {
+                      startTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          startDateTime.year,
+                          startDateTime.month + selectedRepeatTypeAmount,
+                          startDateTime.day,
+                          startDateTime.hour,
+                          startDateTime.minute,
+                        ),
+                      );
+                      endTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          endDateTime.year,
+                          endDateTime.month + selectedRepeatTypeAmount,
+                          endDateTime.day,
+                          endDateTime.hour,
+                          endDateTime.minute,
+                        ),
+                      );
+                    } else if (selectedRepeatType == RepeatType.perYear) {
+                      startTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          startDateTime.year + selectedRepeatTypeAmount,
+                          startDateTime.month,
+                          startDateTime.day,
+                          startDateTime.hour,
+                          startDateTime.minute,
+                        ),
+                      );
+                      endTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          endDateTime.year + selectedRepeatTypeAmount,
+                          endDateTime.month,
+                          endDateTime.day,
+                          endDateTime.hour,
+                          endDateTime.minute,
+                        ),
+                      );
+                    }
+                  }
+                  final createdRepeatEvent = await _eventService.create(
                     title: _eventTitle.text.isNotEmpty
                         ? _eventTitle.text
                         : "My Event",
@@ -665,13 +1014,13 @@ class _CreateEventViewState extends State<CreateEventView> {
                     selectedNotifications.forEach((key, value) {
                       if (key == NotificationTime.timeOfEvent) {
                         _notificationService.create(
-                          eventId: createdEvent,
+                          eventId: createdRepeatEvent,
                           dateTime: startTimestamp,
                           type: value.name,
                         );
                       } else if (key == NotificationTime.tenMinsBefore) {
                         _notificationService.create(
-                          eventId: createdEvent,
+                          eventId: createdRepeatEvent,
                           dateTime: Timestamp.fromDate(startTimestamp
                               .toDate()
                               .subtract(const Duration(minutes: 10))),
@@ -679,7 +1028,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                         );
                       } else if (key == NotificationTime.hourBefore) {
                         _notificationService.create(
-                          eventId: createdEvent,
+                          eventId: createdRepeatEvent,
                           dateTime: Timestamp.fromDate(startTimestamp
                               .toDate()
                               .subtract(const Duration(hours: 1))),
@@ -687,7 +1036,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                         );
                       } else if (key == NotificationTime.dayBefore) {
                         _notificationService.create(
-                          eventId: createdEvent,
+                          eventId: createdRepeatEvent,
                           dateTime: Timestamp.fromDate(startTimestamp
                               .toDate()
                               .subtract(const Duration(days: 1))),
@@ -708,7 +1057,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                           customDuration = Duration(days: customAmount);
                         }
                         _notificationService.create(
-                          eventId: createdEvent,
+                          eventId: createdRepeatEvent,
                           dateTime: Timestamp.fromDate(
                               startTimestamp.toDate().subtract(customDuration)),
                           type: value.name,
@@ -716,293 +1065,153 @@ class _CreateEventViewState extends State<CreateEventView> {
                       }
                     });
                   }
-
-                  // Create Duplicate Events
-                  if (selectedRepeatType != RepeatType.noRepeat) {
-                    Duration? repeatDurationArithmetic;
-                    if (selectedRepeatType == RepeatType.perDay) {
-                      repeatDurationArithmetic =
-                          Duration(days: selectedRepeatTypeAmount);
-                    } else if (selectedRepeatType == RepeatType.perWeek) {
-                      repeatDurationArithmetic =
-                          Duration(days: 7 * selectedRepeatTypeAmount);
-                    }
-
-                    if (selectedRepeatDuration ==
-                        RepeatDuration.specificNumber) {
-                      for (var i = 0; i < selectedRepeatDurationAmount!; i++) {
-                        if (repeatDurationArithmetic != null) {
-                          startTimestamp = Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .add(repeatDurationArithmetic));
-                          endTimestamp = Timestamp.fromDate(endTimestamp
-                              .toDate()
-                              .add(repeatDurationArithmetic));
-                        } else {
-                          final startDateTime = startTimestamp.toDate();
-                          final endDateTime = endTimestamp.toDate();
-                          if (selectedRepeatType == RepeatType.perMonth) {
-                            startTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                startDateTime.year,
-                                startDateTime.month + selectedRepeatTypeAmount,
-                                startDateTime.day,
-                                startDateTime.hour,
-                                startDateTime.minute,
-                              ),
-                            );
-                            endTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                endDateTime.year,
-                                endDateTime.month + selectedRepeatTypeAmount,
-                                endDateTime.day,
-                                endDateTime.hour,
-                                endDateTime.minute,
-                              ),
-                            );
-                          } else if (selectedRepeatType == RepeatType.perYear) {
-                            startTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                startDateTime.year + selectedRepeatTypeAmount,
-                                startDateTime.month,
-                                startDateTime.day,
-                                startDateTime.hour,
-                                startDateTime.minute,
-                              ),
-                            );
-                            endTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                endDateTime.year + selectedRepeatTypeAmount,
-                                endDateTime.month,
-                                endDateTime.day,
-                                endDateTime.hour,
-                                endDateTime.minute,
-                              ),
-                            );
-                          }
-                        }
-                        final createdRepeatEvent = await _eventService.create(
-                          title: _eventTitle.text.isNotEmpty
-                              ? _eventTitle.text
-                              : "My Event",
-                          categoryId: categoryId,
-                          groupId: eventGroupId,
-                          start: startTimestamp,
-                          end: endTimestamp,
-                          important: important,
-                          description: _eventDescription.text,
-                        );
-
-                        // Create Notifications
-                        if (notificationFlag == true) {
-                          selectedNotifications.forEach((key, value) {
-                            if (key == NotificationTime.timeOfEvent) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: startTimestamp,
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.tenMinsBefore) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(const Duration(minutes: 10))),
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.hourBefore) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(const Duration(hours: 1))),
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.dayBefore) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(const Duration(days: 1))),
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.custom) {
-                              final customAmount =
-                                  selectedCustomNotification!.keys.first;
-                              late Duration customDuration;
-                              if (selectedCustomNotification!.values.first ==
-                                  CustomNotificationUOT.minutes) {
-                                customDuration =
-                                    Duration(minutes: customAmount);
-                              } else if (selectedCustomNotification!
-                                      .values.first ==
-                                  CustomNotificationUOT.hours) {
-                                customDuration = Duration(hours: customAmount);
-                              } else if (selectedCustomNotification!
-                                      .values.first ==
-                                  CustomNotificationUOT.days) {
-                                customDuration = Duration(days: customAmount);
-                              }
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(customDuration)),
-                                type: value.name,
-                              );
-                            }
-                          });
-                        }
-                      }
-                    } else if (selectedRepeatDuration == RepeatDuration.until) {
-                      while (!startTimestamp
-                          .toDate()
-                          .isAfter(selectedRepeatDurationDate!.add(
-                            const Duration(
-                              hours: 23,
-                              minutes: 59,
-                            ),
-                          ))) {
-                        if (repeatDurationArithmetic != null) {
-                          startTimestamp = Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .add(repeatDurationArithmetic));
-                          endTimestamp = Timestamp.fromDate(endTimestamp
-                              .toDate()
-                              .add(repeatDurationArithmetic));
-                        } else {
-                          final startDateTime = startTimestamp.toDate();
-                          final endDateTime = endTimestamp.toDate();
-                          if (selectedRepeatType == RepeatType.perMonth) {
-                            startTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                startDateTime.year,
-                                startDateTime.month + selectedRepeatTypeAmount,
-                                startDateTime.day,
-                                startDateTime.hour,
-                                startDateTime.minute,
-                              ),
-                            );
-                            endTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                endDateTime.year,
-                                endDateTime.month + selectedRepeatTypeAmount,
-                                endDateTime.day,
-                                endDateTime.hour,
-                                endDateTime.minute,
-                              ),
-                            );
-                          } else if (selectedRepeatType == RepeatType.perYear) {
-                            startTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                startDateTime.year + selectedRepeatTypeAmount,
-                                startDateTime.month,
-                                startDateTime.day,
-                                startDateTime.hour,
-                                startDateTime.minute,
-                              ),
-                            );
-                            endTimestamp = Timestamp.fromDate(
-                              DateTime(
-                                endDateTime.year + selectedRepeatTypeAmount,
-                                endDateTime.month,
-                                endDateTime.day,
-                                endDateTime.hour,
-                                endDateTime.minute,
-                              ),
-                            );
-                          }
-                        }
-                        if (startTimestamp
-                            .toDate()
-                            .isAfter(selectedRepeatDurationDate!.add(
-                              const Duration(
-                                hours: 23,
-                                minutes: 59,
-                              ),
-                            ))) break;
-                        final createdRepeatEvent = await _eventService.create(
-                          title: _eventTitle.text.isNotEmpty
-                              ? _eventTitle.text
-                              : "My Event",
-                          categoryId: categoryId,
-                          groupId: eventGroupId,
-                          start: startTimestamp,
-                          end: endTimestamp,
-                          important: important,
-                          description: _eventDescription.text,
-                        );
-                        // Create Notifications
-                        if (notificationFlag == true) {
-                          selectedNotifications.forEach((key, value) {
-                            if (key == NotificationTime.timeOfEvent) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: startTimestamp,
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.tenMinsBefore) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(const Duration(minutes: 10))),
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.hourBefore) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(const Duration(hours: 1))),
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.dayBefore) {
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(const Duration(days: 1))),
-                                type: value.name,
-                              );
-                            } else if (key == NotificationTime.custom) {
-                              final customAmount =
-                                  selectedCustomNotification!.keys.first;
-                              late Duration customDuration;
-                              if (selectedCustomNotification!.values.first ==
-                                  CustomNotificationUOT.minutes) {
-                                customDuration =
-                                    Duration(minutes: customAmount);
-                              } else if (selectedCustomNotification!
-                                      .values.first ==
-                                  CustomNotificationUOT.hours) {
-                                customDuration = Duration(hours: customAmount);
-                              } else if (selectedCustomNotification!
-                                      .values.first ==
-                                  CustomNotificationUOT.days) {
-                                customDuration = Duration(days: customAmount);
-                              }
-                              _notificationService.create(
-                                eventId: createdRepeatEvent,
-                                dateTime: Timestamp.fromDate(startTimestamp
-                                    .toDate()
-                                    .subtract(customDuration)),
-                                type: value.name,
-                              );
-                            }
-                          });
-                        }
-                      }
+                }
+              } else if (selectedRepeatDuration == RepeatDuration.until) {
+                while (!startTimestamp
+                    .toDate()
+                    .isAfter(selectedRepeatDurationDate!.add(
+                      const Duration(
+                        hours: 23,
+                        minutes: 59,
+                      ),
+                    ))) {
+                  if (repeatDurationArithmetic != null) {
+                    startTimestamp = Timestamp.fromDate(
+                        startTimestamp.toDate().add(repeatDurationArithmetic));
+                    endTimestamp = Timestamp.fromDate(
+                        endTimestamp.toDate().add(repeatDurationArithmetic));
+                  } else {
+                    final startDateTime = startTimestamp.toDate();
+                    final endDateTime = endTimestamp.toDate();
+                    if (selectedRepeatType == RepeatType.perMonth) {
+                      startTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          startDateTime.year,
+                          startDateTime.month + selectedRepeatTypeAmount,
+                          startDateTime.day,
+                          startDateTime.hour,
+                          startDateTime.minute,
+                        ),
+                      );
+                      endTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          endDateTime.year,
+                          endDateTime.month + selectedRepeatTypeAmount,
+                          endDateTime.day,
+                          endDateTime.hour,
+                          endDateTime.minute,
+                        ),
+                      );
+                    } else if (selectedRepeatType == RepeatType.perYear) {
+                      startTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          startDateTime.year + selectedRepeatTypeAmount,
+                          startDateTime.month,
+                          startDateTime.day,
+                          startDateTime.hour,
+                          startDateTime.minute,
+                        ),
+                      );
+                      endTimestamp = Timestamp.fromDate(
+                        DateTime(
+                          endDateTime.year + selectedRepeatTypeAmount,
+                          endDateTime.month,
+                          endDateTime.day,
+                          endDateTime.hour,
+                          endDateTime.minute,
+                        ),
+                      );
                     }
                   }
-
-                  if (mounted) {
-                    Navigator.of(context).pop();
+                  if (startTimestamp
+                      .toDate()
+                      .isAfter(selectedRepeatDurationDate!.add(
+                        const Duration(
+                          hours: 23,
+                          minutes: 59,
+                        ),
+                      ))) break;
+                  final createdRepeatEvent = await _eventService.create(
+                    title: _eventTitle.text.isNotEmpty
+                        ? _eventTitle.text
+                        : "My Event",
+                    categoryId: categoryId,
+                    groupId: eventGroupId,
+                    start: startTimestamp,
+                    end: endTimestamp,
+                    important: important,
+                    description: _eventDescription.text,
+                  );
+                  // Create Notifications
+                  if (notificationFlag == true) {
+                    selectedNotifications.forEach(
+                      (key, value) {
+                        if (key == NotificationTime.timeOfEvent) {
+                          _notificationService.create(
+                            eventId: createdRepeatEvent,
+                            dateTime: startTimestamp,
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.tenMinsBefore) {
+                          _notificationService.create(
+                            eventId: createdRepeatEvent,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(const Duration(minutes: 10))),
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.hourBefore) {
+                          _notificationService.create(
+                            eventId: createdRepeatEvent,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(const Duration(hours: 1))),
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.dayBefore) {
+                          _notificationService.create(
+                            eventId: createdRepeatEvent,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(const Duration(days: 1))),
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.custom) {
+                          final customAmount =
+                              selectedCustomNotification!.keys.first;
+                          late Duration customDuration;
+                          if (selectedCustomNotification!.values.first ==
+                              CustomNotificationUOT.minutes) {
+                            customDuration = Duration(minutes: customAmount);
+                          } else if (selectedCustomNotification!.values.first ==
+                              CustomNotificationUOT.hours) {
+                            customDuration = Duration(hours: customAmount);
+                          } else if (selectedCustomNotification!.values.first ==
+                              CustomNotificationUOT.days) {
+                            customDuration = Duration(days: customAmount);
+                          }
+                          _notificationService.create(
+                            eventId: createdRepeatEvent,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(customDuration)),
+                            type: value.name,
+                          );
+                        }
+                      },
+                    );
                   }
-                },
-                child: const Text("Save"),
-              ),
-            ],
+                }
+              }
+            }
+
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          child: const Text(
+            "Save",
+            style: TextStyle(fontSize: 18),
           ),
         ),
       ),
@@ -1263,5 +1472,80 @@ class _CreateEventViewState extends State<CreateEventView> {
     if (hour < 10) hourString = "0$hour";
     if (minute < 10) minuteString = "0$minute";
     return "$hourString:$minuteString";
+  }
+
+  String _printSelectedRepeat({
+    required RepeatType type,
+    required int typeAmount,
+    required RepeatDuration duration,
+    int? durationAmount,
+    DateTime? durationDate,
+  }) {
+    String repeatString = "";
+
+    if (type == RepeatType.noRepeat) {
+      repeatString += "Don't repeat";
+    } else if (type == RepeatType.perDay) {
+      if (typeAmount <= 1) {
+        repeatString += "Everyday";
+      } else {
+        repeatString += "Every $typeAmount days";
+      }
+    } else if (type == RepeatType.perMonth) {
+      if (typeAmount <= 1) {
+        repeatString += "Every month";
+      } else {
+        repeatString += "Every $typeAmount months";
+      }
+    } else if (type == RepeatType.perWeek) {
+      if (typeAmount <= 1) {
+        repeatString += "Every week";
+      } else {
+        repeatString += "Every $typeAmount weeks";
+      }
+    } else if (type == RepeatType.perYear) {
+      if (typeAmount <= 1) {
+        repeatString += "Every year";
+      } else {
+        repeatString += "Every $typeAmount years";
+      }
+    }
+
+    if (durationAmount != null) {
+      if (durationAmount <= 1) {
+        repeatString += " (once)";
+      } else {
+        repeatString += " ($durationAmount times)";
+      }
+    } else if (durationDate != null) {
+      final day = durationDate.day - 1;
+      final month = durationDate.month - 1;
+      final year = durationDate.year;
+      repeatString += " until ${_dateToString(
+        month: month,
+        day: day,
+        year: year,
+      )}";
+    }
+    return repeatString;
+  }
+
+  String _printSelectedNotifications({
+    required bool flag,
+    required Map<NotificationTime, NotificationType> selectedNotifications,
+  }) {
+    String notificationString = "";
+    if (flag == false) {
+      notificationString += "No notifications";
+    } else {
+      final notificationAmount = selectedNotifications.values.length;
+      if (notificationAmount <= 1) {
+        notificationString += "1 notification";
+      } else {
+        notificationString += "$notificationAmount notifications";
+      }
+    }
+
+    return notificationString;
   }
 }

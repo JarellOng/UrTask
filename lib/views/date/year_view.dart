@@ -19,7 +19,7 @@ class YearView extends StatelessWidget {
         child: Text(
           (DateTime.now().year + year).toString(),
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
           ),
         ),

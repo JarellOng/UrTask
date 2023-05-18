@@ -829,13 +829,20 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           ),
                         ],
                         if (untilDateScrollToggle == true) ...[
-                          TextButton(
-                            onPressed: () {
-                              _untilDateScrollOff();
-                            },
-                            child: const Text(
-                              "...",
-                              style: TextStyle(fontSize: 18),
+                          SizedBox(
+                            width: 115,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 234, 220, 220),
+                              ),
+                              onPressed: () {
+                                _untilDateScrollOff();
+                              },
+                              child: const Text(
+                                "...",
+                                style: TextStyle(fontSize: 18),
+                              ),
                             ),
                           ),
                         ],
