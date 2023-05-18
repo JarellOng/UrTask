@@ -569,6 +569,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               const SizedBox(height: 10),
               const Icon(Icons.event),
               const SizedBox(height: 10),
+
               // CATEGORY
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -597,11 +598,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                           tileColor: HexColor.fromHex(categoryHex),
                           minLeadingWidth: 10,
                           shape: RoundedRectangleBorder(
-                              side: const BorderSide(
-                                width: 1,
-                                color: Color.fromARGB(255, 125, 121, 121),
-                              ),
-                              borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           visualDensity: const VisualDensity(vertical: -4),
                           onTap: () async {
                             setState(() {

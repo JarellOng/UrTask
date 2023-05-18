@@ -6,9 +6,13 @@ import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
+import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
+import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/services/events/events_controller.dart';
+import 'package:urtask/services/events/events_model.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
+import 'package:urtask/services/notifications/notifications_model.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/utilities/dialogs/delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
@@ -78,7 +82,7 @@ class _EventDetailViewState extends State<EventDetailView> {
   bool endTimeScrollToggle = false;
 
   // Important
-  bool important = false;
+  late bool important = false;
 
   // Category
   String categoryId = "category3";
@@ -101,7 +105,118 @@ class _EventDetailViewState extends State<EventDetailView> {
     _categoryService = CategoryController();
     _colorService = ColorController();
     _notificationService = NotificationController();
-    setup();
+    _eventId = widget.eventId;
+    setupEvent().then(
+      (event) {
+        setState(() {
+          _eventGroupId = event.groupId;
+
+          _eventTitle.text = event.title;
+
+          final start = event.start.toDate();
+          selectedStartDay = start.day - 1;
+          selectedStartMonth = start.month - 1;
+          selectedStartYear = start.year;
+          selectedStartHour = start.hour;
+          selectedStartMinute = start.minute;
+          selectedStartDateTime = DateTime(
+            selectedStartYear,
+            selectedStartMonth + 1,
+            selectedStartDay + 1,
+            selectedStartHour,
+            selectedStartMinute,
+          );
+
+          final end = event.end.toDate();
+          selectedEndDay = end.day - 1;
+          selectedEndMonth = end.month - 1;
+          selectedEndYear = end.year;
+          selectedEndHour = end.hour;
+          selectedEndMinute = end.minute;
+          selectedEndDateTime = DateTime(
+            selectedEndYear,
+            selectedEndMonth + 1,
+            selectedEndDay + 1,
+            selectedEndHour,
+            selectedEndMinute,
+          );
+
+          if (selectedStartHour == 0 &&
+              selectedStartMinute == 0 &&
+              selectedEndHour == 23 &&
+              selectedEndMinute == 59) {
+            allDay = true;
+          }
+
+          important = event.important;
+
+          categoryId = event.categoryId;
+
+          _eventDescription.text = event.description ?? "";
+
+          setupCategory(id: categoryId).then((category) {
+            setState(() {
+              categoryName = category.name;
+
+              setupColor(id: category.colorId).then((color) {
+                setState(() {
+                  categoryHex = color.hex;
+                });
+              });
+            });
+          });
+
+          setupNotification(eventId: event.id).then((value) {
+            setState(() {
+              storedNotificationIds = value.map((e) => e.id).toList();
+              if (value.isNotEmpty) {
+                notificationFlag = true;
+                for (var element in value) {
+                  final difference = element.dateTime
+                      .toDate()
+                      .difference(event.start.toDate());
+                  if (difference.inSeconds == 0) {
+                    selectedNotifications[NotificationTime.timeOfEvent] =
+                        element.type;
+                  } else if (difference.inMinutes == -10) {
+                    selectedNotifications[NotificationTime.tenMinsBefore] =
+                        element.type;
+                  } else if (difference.inHours == -1) {
+                    selectedNotifications[NotificationTime.hourBefore] =
+                        element.type;
+                  } else if (difference.inDays == -1) {
+                    selectedNotifications[NotificationTime.dayBefore] =
+                        element.type;
+                  } else {
+                    selectedNotifications[NotificationTime.custom] =
+                        element.type;
+                    if (difference.inMinutes >= -60) {
+                      selectedCustomNotification = {
+                        difference.inMinutes.abs():
+                            CustomNotificationUOT.minutes
+                      };
+                    } else if (difference.inHours >= -24) {
+                      selectedCustomNotification = {
+                        difference.inHours.abs(): CustomNotificationUOT.hours
+                      };
+                    } else if (difference.inDays >= -365) {
+                      selectedCustomNotification = {
+                        difference.inDays.abs(): CustomNotificationUOT.days
+                      };
+                    }
+                  }
+                }
+              } else {
+                notificationFlag = false;
+                selectedNotifications = {
+                  NotificationTime.tenMinsBefore: NotificationType.alert
+                };
+              }
+            });
+          });
+        });
+      },
+    );
     super.initState();
   }
 
@@ -112,105 +227,26 @@ class _EventDetailViewState extends State<EventDetailView> {
     super.dispose();
   }
 
-  void setup() async {
-    final event =
-        await _eventService.get(id: widget.eventId).then((value) => value);
-    final category =
-        await _categoryService.get(id: event.categoryId).then((value) => value);
-    final color =
-        await _colorService.get(id: category.colorId).then((value) => value);
-    final notifications = await _notificationService
-        .getByEventId(id: event.id)
-        .then((value) => value);
-    setState(() {
-      _eventId = event.id;
+  Future<Events> setupEvent() async {
+    final event = await _eventService.get(id: widget.eventId);
+    return event;
+  }
 
-      _eventGroupId = event.groupId;
+  Future<Categories> setupCategory({required String id}) async {
+    final category = await _categoryService.get(id: id);
+    return category;
+  }
 
-      _eventTitle.text = event.title;
+  Future<color_model.Colors> setupColor({required String id}) async {
+    final color = await _colorService.get(id: id);
+    return color;
+  }
 
-      final start = event.start.toDate();
-      selectedStartDay = start.day - 1;
-      selectedStartMonth = start.month - 1;
-      selectedStartYear = start.year;
-      selectedStartHour = start.hour;
-      selectedStartMinute = start.minute;
-      selectedStartDateTime = DateTime(
-        selectedStartYear,
-        selectedStartMonth + 1,
-        selectedStartDay + 1,
-        selectedStartHour,
-        selectedStartMinute,
-      );
-
-      final end = event.end.toDate();
-      selectedEndDay = end.day - 1;
-      selectedEndMonth = end.month - 1;
-      selectedEndYear = end.year;
-      selectedEndHour = end.hour;
-      selectedEndMinute = end.minute;
-      selectedEndDateTime = DateTime(
-        selectedEndYear,
-        selectedEndMonth + 1,
-        selectedEndDay + 1,
-        selectedEndHour,
-        selectedEndMinute,
-      );
-
-      if (selectedStartHour == 0 &&
-          selectedStartMinute == 0 &&
-          selectedEndHour == 23 &&
-          selectedEndMinute == 59) {
-        allDay = true;
-      }
-
-      important = event.important;
-
-      categoryId = category.id;
-      categoryName = category.name;
-      categoryHex = color.hex;
-
-      storedNotificationIds = notifications.map((e) => e.id).toList();
-      if (notifications.isNotEmpty) {
-        notificationFlag = true;
-        for (var element in notifications) {
-          final difference =
-              element.dateTime.toDate().difference(event.start.toDate());
-          if (difference.inSeconds == 0) {
-            selectedNotifications[NotificationTime.timeOfEvent] = element.type;
-          } else if (difference.inMinutes == -10) {
-            selectedNotifications[NotificationTime.tenMinsBefore] =
-                element.type;
-          } else if (difference.inHours == -1) {
-            selectedNotifications[NotificationTime.hourBefore] = element.type;
-          } else if (difference.inDays == -1) {
-            selectedNotifications[NotificationTime.dayBefore] = element.type;
-          } else {
-            selectedNotifications[NotificationTime.custom] = element.type;
-            if (difference.inMinutes >= -60) {
-              selectedCustomNotification = {
-                difference.inMinutes.abs(): CustomNotificationUOT.minutes
-              };
-            } else if (difference.inHours >= -24) {
-              selectedCustomNotification = {
-                difference.inHours.abs(): CustomNotificationUOT.hours
-              };
-            } else if (difference.inDays >= -365) {
-              selectedCustomNotification = {
-                difference.inDays.abs(): CustomNotificationUOT.days
-              };
-            }
-          }
-        }
-      } else {
-        notificationFlag = false;
-        selectedNotifications = {
-          NotificationTime.tenMinsBefore: NotificationType.alert
-        };
-      }
-
-      _eventDescription.text = event.description ?? "";
-    });
+  Future<Iterable<Notifications>> setupNotification({
+    required String eventId,
+  }) async {
+    final notifications = await _notificationService.getByEventId(id: eventId);
+    return notifications;
   }
 
   @override
