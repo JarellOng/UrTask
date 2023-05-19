@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/calendars/calendars_constants.dart';
 import 'calendars_model.dart';
+// ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 
 class CalendarController {
@@ -25,5 +26,13 @@ class CalendarController {
     return querySnapshot.docs
         .map((doc) => Calendars.fromSnapshot(doc))
         .firstOrNull;
+  }
+
+  Future<Calendars> getPreset() async {
+    final querySnapshot = await calendars
+        .where(calendarUserIdField, isEqualTo: calendarAdminUserId)
+        .limit(1)
+        .get();
+    return querySnapshot.docs.map((doc) => Calendars.fromSnapshot(doc)).first;
   }
 }

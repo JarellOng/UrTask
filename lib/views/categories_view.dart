@@ -31,22 +31,23 @@ class _CategoryViewState extends State<CategoryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Event Categories", style: TextStyle(color: Colors.white)),
+        title: const Text("Event Categories",
+            style: TextStyle(color: Colors.white)),
         iconTheme: IconThemeData(color: Colors.white),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_outlined),
           onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeView(),
-              ),
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomeView(),
             ),
           ),
-          centerTitle: true,
+        ),
+        centerTitle: true,
       ),
       //backgroundColor: const Color.fromARGB(31, 133, 133, 133),
       body: StreamBuilder(
-        stream: _categoryService.getAll(userId: userId),
+        stream: _categoryService.getAll(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
@@ -54,9 +55,7 @@ class _CategoryViewState extends State<CategoryView> {
               if (snapshot.hasData) {
                 final categories = snapshot.data as Iterable<Categories>;
                 return ListView.builder(
-                  padding: const EdgeInsets.only(
-            top: 4, right: 12, left: 12
-          ),
+                  padding: const EdgeInsets.only(top: 4, right: 12, left: 12),
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories.elementAt(index);
@@ -68,18 +67,19 @@ class _CategoryViewState extends State<CategoryView> {
                             if (snapshot.hasData) {
                               final color = snapshot.data as color_model.Colors;
                               return ListTile(
-                                leading: Icon(
-                                  Icons.circle,
-                                  color: HexColor.fromHex(color.hex),
-                                ),
-                                title: Text(
-                                  category.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 20),
-                                ),
-                                shape: Border(bottom: BorderSide(color: Colors.black26))
-                              );
+                                  leading: Icon(
+                                    Icons.circle,
+                                    color: HexColor.fromHex(color.hex),
+                                  ),
+                                  title: Text(
+                                    category.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 20),
+                                  ),
+                                  shape: Border(
+                                      bottom:
+                                          BorderSide(color: Colors.black26)));
                             } else {
                               return Column();
                             }
@@ -100,11 +100,11 @@ class _CategoryViewState extends State<CategoryView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CreateCategoryView(),
-              ),
-            ),
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CreateCategoryView(),
+          ),
+        ),
         tooltip: 'Increment',
         child: Icon(Icons.add, color: Colors.white),
       ),

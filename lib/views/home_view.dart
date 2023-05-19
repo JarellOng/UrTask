@@ -262,7 +262,7 @@ class _CategoryListState extends State<CategoryList> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _categoryService.getAll(userId: userId),
+      stream: _categoryService.getAll(),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.active:

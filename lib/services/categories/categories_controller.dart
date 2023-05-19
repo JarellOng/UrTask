@@ -1,9 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/categories/categories_constants.dart';
 import 'package:urtask/services/categories/categories_model.dart';
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 
 class CategoryController {
-  final categories = FirebaseFirestore.instance.collection("categories");
+  final calendarController = CalendarController();
+  final calendars = FirebaseFirestore.instance.collection("calendar");
+  Future<CollectionReference<Map<String, dynamic>>> _getCollection() async {
+    final calendar = await calendarController.get();
+    return calendars.doc(calendar!.id).collection(categoriesCollectionId);
+  }
+
+  Future<CollectionReference<Map<String, dynamic>>>
+      _getPresetCollection() async {
+    final calendar = await calendarController.getPreset();
+    return calendars.doc(calendar.id).collection(categoriesCollectionId);
+  }
 
   static final CategoryController _shared =
       CategoryController._sharedInstance();
@@ -11,34 +26,50 @@ class CategoryController {
   factory CategoryController() => _shared;
 
   Future<void> create({
-    required String userId,
     required String colorId,
     required String name,
   }) async {
+    final categories = await _getCollection();
     await categories.add({
-      categoriesUserIdField: userId,
       categoriesColorIdField: colorId,
-      categoriesNameField: name
+      categoriesNameField: name,
     });
   }
 
   Future<Categories> get({required String id}) async {
+    final categories = await _getCollection();
     final querySnapshot = await categories
         .where(FieldPath.documentId, isEqualTo: id)
         .limit(1)
         .get();
-    return querySnapshot.docs.map((doc) => Categories.fromSnapshot(doc)).first;
+    final category = querySnapshot.docs
+        .map((doc) => Categories.fromSnapshot(doc))
+        .firstOrNull;
+    if (category != null) {
+      return category;
+    } else {
+      final presetCategories = await _getPresetCollection();
+      final presetquerySnapshot = await presetCategories
+          .where(FieldPath.documentId, isEqualTo: id)
+          .limit(1)
+          .get();
+      return presetquerySnapshot.docs
+          .map((doc) => Categories.fromSnapshot(doc))
+          .first;
+    }
   }
 
-  Stream<Iterable<Categories>> getAll({required String userId}) {
-    return categories
-        .where(
-          categoriesUserIdField,
-          whereIn: [userId, categoriesAdminUserId],
-        )
-        .orderBy(categoriesNameField)
+  Stream<Iterable<Categories>> getAll() async* {
+    final categories = await _getCollection();
+    final presetCategories = await _getPresetCollection();
+    final categoriesStream = categories
         .snapshots()
         .map((data) => data.docs.map((doc) => Categories.fromSnapshot(doc)));
+    final presetCategoriesStream = presetCategories
+        .snapshots()
+        .map((data) => data.docs.map((doc) => Categories.fromSnapshot(doc)));
+    yield* ZipStream.zip2(categoriesStream, presetCategoriesStream,
+        (a, b) => [...a, ...b].sortedBy((element) => element.name));
   }
 
   Future<void> update({
@@ -46,6 +77,7 @@ class CategoryController {
     required String colorId,
     required String name,
   }) async {
+    final categories = await _getCollection();
     await categories.doc(id).update({
       categoriesColorIdField: colorId,
       categoriesNameField: name,
@@ -53,6 +85,7 @@ class CategoryController {
   }
 
   Future<void> delete({required String id}) async {
+    final categories = await _getCollection();
     await categories.doc(id).delete();
   }
 }
