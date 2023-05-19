@@ -13,6 +13,7 @@ import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
+import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
@@ -845,6 +846,8 @@ class _CreateEventViewState extends State<CreateEventView> {
         ),
         child: TextButton(
           onPressed: () async {
+            showLoadingDialog(context: context, text: "Saving");
+
             if (startDateScrollToggle == true) {
               _startDateScrollOff();
             }
@@ -1028,6 +1031,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                       );
                     }
                   }
+
                   final createdRepeatEvent = await _eventService.create(
                     title: _eventTitle.text.isNotEmpty
                         ? _eventTitle.text
@@ -1237,6 +1241,7 @@ class _CreateEventViewState extends State<CreateEventView> {
             }
 
             if (mounted) {
+              Navigator.of(context).pop();
               Navigator.of(context).pop();
             }
           },

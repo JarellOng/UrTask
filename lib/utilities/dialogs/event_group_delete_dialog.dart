@@ -6,11 +6,16 @@ Future<bool> showEventGroupDeleteDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return SimpleDialog(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
         title: const Text("This event has repetitions!",
             style: TextStyle(
               fontWeight: FontWeight.normal,
+              fontSize: 18,
             )),
         children: [
+          const SizedBox(height: 10),
           SimpleDialogOption(
             onPressed: () => Navigator.of(context).pop(false),
             child: const Text(
@@ -18,6 +23,7 @@ Future<bool> showEventGroupDeleteDialog(BuildContext context) {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: primary,
+                fontSize: 18,
               ),
             ),
           ),
@@ -28,6 +34,7 @@ Future<bool> showEventGroupDeleteDialog(BuildContext context) {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: primary,
+                fontSize: 18,
               ),
             ),
           )
