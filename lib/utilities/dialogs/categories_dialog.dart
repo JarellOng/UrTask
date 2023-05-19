@@ -16,7 +16,7 @@ Future<List<String>> showCategoriesDialog(
     context: context,
     builder: (BuildContext context) {
       return StreamBuilder(
-        stream: categoryService.getAll(userId: userId),
+        stream: categoryService.getAll(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.active:

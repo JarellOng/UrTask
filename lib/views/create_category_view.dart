@@ -148,7 +148,6 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
         child: TextButton(
           onPressed: () async {
             _categoryService.create(
-                userId: userId,
                 colorId: colorId,
                 name: _eventCategoryTitle.text.isNotEmpty
                     ? _eventCategoryTitle.text

@@ -2,4 +2,4 @@ const categoriesUserIdField = "userId";
 const categoriesColorIdField = "colorId";
 const categoriesNameField = "name";
 
-const categoriesAdminUserId = "admin";
+const categoriesCollectionId = "categories";
