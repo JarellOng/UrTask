@@ -10,7 +10,7 @@ class NotificationController {
   final calendars = FirebaseFirestore.instance.collection("calendar");
   Future<CollectionReference<Map<String, dynamic>>> _getCollection() async {
     final calendar = await calendarController.get();
-    return calendars.doc(calendar.id).collection(notificationCollectionId);
+    return calendars.doc(calendar!.id).collection(notificationCollectionId);
   }
 
   static final NotificationController _shared =

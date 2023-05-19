@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
+import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
@@ -28,10 +29,13 @@ class _HomeViewState extends State<HomeView> {
   int _selectedDestination = 0;
   var uot = CalendarFormat.month;
   late final TextEditingController today;
+  late final CalendarController _calendarService;
 
   @override
   void initState() {
     today = TextEditingController();
+    _calendarService = CalendarController();
+    _setupCalendar();
     super.initState();
   }
 
@@ -226,6 +230,13 @@ class _HomeViewState extends State<HomeView> {
     setState(() {
       _selectedDestination = index;
     });
+  }
+
+  void _setupCalendar() async {
+    final calendar = await _calendarService.get();
+    if (calendar == null) {
+      await _calendarService.create(userId: userId);
+    }
   }
 }
 

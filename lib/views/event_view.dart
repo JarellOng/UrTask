@@ -171,10 +171,10 @@ class _EventViewState extends State<EventView> {
                 },
               );
             } else {
-              return const CircularProgressIndicator();
+              return Column();
             }
           default:
-            return const CircularProgressIndicator();
+            return Column();
         }
       },
     );
