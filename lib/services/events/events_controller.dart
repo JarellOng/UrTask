@@ -10,7 +10,7 @@ class EventController {
   final calendars = FirebaseFirestore.instance.collection("calendar");
   Future<CollectionReference<Map<String, dynamic>>> _getCollection() async {
     final calendar = await calendarController.get();
-    return calendars.doc(calendar.id).collection(eventCollectionId);
+    return calendars.doc(calendar!.id).collection(eventCollectionId);
   }
 
   static final EventController _shared = EventController._sharedInstance();
