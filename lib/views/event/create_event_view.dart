@@ -129,7 +129,19 @@ class _CreateEventViewState extends State<CreateEventView> {
   @override
   void dispose() {
     _eventTitle.dispose();
+    eventTitleFocus.dispose();
     _eventDescription.dispose();
+    eventDescriptionFocus.dispose();
+    _eventStartDay.dispose();
+    _eventStartMonth.dispose();
+    _eventStartYear.dispose();
+    _eventStartHour.dispose();
+    _eventStartMinute.dispose();
+    _eventEndDay.dispose();
+    _eventEndMonth.dispose();
+    _eventEndYear.dispose();
+    _eventEndHour.dispose();
+    _eventEndMinute.dispose();
     super.dispose();
   }
 

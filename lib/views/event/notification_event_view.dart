@@ -52,6 +52,13 @@ class _NotificationEventViewState extends State<NotificationEventView> {
   }
 
   @override
+  void dispose() {
+    customNotificationAmount.dispose();
+    customNotificationUot.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
