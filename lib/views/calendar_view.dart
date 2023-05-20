@@ -19,7 +19,7 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   DateTime selectedDay = DateTime.now();
-  // DateTime focusedDay = DateTime.now();
+  DateTime pilihanDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -35,24 +35,18 @@ class _CalendarViewState extends State<CalendarView> {
             lastDay: DateTime.utc(2025, 10, 16),
             rowHeight: 45,
             calendarFormat: widget.calendarFilter,
-            headerStyle: HeaderStyle(
-                titleCentered: true,
-                titleTextFormatter: (date, locale) =>
-                    DateFormat.yMMMM(locale).format(date),
-                formatButtonVisible: false,
-                leftChevronVisible: false,
-                rightChevronVisible: false),
-            //headerVisible: false,
+            headerVisible: false,
+            
             onDaySelected: (DateTime selectDay, DateTime focusDay) {
               setState(() {
                 selectedDay = selectDay;
-                // focusedDay = focusDay;
               });
             },
             onPageChanged: (focusedDay) {
               setState(() {
                 selectedDay = focusedDay;
               });
+              widget.today.text = DateFormat('yMMMM').format(selectedDay);
             },
             selectedDayPredicate: (DateTime date) {
               return isSameDay(selectedDay, date);
@@ -95,6 +89,7 @@ class _CalendarViewState extends State<CalendarView> {
       widget.today.text = "";
       return selectedDay;
     }
+    //widget.today.text = DateFormat('yMMMM').format(selectedDay);
     return null;
   }
 }

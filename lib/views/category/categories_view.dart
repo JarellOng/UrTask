@@ -5,7 +5,8 @@ import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/utilities/extensions/hex_color.dart';
-import 'package:urtask/views/create_category_view.dart';
+import 'package:urtask/views/category/category_detail_view.dart';
+import 'package:urtask/views/category/create_category_view.dart';
 import 'package:urtask/views/home_view.dart';
 
 class CategoryView extends StatefulWidget {
@@ -67,6 +68,17 @@ class _CategoryViewState extends State<CategoryView> {
                             if (snapshot.hasData) {
                               final color = snapshot.data as color_model.Colors;
                               return ListTile(
+                                  onTap: () async {
+                                    final categoryDetail = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            categoryDetailView(
+                                          categoryId: category.id,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                   leading: Icon(
                                     Icons.circle,
                                     color: HexColor.fromHex(color.hex),

@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:urtask/color.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
+import 'package:urtask/utilities/dialogs/delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
+import 'package:urtask/utilities/dialogs/event_group_delete_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
-import 'package:urtask/views/categories_view.dart';
+import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/views/color_view.dart';
 
-class CreateCategoryView extends StatefulWidget {
-  const CreateCategoryView({super.key});
+class categoryDetailView extends StatefulWidget {
+  final String categoryId;
+  const categoryDetailView({
+    super.key,
+    required this.categoryId,
+  });
 
   @override
-  State<CreateCategoryView> createState() => _CreateCategoryViewState();
+  State<categoryDetailView> createState() => _categoryDetailViewState();
 }
 
-class _CreateCategoryViewState extends State<CreateCategoryView> {
+class _categoryDetailViewState extends State<categoryDetailView> {
   late final ColorController _colorService;
   late final CategoryController _categoryService;
   late final TextEditingController _eventCategoryTitle;
 
+  String _categoryId = "";
   String colorId = "color1";
   String colorName = "Tomato";
   String colorHex = "#D50000";
@@ -27,12 +33,15 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
 
+  var _eventGroupId;
+
   @override
   void initState() {
     _colorService = ColorController();
     _categoryService = CategoryController();
     _eventCategoryTitle = TextEditingController();
     eventTitleFocus = FocusNode();
+    setup();
     super.initState();
   }
 
@@ -40,6 +49,21 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   void dispose() {
     _eventCategoryTitle.dispose();
     super.dispose();
+  }
+
+  void setup() async {
+    final category = await _categoryService
+        .get(id: widget.categoryId)
+        .then((value) => value);
+    final color =
+        await _colorService.get(id: category.colorId).then((value) => value);
+    setState(() {
+      _categoryId = category.id;
+      _eventCategoryTitle.text = category.name;
+      colorId = color.id;
+      colorName = color.name;
+      colorHex = color.hex;
+    });
   }
 
   @override
@@ -56,7 +80,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
           setState(() {
             eventTitleFocus.unfocus();
           });
-          if (eventIsEdited || _eventCategoryTitle.text.isNotEmpty) {
+          if (eventIsEdited) {
             final shouldDiscard = await showDiscardDialog(
               context,
               "Are you sure you want to discard this event?",
@@ -89,8 +113,13 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
                       autocorrect: false,
                       maxLines: 2,
                       decoration: const InputDecoration(
+                          isDense: true,
                           hintText: "Event Category Name",
                           hintStyle: TextStyle(fontSize: 18)),
+                      style: TextStyle(fontSize: 18),
+                      onChanged: (value) {
+                        eventIsEdited = true;
+                      },
                     ),
                     SizedBox(height: 20),
                     Row(
@@ -103,14 +132,13 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
                         Container(
                             width: 200,
                             child: ListTile(
-                              title: Text(colorName,
-                                  style: TextStyle(fontSize: 20)),
-                              leading: Icon(
-                                Icons.circle,
-                                color: HexColor.fromHex(colorHex),
+                              title: Center(
+                                child: Text(colorName,
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white)),
                               ),
+                              tileColor: HexColor.fromHex(colorHex),
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(width: 0.5),
                                   borderRadius: BorderRadius.circular(20)),
                               visualDensity: VisualDensity(vertical: -4),
                               onTap: () async {
@@ -133,34 +161,63 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
                     ),
                   ],
                 )),
-            Transform.translate(
-              offset: Offset(0, 460),
-              child: Divider(
-                height: 1,
-                thickness: 2,
-              ),
-            )
           ],
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(bottom: 6, left: 100, right: 100),
-        child: TextButton(
-          onPressed: () async {
-            _categoryService.create(
-                colorId: colorId,
-                name: _eventCategoryTitle.text.isNotEmpty
-                    ? _eventCategoryTitle.text
-                    : "My Category");
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CategoryView(),
-              ),
-            );
-          },
-          child: const Text("Save", style: TextStyle(fontSize: 18)),
-        ),
+        decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.black, width: 1.0))),
+        child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // DELETE BUTTON
+                TextButton(
+                  onPressed: () async {
+                    final shouldDelete = await showDeleteDialog(
+                      context,
+                      "Are you sure you want to delete this event?",
+                    );
+                    if (shouldDelete) {
+                      if (_eventGroupId != null && mounted) {
+                        final shouldDeleteAllRepeatedEvents =
+                            await showEventGroupDeleteDialog(context);
+                        if (shouldDeleteAllRepeatedEvents == false) {
+                          await _categoryService.delete(id: _categoryId);
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        }
+                      } else {
+                        await _categoryService.delete(id: _categoryId);
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
+                      }
+                    }
+                  },
+                  child: const Text("Delete", style: TextStyle(fontSize: 18)),
+                ),
+
+                // SAVE BUTTON
+                TextButton(
+                  onPressed: () async {
+                    // Update Categories
+                    await _categoryService.update(
+                        id: _categoryId,
+                        colorId: colorId,
+                        name: _eventCategoryTitle.text.isNotEmpty
+                            ? _eventCategoryTitle.text
+                            : "My Event");
+
+                    // Update Notification
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Text("Save", style: TextStyle(fontSize: 18)),
+                ),
+              ],
+            ),
       ),
     );
   }

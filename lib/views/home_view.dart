@@ -4,7 +4,6 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
@@ -15,9 +14,9 @@ import 'package:urtask/services/user_details/user_detail_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/views/calendar_view.dart';
 import 'package:urtask/views/profile_view.dart';
-import 'package:urtask/views/categories_view.dart';
+import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
-import 'package:urtask/views/create_category_view.dart';
+import 'package:urtask/views/category/create_category_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -26,7 +25,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  int _counter = 0;
   int _selectedDestination = 0;
   var uot = CalendarFormat.month;
   late final TextEditingController today;
@@ -50,17 +48,12 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); //for
-    final textTheme = theme.textTheme;
     var borderRadius = const BorderRadius.all(Radius.circular(20));
-    final padding = 20;
     final userId = AuthService.firebase().currentUser!.id;
 
     return Scaffold(
       appBar: AppBar(
         //leading: Icon(Icons.menu, size: 32, color: Colors.white),
-        title: Text(DateFormat('yMMMM').format(DateTime.now()),
-            style: TextStyle(color: Colors.white)),
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
           Padding(
@@ -70,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
 
           // Show Today
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.only(left: 8),
             child: IconButton(
               icon: const Icon(
                 Icons.event_available,
@@ -181,7 +174,7 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ),
-      body: CalendarView(calendarFilter: uot, today: today),
+      body: CalendarView(calendarFilter: uot, today: today, ),
       floatingActionButton: SpeedDial(
         //Speed dial menu
         marginBottom: 10, //margin bottom
@@ -197,8 +190,7 @@ class _HomeViewState extends State<HomeView> {
         curve: Curves.bounceIn,
         overlayColor: Colors.white,
         overlayOpacity: 0.8,
-        onOpen: () => print('OPENING DIAL'), // action when menu opens
-        onClose: () => print('DIAL CLOSED'), //action when menu closes
+         //action when menu closes
 
         elevation: 8.0, //shadow elevation of button
         shape: CircleBorder(), //shape of button
@@ -217,7 +209,7 @@ class _HomeViewState extends State<HomeView> {
                 builder: (context) => const CreateCategoryView(),
               ),
             ),
-            onLongPress: () => print('FIRST CHILD LONG PRESS'),
+            
           ),
           SpeedDialChild(
             child: Icon(Icons.event),
@@ -231,7 +223,6 @@ class _HomeViewState extends State<HomeView> {
                 builder: (context) => const CreateEventView(),
               ),
             ),
-            onLongPress: () => print('SECOND CHILD LONG PRESS'),
           ),
         ],
       ),
