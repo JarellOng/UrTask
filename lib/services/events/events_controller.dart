@@ -101,6 +101,19 @@ class EventController {
     }
   }
 
+  Future<void> bulkDeleteByCategoryId({required String id}) async {
+    final events = await _getCollection();
+    final querySnapshot =
+        await events.where(eventCategoryIdField, isEqualTo: id).get();
+    for (var element in querySnapshot.docs) {
+      await events.doc(element.id).delete();
+      final notificationIds = await notificationController
+          .getByEventId(id: element.id)
+          .then((value) => value.map((e) => e.id).toList());
+      await notificationController.bulkDelete(ids: notificationIds);
+    }
+  }
+
   String printSelectedRepeat({
     required RepeatType type,
     required int typeAmount,
