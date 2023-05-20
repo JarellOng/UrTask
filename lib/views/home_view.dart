@@ -11,6 +11,7 @@ import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
+import 'package:urtask/services/user_details/user_detail_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/views/calendar_view.dart';
 import 'package:urtask/views/profile_view.dart';
@@ -30,11 +31,13 @@ class _HomeViewState extends State<HomeView> {
   var uot = CalendarFormat.month;
   late final TextEditingController today;
   late final CalendarController _calendarService;
+  late final UserDetailController _userDetailService;
 
   @override
   void initState() {
     today = TextEditingController();
     _calendarService = CalendarController();
+    _userDetailService = UserDetailController();
     _setupCalendar();
     super.initState();
   }
@@ -88,15 +91,18 @@ class _HomeViewState extends State<HomeView> {
               icon: const Icon(Icons.account_circle,
                   size: 32, color: Colors.white),
               onPressed: () async {
-                final isLogout = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ),
-                );
-                if (isLogout == true) {
-                  if (mounted) {
-                    context.read<AuthBloc>().add(const AuthEventLogOut());
+                final userDetail = await _userDetailService.get(id: userId);
+                if (mounted) {
+                  final isLogout = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileView(name: userDetail.name),
+                    ),
+                  );
+                  if (isLogout == true) {
+                    if (mounted) {
+                      context.read<AuthBloc>().add(const AuthEventLogOut());
+                    }
                   }
                 }
               },

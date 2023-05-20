@@ -5,6 +5,7 @@ import 'package:urtask/services/auth/auth_provider.dart';
 import 'package:urtask/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
+import 'package:urtask/services/user_details/user_detail_controller.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -28,6 +29,7 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser> createUser({
     required String email,
     required String password,
+    required String name,
   }) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -36,6 +38,7 @@ class FirebaseAuthProvider implements AuthProvider {
       );
       final user = currentUser;
       if (user != null) {
+        await UserDetailController().create(id: user.id, name: name);
         return user;
       } else {
         throw UserNotLoggedInAuthException();

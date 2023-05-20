@@ -2,23 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/utilities/dialogs/logout_dialog.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfileView extends StatefulWidget {
+  final String name;
+
+  const ProfileView({
+    super.key,
+    required this.name,
+  });
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfileViewState extends State<ProfileView> {
   final userId = AuthService.firebase().currentUser!.id;
   final userEmail = AuthService.firebase().currentUser!.email;
+  late String name;
+
+  @override
+  void initState() {
+    name = widget.name;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          userId,
+          name,
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
         automaticallyImplyLeading: false,
