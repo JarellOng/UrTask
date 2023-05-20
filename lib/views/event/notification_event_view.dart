@@ -5,6 +5,7 @@ import 'package:urtask/color.dart';
 import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
+import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/views/notification/custom_notification_view.dart';
 
 class NotificationEventView extends StatefulWidget {
@@ -24,6 +25,7 @@ class NotificationEventView extends StatefulWidget {
 }
 
 class _NotificationEventViewState extends State<NotificationEventView> {
+  late final EventController _eventService;
   late bool remindMe;
   late Map<NotificationTime, NotificationType> selectedNotifications;
   late Map<int, CustomNotificationUOT>? customNotification;
@@ -35,6 +37,7 @@ class _NotificationEventViewState extends State<NotificationEventView> {
 
   @override
   void initState() {
+    _eventService = EventController();
     remindMe = widget.flag;
     selectedNotifications = widget.notifications;
     customNotification = widget.customNotification;
@@ -511,7 +514,7 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                               _customNotificationScrollOn();
                             },
                             child: Text(
-                              _printCustomNotification(
+                              _eventService.printCustomNotification(
                                 amount: selectedCustomNotifcationAmount,
                                 uot: selectedCustomNotifcationUot,
                               ),
@@ -659,14 +662,5 @@ class _NotificationEventViewState extends State<NotificationEventView> {
     setState(() {
       customNotificationScrollToggle = false;
     });
-  }
-
-  String _printCustomNotification({required int amount, required int uot}) {
-    if (amount == 0) {
-      return "At time of event";
-    }
-
-    final uotName = CustomNotificationUOT.values.elementAt(uot).name;
-    return "$amount $uotName before";
   }
 }

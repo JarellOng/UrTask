@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:urtask/color.dart';
 import 'package:urtask/enums/repeat_duration_enum.dart';
 import 'package:urtask/enums/repeat_type_enum.dart';
+import 'package:urtask/helpers/datetime/datetime_helper.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 
 class RepeatEventView extends StatefulWidget {
@@ -832,7 +833,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                               _untilDateScrollOn();
                             },
                             child: Text(
-                              _dateToString(
+                              DateTimeHelper.dateToString(
                                 month: selectedUntilDateTime.month - 1,
                                 day: selectedUntilDateTime.day - 1,
                                 year: selectedUntilDateTime.year,
@@ -962,29 +963,5 @@ class _RepeatEventViewState extends State<RepeatEventView> {
         );
       }
     });
-  }
-
-  String _dateToString({
-    required int month,
-    required int day,
-    required int year,
-  }) {
-    List<String> months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    String monthName = months.elementAt(month);
-    int selectedDay = day + 1;
-    return "$monthName $selectedDay, $year";
   }
 }

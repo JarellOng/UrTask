@@ -9,6 +9,7 @@ import 'package:urtask/color.dart';
 import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
 import 'package:urtask/enums/notification_type_enum.dart';
+import 'package:urtask/helpers/datetime/datetime_helper.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
@@ -409,7 +410,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                             eventIsEdited = true;
                           },
                           child: Text(
-                            _dateToString(
+                            DateTimeHelper.dateToString(
                               month: selectedStartDateTime.month - 1,
                               day: selectedStartDateTime.day - 1,
                               year: selectedStartDateTime.year,
@@ -464,7 +465,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                               eventIsEdited = true;
                             },
                             child: Text(
-                              _timeToString(
+                              DateTimeHelper.timeToString(
                                 hour: selectedStartDateTime.hour,
                                 minute: selectedStartDateTime.minute,
                               ),
@@ -540,7 +541,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                             eventIsEdited = true;
                           },
                           child: Text(
-                            _dateToString(
+                            DateTimeHelper.dateToString(
                               month: selectedEndDateTime.month - 1,
                               day: selectedEndDateTime.day - 1,
                               year: selectedEndDateTime.year,
@@ -594,7 +595,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                               eventIsEdited = true;
                             },
                             child: Text(
-                              _timeToString(
+                              DateTimeHelper.timeToString(
                                 hour: selectedEndDateTime.hour,
                                 minute: selectedEndDateTime.minute,
                               ),
@@ -801,7 +802,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                           });
                         },
                         child: Text(
-                          _printSelectedNotifications(
+                          _eventService.printSelectedNotifications(
                             flag: notificationFlag,
                             selectedNotifications: selectedNotifications,
                           ),
@@ -1283,56 +1284,5 @@ class _EventDetailViewState extends State<EventDetailView> {
         selectedStartMinute = selectedStartDateTime.minute;
       }
     });
-  }
-
-  String _dateToString({
-    required int month,
-    required int day,
-    required int year,
-  }) {
-    List<String> months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    String monthName = months.elementAt(month);
-    int selectedDay = day + 1;
-    return "$monthName $selectedDay, $year";
-  }
-
-  String _timeToString({required int hour, required int minute}) {
-    String hourString = hour.toString();
-    String minuteString = minute.toString();
-    if (hour < 10) hourString = "0$hour";
-    if (minute < 10) minuteString = "0$minute";
-    return "$hourString:$minuteString";
-  }
-
-  String _printSelectedNotifications({
-    required bool flag,
-    required Map<NotificationTime, NotificationType> selectedNotifications,
-  }) {
-    String notificationString = "";
-    if (flag == false) {
-      notificationString += "No notifications";
-    } else {
-      final notificationAmount = selectedNotifications.values.length;
-      if (notificationAmount <= 1) {
-        notificationString += "1 notification";
-      } else {
-        notificationString += "$notificationAmount notifications";
-      }
-    }
-
-    return notificationString;
   }
 }
