@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:urtask/color.dart';
 import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
@@ -18,6 +22,7 @@ import 'package:urtask/utilities/dialogs/delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/dialogs/event_group_delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/loading_dialog.dart';
+import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
@@ -60,6 +65,10 @@ class _EventDetailViewState extends State<EventDetailView> {
   late final CategoryController _categoryService;
   late final ColorController _colorService;
   late final NotificationController _notificationService;
+
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   late String _eventId;
   late String? _eventGroupId;
@@ -118,6 +127,9 @@ class _EventDetailViewState extends State<EventDetailView> {
 
   @override
   void initState() {
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _eventService = EventController();
     _eventTitle = TextEditingController();
     eventTitleFocus = FocusNode();
@@ -215,43 +227,34 @@ class _EventDetailViewState extends State<EventDetailView> {
 
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     _eventTitle.dispose();
     eventTitleFocus.dispose();
     _eventDescription.dispose();
     eventDescriptionFocus.dispose();
-    _eventStartDay.dispose();
-    _eventStartMonth.dispose();
-    _eventStartYear.dispose();
-    _eventStartHour.dispose();
-    _eventStartMinute.dispose();
-    _eventEndDay.dispose();
-    _eventEndMonth.dispose();
-    _eventEndYear.dispose();
-    _eventEndHour.dispose();
-    _eventEndMinute.dispose();
     super.dispose();
   }
 
-  Future<Events> setupEvent() async {
-    final event = await _eventService.get(id: widget.eventId);
-    return event;
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException {
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
   }
 
-  Future<Categories> setupCategory({required String id}) async {
-    final category = await _categoryService.get(id: id);
-    return category;
-  }
-
-  Future<color_model.Colors> setupColor({required String id}) async {
-    final color = await _colorService.get(id: id);
-    return color;
-  }
-
-  Future<Iterable<Notifications>> setupNotification({
-    required String eventId,
-  }) async {
-    final notifications = await _notificationService.getByEventId(id: eventId);
-    return notifications;
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
   }
 
   @override
@@ -855,23 +858,38 @@ class _EventDetailViewState extends State<EventDetailView> {
               width: 175,
               child: TextButton(
                 onPressed: () async {
-                  final shouldDelete = await showDeleteDialog(
-                    context,
-                    "Are you sure you want to delete this event?",
-                  );
-                  if (shouldDelete) {
-                    showLoadingDialog(context: context, text: "Deleting");
-                    if (_eventGroupId != null && mounted) {
-                      final shouldDeleteAllRepeatedEvents =
-                          await showEventGroupDeleteDialog(context);
-                      if (shouldDeleteAllRepeatedEvents == true) {
-                        await _eventService.bulkDeleteByGroupId(
-                            id: _eventGroupId!);
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+                  if (_connectionStatus == ConnectivityResult.none) {
+                    showOfflineDialog(
+                      context: context,
+                      text: "Please turn on your Internet connection",
+                    );
+                  } else {
+                    final shouldDelete = await showDeleteDialog(
+                      context,
+                      "Are you sure you want to delete this event?",
+                    );
+                    if (shouldDelete) {
+                      showLoadingDialog(context: context, text: "Deleting");
+                      if (_eventGroupId != null && mounted) {
+                        final shouldDeleteAllRepeatedEvents =
+                            await showEventGroupDeleteDialog(context);
+                        if (shouldDeleteAllRepeatedEvents == true) {
+                          await _eventService.bulkDeleteByGroupId(
+                              id: _eventGroupId!);
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          }
+                        } else if (shouldDeleteAllRepeatedEvents == false) {
+                          await _eventService.delete(id: _eventId);
+                          await _notificationService.bulkDelete(
+                              ids: storedNotificationIds);
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          }
                         }
-                      } else if (shouldDeleteAllRepeatedEvents == false) {
+                      } else {
                         await _eventService.delete(id: _eventId);
                         await _notificationService.bulkDelete(
                             ids: storedNotificationIds);
@@ -879,14 +897,6 @@ class _EventDetailViewState extends State<EventDetailView> {
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         }
-                      }
-                    } else {
-                      await _eventService.delete(id: _eventId);
-                      await _notificationService.bulkDelete(
-                          ids: storedNotificationIds);
-                      if (mounted) {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
                       }
                     }
                   }
@@ -903,132 +913,140 @@ class _EventDetailViewState extends State<EventDetailView> {
               width: 175,
               child: TextButton(
                 onPressed: () async {
-                  showLoadingDialog(context: context, text: "Saving");
+                  if (_connectionStatus == ConnectivityResult.none) {
+                    showOfflineDialog(
+                      context: context,
+                      text: "Please turn on your Internet connection",
+                    );
+                  } else {
+                    showLoadingDialog(context: context, text: "Saving");
 
-                  if (startDateScrollToggle == true) {
-                    _startDateScrollOff();
-                  }
-                  if (startTimeScrollToggle == true) {
-                    _startTimeScrollOff();
-                  }
-                  if (endDateScrollToggle == true) {
-                    _endDateScrollOff();
-                  }
-                  if (endTimeScrollToggle == true) {
-                    _endTimeScrollOff();
-                  }
-                  final startTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedStartDateTime.year,
-                            selectedStartDateTime.month,
-                            selectedStartDateTime.day,
-                            selectedStartDateTime.hour,
-                            selectedStartDateTime.minute,
-                          ),
-                        );
-                  final endTimestamp = allDay == true
-                      ? Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            23,
-                            59,
-                          ),
-                        )
-                      : Timestamp.fromDate(
-                          DateTime(
-                            selectedEndDateTime.year,
-                            selectedEndDateTime.month,
-                            selectedEndDateTime.day,
-                            selectedEndDateTime.hour,
-                            selectedEndDateTime.minute,
-                          ),
-                        );
+                    if (startDateScrollToggle == true) {
+                      _startDateScrollOff();
+                    }
+                    if (startTimeScrollToggle == true) {
+                      _startTimeScrollOff();
+                    }
+                    if (endDateScrollToggle == true) {
+                      _endDateScrollOff();
+                    }
+                    if (endTimeScrollToggle == true) {
+                      _endTimeScrollOff();
+                    }
+                    final startTimestamp = allDay == true
+                        ? Timestamp.fromDate(
+                            DateTime(
+                              selectedStartDateTime.year,
+                              selectedStartDateTime.month,
+                              selectedStartDateTime.day,
+                            ),
+                          )
+                        : Timestamp.fromDate(
+                            DateTime(
+                              selectedStartDateTime.year,
+                              selectedStartDateTime.month,
+                              selectedStartDateTime.day,
+                              selectedStartDateTime.hour,
+                              selectedStartDateTime.minute,
+                            ),
+                          );
+                    final endTimestamp = allDay == true
+                        ? Timestamp.fromDate(
+                            DateTime(
+                              selectedEndDateTime.year,
+                              selectedEndDateTime.month,
+                              selectedEndDateTime.day,
+                              23,
+                              59,
+                            ),
+                          )
+                        : Timestamp.fromDate(
+                            DateTime(
+                              selectedEndDateTime.year,
+                              selectedEndDateTime.month,
+                              selectedEndDateTime.day,
+                              selectedEndDateTime.hour,
+                              selectedEndDateTime.minute,
+                            ),
+                          );
 
-                  // Update Event
-                  await _eventService.update(
-                    id: _eventId,
-                    title: _eventTitle.text.isNotEmpty
-                        ? _eventTitle.text
-                        : "My Event",
-                    categoryId: categoryId,
-                    start: startTimestamp,
-                    end: endTimestamp,
-                    important: important,
-                    description: _eventDescription.text,
-                  );
+                    // Update Event
+                    await _eventService.update(
+                      id: _eventId,
+                      title: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
+                      categoryId: categoryId,
+                      start: startTimestamp,
+                      end: endTimestamp,
+                      important: important,
+                      description: _eventDescription.text,
+                    );
 
-                  // Update Notification
-                  await _notificationService.bulkDelete(
-                      ids: storedNotificationIds);
-                  if (notificationFlag == true) {
-                    selectedNotifications.forEach((key, value) {
-                      if (key == NotificationTime.timeOfEvent) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: startTimestamp,
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.tenMinsBefore) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(minutes: 10))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.hourBefore) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(hours: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.dayBefore) {
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(days: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.custom) {
-                        final customAmount =
-                            selectedCustomNotification!.keys.first;
-                        late Duration customDuration;
-                        if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.minutes) {
-                          customDuration = Duration(minutes: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.hours) {
-                          customDuration = Duration(hours: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.days) {
-                          customDuration = Duration(days: customAmount);
+                    // Update Notification
+                    await _notificationService.bulkDelete(
+                        ids: storedNotificationIds);
+                    if (notificationFlag == true) {
+                      selectedNotifications.forEach((key, value) {
+                        if (key == NotificationTime.timeOfEvent) {
+                          _notificationService.create(
+                            eventId: _eventId,
+                            dateTime: startTimestamp,
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.tenMinsBefore) {
+                          _notificationService.create(
+                            eventId: _eventId,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(const Duration(minutes: 10))),
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.hourBefore) {
+                          _notificationService.create(
+                            eventId: _eventId,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(const Duration(hours: 1))),
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.dayBefore) {
+                          _notificationService.create(
+                            eventId: _eventId,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(const Duration(days: 1))),
+                            type: value.name,
+                          );
+                        } else if (key == NotificationTime.custom) {
+                          final customAmount =
+                              selectedCustomNotification!.keys.first;
+                          late Duration customDuration;
+                          if (selectedCustomNotification!.values.first ==
+                              CustomNotificationUOT.minutes) {
+                            customDuration = Duration(minutes: customAmount);
+                          } else if (selectedCustomNotification!.values.first ==
+                              CustomNotificationUOT.hours) {
+                            customDuration = Duration(hours: customAmount);
+                          } else if (selectedCustomNotification!.values.first ==
+                              CustomNotificationUOT.days) {
+                            customDuration = Duration(days: customAmount);
+                          }
+                          _notificationService.create(
+                            eventId: _eventId,
+                            dateTime: Timestamp.fromDate(startTimestamp
+                                .toDate()
+                                .subtract(customDuration)),
+                            type: value.name,
+                          );
                         }
-                        _notificationService.create(
-                          eventId: _eventId,
-                          dateTime: Timestamp.fromDate(
-                              startTimestamp.toDate().subtract(customDuration)),
-                          type: value.name,
-                        );
-                      }
-                    });
-                  }
+                      });
+                    }
 
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    if (mounted) {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    }
                   }
                 },
                 child: const Text(
