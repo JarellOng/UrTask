@@ -68,8 +68,6 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   late FixedExtentScrollController untilDay;
   late FixedExtentScrollController untilMonth;
   late FixedExtentScrollController untilYear;
-  late FixedExtentScrollController untilHour;
-  late FixedExtentScrollController untilMinute;
   late DateTime selectedUntilDateTime;
   late int selectedUntilDay;
   late int selectedUntilMonth;
@@ -150,6 +148,21 @@ class _RepeatEventViewState extends State<RepeatEventView> {
       );
     }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    perDayAmount.dispose();
+    perDayFocus.dispose();
+    perWeekAmount.dispose();
+    perWeekFocus.dispose();
+    perMonthAmount.dispose();
+    perMonthFocus.dispose();
+    perYearAmount.dispose();
+    perYearFocus.dispose();
+    specificNumberAmount.dispose();
+    specificNumberFocus.dispose();
+    super.dispose();
   }
 
   @override

@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:urtask/color.dart';
 import 'package:urtask/enums/custom_notification_uot_enum.dart';
 import 'package:urtask/enums/notification_time_enum.dart';
@@ -14,6 +17,7 @@ import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/dialogs/loading_dialog.dart';
+import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
@@ -32,6 +36,11 @@ class _CreateEventViewState extends State<CreateEventView> {
   late final CategoryController _categoryService;
   late final ColorController _colorService;
   late final NotificationController _notificationService;
+
+  // Connectivity
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   late final TextEditingController _eventTitle;
   late final FocusNode eventTitleFocus;
@@ -96,6 +105,9 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   @override
   void initState() {
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _eventService = EventController();
     _eventTitle = TextEditingController();
     eventTitleFocus = FocusNode();
@@ -128,9 +140,34 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     _eventTitle.dispose();
+    eventTitleFocus.dispose();
     _eventDescription.dispose();
+    eventDescriptionFocus.dispose();
     super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException {
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
   }
 
   @override
@@ -846,341 +883,215 @@ class _CreateEventViewState extends State<CreateEventView> {
         ),
         child: TextButton(
           onPressed: () async {
-            showLoadingDialog(context: context, text: "Saving");
-
-            if (startDateScrollToggle == true) {
-              _startDateScrollOff();
-            }
-            if (startTimeScrollToggle == true) {
-              _startTimeScrollOff();
-            }
-            if (endDateScrollToggle == true) {
-              _endDateScrollOff();
-            }
-            if (endTimeScrollToggle == true) {
-              _endTimeScrollOff();
-            }
-            Timestamp startTimestamp = allDay == true
-                ? Timestamp.fromDate(
-                    DateTime(
-                      selectedStartDateTime.year,
-                      selectedStartDateTime.month,
-                      selectedStartDateTime.day,
-                    ),
-                  )
-                : Timestamp.fromDate(
-                    DateTime(
-                      selectedStartDateTime.year,
-                      selectedStartDateTime.month,
-                      selectedStartDateTime.day,
-                      selectedStartDateTime.hour,
-                      selectedStartDateTime.minute,
-                    ),
-                  );
-            Timestamp endTimestamp = allDay == true
-                ? Timestamp.fromDate(
-                    DateTime(
-                      selectedEndDateTime.year,
-                      selectedEndDateTime.month,
-                      selectedEndDateTime.day,
-                      23,
-                      59,
-                    ),
-                  )
-                : Timestamp.fromDate(
-                    DateTime(
-                      selectedEndDateTime.year,
-                      selectedEndDateTime.month,
-                      selectedEndDateTime.day,
-                      selectedEndDateTime.hour,
-                      selectedEndDateTime.minute,
-                    ),
-                  );
-
-            // Create Event
-            final eventGroupId = selectedRepeatType != RepeatType.noRepeat
-                ? "repeat${DateTime.now()}"
-                : null;
-            final createdEvent = await _eventService.create(
-              title:
-                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
-              categoryId: categoryId,
-              groupId: eventGroupId,
-              start: startTimestamp,
-              end: endTimestamp,
-              important: important,
-              description: _eventDescription.text,
-            );
-
-            // Create Notifications
-            if (notificationFlag == true) {
-              selectedNotifications.forEach(
-                (key, value) {
-                  if (key == NotificationTime.timeOfEvent) {
-                    _notificationService.create(
-                      eventId: createdEvent,
-                      dateTime: startTimestamp,
-                      type: value.name,
-                    );
-                  } else if (key == NotificationTime.tenMinsBefore) {
-                    _notificationService.create(
-                      eventId: createdEvent,
-                      dateTime: Timestamp.fromDate(startTimestamp
-                          .toDate()
-                          .subtract(const Duration(minutes: 10))),
-                      type: value.name,
-                    );
-                  } else if (key == NotificationTime.hourBefore) {
-                    _notificationService.create(
-                      eventId: createdEvent,
-                      dateTime: Timestamp.fromDate(startTimestamp
-                          .toDate()
-                          .subtract(const Duration(hours: 1))),
-                      type: value.name,
-                    );
-                  } else if (key == NotificationTime.dayBefore) {
-                    _notificationService.create(
-                      eventId: createdEvent,
-                      dateTime: Timestamp.fromDate(startTimestamp
-                          .toDate()
-                          .subtract(const Duration(days: 1))),
-                      type: value.name,
-                    );
-                  } else if (key == NotificationTime.custom) {
-                    final customAmount = selectedCustomNotification!.keys.first;
-                    late Duration customDuration;
-                    if (selectedCustomNotification!.values.first ==
-                        CustomNotificationUOT.minutes) {
-                      customDuration = Duration(minutes: customAmount);
-                    } else if (selectedCustomNotification!.values.first ==
-                        CustomNotificationUOT.hours) {
-                      customDuration = Duration(hours: customAmount);
-                    } else if (selectedCustomNotification!.values.first ==
-                        CustomNotificationUOT.days) {
-                      customDuration = Duration(days: customAmount);
-                    }
-                    _notificationService.create(
-                      eventId: createdEvent,
-                      dateTime: Timestamp.fromDate(
-                          startTimestamp.toDate().subtract(customDuration)),
-                      type: value.name,
-                    );
-                  }
-                },
+            if (_connectionStatus == ConnectivityResult.none) {
+              showOfflineDialog(
+                context: context,
+                text: "Please turn on your Internet connection",
               );
-            }
+            } else {
+              showLoadingDialog(context: context, text: "Saving");
 
-            // Create Duplicate Events
-            if (selectedRepeatType != RepeatType.noRepeat) {
-              Duration? repeatDurationArithmetic;
-              if (selectedRepeatType == RepeatType.perDay) {
-                repeatDurationArithmetic =
-                    Duration(days: selectedRepeatTypeAmount);
-              } else if (selectedRepeatType == RepeatType.perWeek) {
-                repeatDurationArithmetic =
-                    Duration(days: 7 * selectedRepeatTypeAmount);
+              if (startDateScrollToggle == true) {
+                _startDateScrollOff();
+              }
+              if (startTimeScrollToggle == true) {
+                _startTimeScrollOff();
+              }
+              if (endDateScrollToggle == true) {
+                _endDateScrollOff();
+              }
+              if (endTimeScrollToggle == true) {
+                _endTimeScrollOff();
+              }
+              Timestamp startTimestamp = allDay == true
+                  ? Timestamp.fromDate(
+                      DateTime(
+                        selectedStartDateTime.year,
+                        selectedStartDateTime.month,
+                        selectedStartDateTime.day,
+                      ),
+                    )
+                  : Timestamp.fromDate(
+                      DateTime(
+                        selectedStartDateTime.year,
+                        selectedStartDateTime.month,
+                        selectedStartDateTime.day,
+                        selectedStartDateTime.hour,
+                        selectedStartDateTime.minute,
+                      ),
+                    );
+              Timestamp endTimestamp = allDay == true
+                  ? Timestamp.fromDate(
+                      DateTime(
+                        selectedEndDateTime.year,
+                        selectedEndDateTime.month,
+                        selectedEndDateTime.day,
+                        23,
+                        59,
+                      ),
+                    )
+                  : Timestamp.fromDate(
+                      DateTime(
+                        selectedEndDateTime.year,
+                        selectedEndDateTime.month,
+                        selectedEndDateTime.day,
+                        selectedEndDateTime.hour,
+                        selectedEndDateTime.minute,
+                      ),
+                    );
+
+              // Create Event
+              final eventGroupId = selectedRepeatType != RepeatType.noRepeat
+                  ? "repeat${DateTime.now()}"
+                  : null;
+              final createdEvent = await _eventService.create(
+                title:
+                    _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
+                categoryId: categoryId,
+                groupId: eventGroupId,
+                start: startTimestamp,
+                end: endTimestamp,
+                important: important,
+                description: _eventDescription.text,
+              );
+
+              // Create Notifications
+              if (notificationFlag == true) {
+                selectedNotifications.forEach(
+                  (key, value) {
+                    if (key == NotificationTime.timeOfEvent) {
+                      _notificationService.create(
+                        eventId: createdEvent,
+                        dateTime: startTimestamp,
+                        type: value.name,
+                      );
+                    } else if (key == NotificationTime.tenMinsBefore) {
+                      _notificationService.create(
+                        eventId: createdEvent,
+                        dateTime: Timestamp.fromDate(startTimestamp
+                            .toDate()
+                            .subtract(const Duration(minutes: 10))),
+                        type: value.name,
+                      );
+                    } else if (key == NotificationTime.hourBefore) {
+                      _notificationService.create(
+                        eventId: createdEvent,
+                        dateTime: Timestamp.fromDate(startTimestamp
+                            .toDate()
+                            .subtract(const Duration(hours: 1))),
+                        type: value.name,
+                      );
+                    } else if (key == NotificationTime.dayBefore) {
+                      _notificationService.create(
+                        eventId: createdEvent,
+                        dateTime: Timestamp.fromDate(startTimestamp
+                            .toDate()
+                            .subtract(const Duration(days: 1))),
+                        type: value.name,
+                      );
+                    } else if (key == NotificationTime.custom) {
+                      final customAmount =
+                          selectedCustomNotification!.keys.first;
+                      late Duration customDuration;
+                      if (selectedCustomNotification!.values.first ==
+                          CustomNotificationUOT.minutes) {
+                        customDuration = Duration(minutes: customAmount);
+                      } else if (selectedCustomNotification!.values.first ==
+                          CustomNotificationUOT.hours) {
+                        customDuration = Duration(hours: customAmount);
+                      } else if (selectedCustomNotification!.values.first ==
+                          CustomNotificationUOT.days) {
+                        customDuration = Duration(days: customAmount);
+                      }
+                      _notificationService.create(
+                        eventId: createdEvent,
+                        dateTime: Timestamp.fromDate(
+                            startTimestamp.toDate().subtract(customDuration)),
+                        type: value.name,
+                      );
+                    }
+                  },
+                );
               }
 
-              if (selectedRepeatDuration == RepeatDuration.specificNumber) {
-                for (var i = 0; i < selectedRepeatDurationAmount!; i++) {
-                  if (repeatDurationArithmetic != null) {
-                    startTimestamp = Timestamp.fromDate(
-                        startTimestamp.toDate().add(repeatDurationArithmetic));
-                    endTimestamp = Timestamp.fromDate(
-                        endTimestamp.toDate().add(repeatDurationArithmetic));
-                  } else {
-                    final startDateTime = startTimestamp.toDate();
-                    final endDateTime = endTimestamp.toDate();
-                    if (selectedRepeatType == RepeatType.perMonth) {
-                      startTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          startDateTime.year,
-                          startDateTime.month + selectedRepeatTypeAmount,
-                          startDateTime.day,
-                          startDateTime.hour,
-                          startDateTime.minute,
-                        ),
-                      );
-                      endTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          endDateTime.year,
-                          endDateTime.month + selectedRepeatTypeAmount,
-                          endDateTime.day,
-                          endDateTime.hour,
-                          endDateTime.minute,
-                        ),
-                      );
-                    } else if (selectedRepeatType == RepeatType.perYear) {
-                      startTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          startDateTime.year + selectedRepeatTypeAmount,
-                          startDateTime.month,
-                          startDateTime.day,
-                          startDateTime.hour,
-                          startDateTime.minute,
-                        ),
-                      );
-                      endTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          endDateTime.year + selectedRepeatTypeAmount,
-                          endDateTime.month,
-                          endDateTime.day,
-                          endDateTime.hour,
-                          endDateTime.minute,
-                        ),
-                      );
-                    }
-                  }
+              // Create Duplicate Events
+              if (selectedRepeatType != RepeatType.noRepeat) {
+                Duration? repeatDurationArithmetic;
+                if (selectedRepeatType == RepeatType.perDay) {
+                  repeatDurationArithmetic =
+                      Duration(days: selectedRepeatTypeAmount);
+                } else if (selectedRepeatType == RepeatType.perWeek) {
+                  repeatDurationArithmetic =
+                      Duration(days: 7 * selectedRepeatTypeAmount);
+                }
 
-                  final createdRepeatEvent = await _eventService.create(
-                    title: _eventTitle.text.isNotEmpty
-                        ? _eventTitle.text
-                        : "My Event",
-                    categoryId: categoryId,
-                    groupId: eventGroupId,
-                    start: startTimestamp,
-                    end: endTimestamp,
-                    important: important,
-                    description: _eventDescription.text,
-                  );
-
-                  // Create Notifications
-                  if (notificationFlag == true) {
-                    selectedNotifications.forEach((key, value) {
-                      if (key == NotificationTime.timeOfEvent) {
-                        _notificationService.create(
-                          eventId: createdRepeatEvent,
-                          dateTime: startTimestamp,
-                          type: value.name,
+                if (selectedRepeatDuration == RepeatDuration.specificNumber) {
+                  for (var i = 0; i < selectedRepeatDurationAmount!; i++) {
+                    if (repeatDurationArithmetic != null) {
+                      startTimestamp = Timestamp.fromDate(startTimestamp
+                          .toDate()
+                          .add(repeatDurationArithmetic));
+                      endTimestamp = Timestamp.fromDate(
+                          endTimestamp.toDate().add(repeatDurationArithmetic));
+                    } else {
+                      final startDateTime = startTimestamp.toDate();
+                      final endDateTime = endTimestamp.toDate();
+                      if (selectedRepeatType == RepeatType.perMonth) {
+                        startTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            startDateTime.year,
+                            startDateTime.month + selectedRepeatTypeAmount,
+                            startDateTime.day,
+                            startDateTime.hour,
+                            startDateTime.minute,
+                          ),
                         );
-                      } else if (key == NotificationTime.tenMinsBefore) {
-                        _notificationService.create(
-                          eventId: createdRepeatEvent,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(minutes: 10))),
-                          type: value.name,
+                        endTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            endDateTime.year,
+                            endDateTime.month + selectedRepeatTypeAmount,
+                            endDateTime.day,
+                            endDateTime.hour,
+                            endDateTime.minute,
+                          ),
                         );
-                      } else if (key == NotificationTime.hourBefore) {
-                        _notificationService.create(
-                          eventId: createdRepeatEvent,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(hours: 1))),
-                          type: value.name,
+                      } else if (selectedRepeatType == RepeatType.perYear) {
+                        startTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            startDateTime.year + selectedRepeatTypeAmount,
+                            startDateTime.month,
+                            startDateTime.day,
+                            startDateTime.hour,
+                            startDateTime.minute,
+                          ),
                         );
-                      } else if (key == NotificationTime.dayBefore) {
-                        _notificationService.create(
-                          eventId: createdRepeatEvent,
-                          dateTime: Timestamp.fromDate(startTimestamp
-                              .toDate()
-                              .subtract(const Duration(days: 1))),
-                          type: value.name,
-                        );
-                      } else if (key == NotificationTime.custom) {
-                        final customAmount =
-                            selectedCustomNotification!.keys.first;
-                        late Duration customDuration;
-                        if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.minutes) {
-                          customDuration = Duration(minutes: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.hours) {
-                          customDuration = Duration(hours: customAmount);
-                        } else if (selectedCustomNotification!.values.first ==
-                            CustomNotificationUOT.days) {
-                          customDuration = Duration(days: customAmount);
-                        }
-                        _notificationService.create(
-                          eventId: createdRepeatEvent,
-                          dateTime: Timestamp.fromDate(
-                              startTimestamp.toDate().subtract(customDuration)),
-                          type: value.name,
+                        endTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            endDateTime.year + selectedRepeatTypeAmount,
+                            endDateTime.month,
+                            endDateTime.day,
+                            endDateTime.hour,
+                            endDateTime.minute,
+                          ),
                         );
                       }
-                    });
-                  }
-                }
-              } else if (selectedRepeatDuration == RepeatDuration.until) {
-                while (!startTimestamp
-                    .toDate()
-                    .isAfter(selectedRepeatDurationDate!.add(
-                      const Duration(
-                        hours: 23,
-                        minutes: 59,
-                      ),
-                    ))) {
-                  if (repeatDurationArithmetic != null) {
-                    startTimestamp = Timestamp.fromDate(
-                        startTimestamp.toDate().add(repeatDurationArithmetic));
-                    endTimestamp = Timestamp.fromDate(
-                        endTimestamp.toDate().add(repeatDurationArithmetic));
-                  } else {
-                    final startDateTime = startTimestamp.toDate();
-                    final endDateTime = endTimestamp.toDate();
-                    if (selectedRepeatType == RepeatType.perMonth) {
-                      startTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          startDateTime.year,
-                          startDateTime.month + selectedRepeatTypeAmount,
-                          startDateTime.day,
-                          startDateTime.hour,
-                          startDateTime.minute,
-                        ),
-                      );
-                      endTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          endDateTime.year,
-                          endDateTime.month + selectedRepeatTypeAmount,
-                          endDateTime.day,
-                          endDateTime.hour,
-                          endDateTime.minute,
-                        ),
-                      );
-                    } else if (selectedRepeatType == RepeatType.perYear) {
-                      startTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          startDateTime.year + selectedRepeatTypeAmount,
-                          startDateTime.month,
-                          startDateTime.day,
-                          startDateTime.hour,
-                          startDateTime.minute,
-                        ),
-                      );
-                      endTimestamp = Timestamp.fromDate(
-                        DateTime(
-                          endDateTime.year + selectedRepeatTypeAmount,
-                          endDateTime.month,
-                          endDateTime.day,
-                          endDateTime.hour,
-                          endDateTime.minute,
-                        ),
-                      );
                     }
-                  }
-                  if (startTimestamp
-                      .toDate()
-                      .isAfter(selectedRepeatDurationDate!.add(
-                        const Duration(
-                          hours: 23,
-                          minutes: 59,
-                        ),
-                      ))) break;
-                  final createdRepeatEvent = await _eventService.create(
-                    title: _eventTitle.text.isNotEmpty
-                        ? _eventTitle.text
-                        : "My Event",
-                    categoryId: categoryId,
-                    groupId: eventGroupId,
-                    start: startTimestamp,
-                    end: endTimestamp,
-                    important: important,
-                    description: _eventDescription.text,
-                  );
-                  // Create Notifications
-                  if (notificationFlag == true) {
-                    selectedNotifications.forEach(
-                      (key, value) {
+
+                    final createdRepeatEvent = await _eventService.create(
+                      title: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
+                      categoryId: categoryId,
+                      groupId: eventGroupId,
+                      start: startTimestamp,
+                      end: endTimestamp,
+                      important: important,
+                      description: _eventDescription.text,
+                    );
+
+                    // Create Notifications
+                    if (notificationFlag == true) {
+                      selectedNotifications.forEach((key, value) {
                         if (key == NotificationTime.timeOfEvent) {
                           _notificationService.create(
                             eventId: createdRepeatEvent,
@@ -1233,16 +1144,155 @@ class _CreateEventViewState extends State<CreateEventView> {
                             type: value.name,
                           );
                         }
-                      },
+                      });
+                    }
+                  }
+                } else if (selectedRepeatDuration == RepeatDuration.until) {
+                  while (!startTimestamp
+                      .toDate()
+                      .isAfter(selectedRepeatDurationDate!.add(
+                        const Duration(
+                          hours: 23,
+                          minutes: 59,
+                        ),
+                      ))) {
+                    if (repeatDurationArithmetic != null) {
+                      startTimestamp = Timestamp.fromDate(startTimestamp
+                          .toDate()
+                          .add(repeatDurationArithmetic));
+                      endTimestamp = Timestamp.fromDate(
+                          endTimestamp.toDate().add(repeatDurationArithmetic));
+                    } else {
+                      final startDateTime = startTimestamp.toDate();
+                      final endDateTime = endTimestamp.toDate();
+                      if (selectedRepeatType == RepeatType.perMonth) {
+                        startTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            startDateTime.year,
+                            startDateTime.month + selectedRepeatTypeAmount,
+                            startDateTime.day,
+                            startDateTime.hour,
+                            startDateTime.minute,
+                          ),
+                        );
+                        endTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            endDateTime.year,
+                            endDateTime.month + selectedRepeatTypeAmount,
+                            endDateTime.day,
+                            endDateTime.hour,
+                            endDateTime.minute,
+                          ),
+                        );
+                      } else if (selectedRepeatType == RepeatType.perYear) {
+                        startTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            startDateTime.year + selectedRepeatTypeAmount,
+                            startDateTime.month,
+                            startDateTime.day,
+                            startDateTime.hour,
+                            startDateTime.minute,
+                          ),
+                        );
+                        endTimestamp = Timestamp.fromDate(
+                          DateTime(
+                            endDateTime.year + selectedRepeatTypeAmount,
+                            endDateTime.month,
+                            endDateTime.day,
+                            endDateTime.hour,
+                            endDateTime.minute,
+                          ),
+                        );
+                      }
+                    }
+                    if (startTimestamp
+                        .toDate()
+                        .isAfter(selectedRepeatDurationDate!.add(
+                          const Duration(
+                            hours: 23,
+                            minutes: 59,
+                          ),
+                        ))) break;
+                    final createdRepeatEvent = await _eventService.create(
+                      title: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
+                      categoryId: categoryId,
+                      groupId: eventGroupId,
+                      start: startTimestamp,
+                      end: endTimestamp,
+                      important: important,
+                      description: _eventDescription.text,
                     );
+                    // Create Notifications
+                    if (notificationFlag == true) {
+                      selectedNotifications.forEach(
+                        (key, value) {
+                          if (key == NotificationTime.timeOfEvent) {
+                            _notificationService.create(
+                              eventId: createdRepeatEvent,
+                              dateTime: startTimestamp,
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.tenMinsBefore) {
+                            _notificationService.create(
+                              eventId: createdRepeatEvent,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(const Duration(minutes: 10))),
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.hourBefore) {
+                            _notificationService.create(
+                              eventId: createdRepeatEvent,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(const Duration(hours: 1))),
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.dayBefore) {
+                            _notificationService.create(
+                              eventId: createdRepeatEvent,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(const Duration(days: 1))),
+                              type: value.name,
+                            );
+                          } else if (key == NotificationTime.custom) {
+                            final customAmount =
+                                selectedCustomNotification!.keys.first;
+                            late Duration customDuration;
+                            if (selectedCustomNotification!.values.first ==
+                                CustomNotificationUOT.minutes) {
+                              customDuration = Duration(minutes: customAmount);
+                            } else if (selectedCustomNotification!
+                                    .values.first ==
+                                CustomNotificationUOT.hours) {
+                              customDuration = Duration(hours: customAmount);
+                            } else if (selectedCustomNotification!
+                                    .values.first ==
+                                CustomNotificationUOT.days) {
+                              customDuration = Duration(days: customAmount);
+                            }
+                            _notificationService.create(
+                              eventId: createdRepeatEvent,
+                              dateTime: Timestamp.fromDate(startTimestamp
+                                  .toDate()
+                                  .subtract(customDuration)),
+                              type: value.name,
+                            );
+                          }
+                        },
+                      );
+                    }
                   }
                 }
               }
-            }
 
-            if (mounted) {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              if (mounted) {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              }
             }
           },
           child: const Text(
