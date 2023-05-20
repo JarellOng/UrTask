@@ -120,17 +120,17 @@ class _EventViewState extends State<EventView> {
                                                             color:
                                                                 Colors.white)));
                                               } else {
-                                                return const CircularProgressIndicator();
+                                                return Column();
                                               }
                                             default:
-                                              return const CircularProgressIndicator();
+                                              return Column();
                                           }
                                         });
                                   } else {
-                                    return const CircularProgressIndicator();
+                                    return Column();
                                   }
                                 default:
-                                  return const CircularProgressIndicator();
+                                  return Column();
                               }
                             })),
                     horizontalTitleGap: -2,
@@ -143,10 +143,10 @@ class _EventViewState extends State<EventView> {
                 },
               );
             } else {
-              return const CircularProgressIndicator();
+              return Column();
             }
           default:
-            return const CircularProgressIndicator();
+            return Column();
         }
       },
     );

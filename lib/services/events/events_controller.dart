@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/events/events_constants.dart';
@@ -86,6 +87,19 @@ class EventController {
     final events = await _getCollection();
     final querySnapshot =
         await events.where(eventGroupIdField, isEqualTo: id).get();
+    for (var element in querySnapshot.docs) {
+      await events.doc(element.id).delete();
+      final notificationIds = await notificationController
+          .getByEventId(id: element.id)
+          .then((value) => value.map((e) => e.id).toList());
+      await notificationController.bulkDelete(ids: notificationIds);
+    }
+  }
+
+  Future<void> bulkDeleteByCategoryId({required String id}) async {
+    final events = await _getCollection();
+    final querySnapshot =
+        await events.where(eventCategoryIdField, isEqualTo: id).get();
     for (var element in querySnapshot.docs) {
       await events.doc(element.id).delete();
       final notificationIds = await notificationController
