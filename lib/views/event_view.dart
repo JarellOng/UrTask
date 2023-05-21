@@ -179,21 +179,4 @@ class _EventViewState extends State<EventView> {
       },
     );
   }
-
-  Future<Categories> setupCategory({required String id}) async {
-    final category = await _categoryController.get(id: id);
-    return category;
-  }
-
-  Future<color_model.Colors> setupColor({required String id}) async {
-    final color = await _colorService.get(id: id);
-    return color;
-  }
-
-  Future<Iterable<Notifications>> setupNotification({
-    required String eventId,
-  }) async {
-    final notifications = await _notificationService.getByEventId(id: eventId);
-    return notifications;
-  }
 }

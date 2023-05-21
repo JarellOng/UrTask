@@ -7,10 +7,12 @@ import 'package:urtask/views/event_view.dart';
 class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;
   final TextEditingController today;
+  final TextEditingController selectedDate;
   const CalendarView({
     super.key,
     required this.calendarFilter,
     required this.today,
+    required this.selectedDate,
   });
 
   @override
@@ -36,17 +38,20 @@ class _CalendarViewState extends State<CalendarView> {
             rowHeight: 45,
             calendarFormat: widget.calendarFilter,
             headerVisible: false,
-            
             onDaySelected: (DateTime selectDay, DateTime focusDay) {
               setState(() {
                 selectedDay = selectDay;
               });
+              widget.selectedDate.text =
+                  selectedDay.toString().substring(0, 10);
             },
             onPageChanged: (focusedDay) {
               setState(() {
                 selectedDay = focusedDay;
               });
               widget.today.text = DateFormat('yMMMM').format(selectedDay);
+              widget.selectedDate.text =
+                  selectedDay.toString().substring(0, 10);
             },
             selectedDayPredicate: (DateTime date) {
               return isSameDay(selectedDay, date);

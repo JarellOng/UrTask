@@ -26,7 +26,11 @@ import 'package:urtask/views/event/repeat_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
 
 class CreateEventView extends StatefulWidget {
-  const CreateEventView({super.key});
+  final DateTime selectedDate;
+  const CreateEventView({
+    super.key,
+    required this.selectedDate,
+  });
 
   @override
   State<CreateEventView> createState() => _CreateEventViewState();
@@ -59,9 +63,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   late FixedExtentScrollController _eventStartHour;
   late FixedExtentScrollController _eventStartMinute;
   late DateTime selectedStartDateTime;
-  int selectedStartDay = DateTime.now().day - 1;
-  int selectedStartMonth = DateTime.now().month - 1;
-  int selectedStartYear = DateTime.now().year;
+  late int selectedStartDay;
+  late int selectedStartMonth;
+  late int selectedStartYear;
   int selectedStartHour = (DateTime.now().hour + 1) % 24;
   int selectedStartMinute = 0;
   bool startDateScrollToggle = false;
@@ -74,9 +78,9 @@ class _CreateEventViewState extends State<CreateEventView> {
   late FixedExtentScrollController _eventEndHour;
   late FixedExtentScrollController _eventEndMinute;
   late DateTime selectedEndDateTime;
-  int selectedEndDay = DateTime.now().day - 1;
-  int selectedEndMonth = DateTime.now().month - 1;
-  int selectedEndYear = DateTime.now().year;
+  late int selectedEndDay;
+  late int selectedEndMonth;
+  late int selectedEndYear;
   int selectedEndHour = (DateTime.now().hour + 2) % 24;
   int selectedEndMinute = 0;
   bool endDateScrollToggle = false;
@@ -117,6 +121,12 @@ class _CreateEventViewState extends State<CreateEventView> {
     _categoryService = CategoryController();
     _colorService = ColorController();
     _notificationService = NotificationController();
+    selectedStartDay = widget.selectedDate.day - 1;
+    selectedStartMonth = widget.selectedDate.month - 1;
+    selectedStartYear = widget.selectedDate.year;
+    selectedEndDay = widget.selectedDate.day - 1;
+    selectedEndMonth = widget.selectedDate.month - 1;
+    selectedEndYear = widget.selectedDate.year;
     selectedStartDay =
         selectedStartHour == 0 ? ++selectedStartDay : selectedStartDay;
     selectedEndDay = selectedEndHour == 0 || selectedEndHour == 1

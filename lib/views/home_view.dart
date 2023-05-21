@@ -30,12 +30,14 @@ class _HomeViewState extends State<HomeView> {
   late final TextEditingController today;
   late final CalendarController _calendarService;
   late final UserDetailController _userDetailService;
+  late final TextEditingController selectedDate;
 
   @override
   void initState() {
     today = TextEditingController();
     _calendarService = CalendarController();
     _userDetailService = UserDetailController();
+    selectedDate = TextEditingController(text: DateTime.now().toString());
     _setupCalendar();
     super.initState();
   }
@@ -54,9 +56,9 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       appBar: AppBar(
         //leading: Icon(Icons.menu, size: 32, color: Colors.white),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          Padding(
+          const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Icon(Icons.search, size: 32, color: Colors.white),
           ),
@@ -109,7 +111,7 @@ class _HomeViewState extends State<HomeView> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
               child: ListTile(
-                title: Text('Week',
+                title: const Text('Week',
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
                 selected: _selectedDestination == 1,
@@ -128,7 +130,7 @@ class _HomeViewState extends State<HomeView> {
               padding:
                   const EdgeInsets.only(right: 8.0, bottom: 8.0, left: 8.0),
               child: ListTile(
-                title: Text('Month',
+                title: const Text('Month',
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
                 selected: _selectedDestination == 0,
@@ -147,11 +149,11 @@ class _HomeViewState extends State<HomeView> {
                 selectedTileColor: primary,
               ),
             ),
-            DottedLine(),
+            const DottedLine(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListTile(
-                title: Text('Edit Category',
+                title: const Text('Edit Category',
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
                 onTap: () => Navigator.push(
@@ -166,15 +168,19 @@ class _HomeViewState extends State<HomeView> {
                 selectedTileColor: primary,
               ),
             ),
-            Divider(
+            const Divider(
               height: 1,
               thickness: 2,
             ),
-            CategoryList()
+            const CategoryList()
           ],
         ),
       ),
-      body: CalendarView(calendarFilter: uot, today: today, ),
+      body: CalendarView(
+        calendarFilter: uot,
+        today: today,
+        selectedDate: selectedDate,
+      ),
       floatingActionButton: SpeedDial(
         //Speed dial menu
         marginBottom: 10, //margin bottom
@@ -190,39 +196,41 @@ class _HomeViewState extends State<HomeView> {
         curve: Curves.bounceIn,
         overlayColor: Colors.white,
         overlayOpacity: 0.8,
-         //action when menu closes
+        //action when menu closes
 
         elevation: 8.0, //shadow elevation of button
-        shape: CircleBorder(), //shape of button
+        shape: const CircleBorder(), //shape of button
 
         children: [
           SpeedDialChild(
             //speed dial child
-            child: Icon(Icons.category),
+            child: const Icon(Icons.category),
             backgroundColor: secondary,
             foregroundColor: primary,
             label: 'Event Category',
-            labelStyle: TextStyle(fontSize: 18.0),
+            labelStyle: const TextStyle(fontSize: 18.0),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const CreateCategoryView(),
               ),
             ),
-            
           ),
           SpeedDialChild(
-            child: Icon(Icons.event),
+            child: const Icon(Icons.event),
             backgroundColor: secondary,
             foregroundColor: primary,
             label: 'Event',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CreateEventView(),
-              ),
-            ),
+            labelStyle: const TextStyle(fontSize: 18.0),
+            onTap: () {
+              final date = DateTime.parse(selectedDate.text);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CreateEventView(selectedDate: date),
+                ),
+              );
+            },
           ),
         ],
       ),
