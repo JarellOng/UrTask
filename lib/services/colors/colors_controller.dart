@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:urtask/helpers/id/id_helper.dart';
 import 'package:urtask/services/colors/colors_model.dart';
 
 class ColorController {
@@ -22,16 +23,10 @@ class ColorController {
         )
         .toList();
     colorList.sort((a, b) {
-      final id1 = _idToInt(id: a.id);
-      final id2 = _idToInt(id: b.id);
+      final id1 = IdHelper.idToInt(id: a.id);
+      final id2 = IdHelper.idToInt(id: b.id);
       return id1.compareTo(id2);
     });
     return colorList;
-  }
-
-  static int _idToInt({required String id}) {
-    final buffer = StringBuffer();
-    buffer.write(id.replaceFirst('color', ''));
-    return int.parse(buffer.toString());
   }
 }

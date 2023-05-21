@@ -54,13 +54,17 @@ class EventController {
 
   Stream<Iterable<Events>> getByDate({required DateTime dateTime}) async* {
     final events = await _getCollection();
-    yield* events.snapshots().map((data) => data.docs
-        .map((doc) => Events.fromSnapshot(doc))
-        .where((element) => DateTimeHelper.isBetweenDate(
-              start: element.start.toDate(),
-              end: element.end.toDate(),
-              compare: dateTime,
-            )));
+    yield* events
+        .orderBy(eventImportantField, descending: true)
+        .orderBy(eventStartField)
+        .snapshots()
+        .map((data) => data.docs
+            .map((doc) => Events.fromSnapshot(doc))
+            .where((element) => DateTimeHelper.isBetweenDate(
+                  start: element.start.toDate(),
+                  end: element.end.toDate(),
+                  compare: dateTime,
+                )));
   }
 
   Future<void> update({
