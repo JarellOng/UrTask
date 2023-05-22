@@ -50,7 +50,7 @@ class _EventViewState extends State<EventView> {
                 shrinkWrap: true,
                 itemCount: events.length,
                 separatorBuilder: (context, index) {
-                  return const SizedBox(height: 8);
+                  return const Divider(thickness: 1, color: Colors.black26);
                 },
                 itemBuilder: (context, index) {
                   final event = events.elementAt(index);
@@ -166,7 +166,6 @@ class _EventViewState extends State<EventView> {
                         ? Icon(Icons.error_outlined,
                             size: 32, color: Colors.red)
                         : null,
-                    shape: Border(bottom: BorderSide(color: Colors.black26)),
                   );
                 },
               );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:urtask/color.dart';
 import 'package:intl/intl.dart';
+import 'package:urtask/services/events/events_model.dart';
 import 'package:urtask/views/event_view.dart';
 
 class CalendarView extends StatefulWidget {
@@ -19,11 +20,11 @@ class CalendarView extends StatefulWidget {
 
 class _CalendarViewState extends State<CalendarView> {
   DateTime selectedDay = DateTime.now();
-  DateTime pilihanDay = DateTime.now();
+   CalendarFormat calendar = CalendarFormat.month; 
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return SingleChildScrollView(child: Column(
       children: [
         Container(
           padding: const EdgeInsets.only(
@@ -47,6 +48,9 @@ class _CalendarViewState extends State<CalendarView> {
                 selectedDay = focusedDay;
               });
               widget.today.text = DateFormat('yMMMM').format(selectedDay);
+            },
+            eventLoader: (day) {
+              return [day];
             },
             selectedDayPredicate: (DateTime date) {
               return isSameDay(selectedDay, date);
@@ -76,9 +80,20 @@ class _CalendarViewState extends State<CalendarView> {
               child: Text(DateFormat('yMMMMd').format(selectedDay),
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600))),
         ),
-        EventView(selectedDay: selectedDay)
+        
+        if(widget.calendarFilter == calendar)...[
+          ConstrainedBox(constraints: const BoxConstraints(
+            maxHeight: 330.0,
+              ), child: EventView(selectedDay: selectedDay))
+        ] else...[
+          ConstrainedBox(constraints: const BoxConstraints(
+            maxHeight: 510.0,
+              ), child: EventView(selectedDay: selectedDay))
+        ]
+        
+        
       ],
-    );
+    ),);
   }
 
   DateTime? _showToday() {
