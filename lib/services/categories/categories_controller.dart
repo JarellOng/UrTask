@@ -62,14 +62,17 @@ class CategoryController {
   Stream<Iterable<Categories>> getAll() async* {
     final categories = await _getCollection();
     final presetCategories = await _getPresetCollection();
-    final categoriesStream = categories
+    final presetCategoryStream = presetCategories
         .snapshots()
         .map((data) => data.docs.map((doc) => Categories.fromSnapshot(doc)));
-    final presetCategoriesStream = presetCategories
+    yield* categories
         .snapshots()
-        .map((data) => data.docs.map((doc) => Categories.fromSnapshot(doc)));
-    yield* ZipStream.zip2(categoriesStream, presetCategoriesStream,
-        (a, b) => [...a, ...b].sortedBy((element) => element.name));
+        .map((data) => data.docs.map((doc) => Categories.fromSnapshot(doc)))
+        .withLatestFrom(
+          presetCategoryStream,
+          (t, s) =>
+              (t.toList() + s.toList()).sortedBy((element) => element.name),
+        );
   }
 
   Future<void> update({
