@@ -145,17 +145,14 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
             border: Border(top: BorderSide(color: Colors.black, width: 1.0))),
         child: TextButton(
           onPressed: () async {
-            _categoryService.create(
+            await _categoryService.create(
                 colorId: colorId,
                 name: _eventCategoryTitle.text.isNotEmpty
                     ? _eventCategoryTitle.text
                     : "My Category");
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CategoryView(),
-              ),
-            );
+            if (mounted) {
+              Navigator.of(context).pop();
+            }
           },
           child: const Text("Save", style: TextStyle(fontSize: 18)),
         ),
