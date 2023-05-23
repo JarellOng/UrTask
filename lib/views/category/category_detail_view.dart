@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -126,12 +125,7 @@ class _categoryDetailViewState extends State<categoryDetailView> {
             );
             if (shouldDiscard) {
               if (mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CategoryView(),
-                  ),
-                );
+                Navigator.of(context).pop();
                 return true;
               }
             }
@@ -232,16 +226,19 @@ class _categoryDetailViewState extends State<categoryDetailView> {
                             id: _eventGroupId!);
                         if (mounted) {
                           Navigator.of(context).pop();
+                          Navigator.of(context).pop();
                         }
                       } else if (shouldDeleteAllRepeatedEvents == false) {
                         await _categoryService.delete(id: _categoryId);
                         if (mounted) {
+                          Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         }
                       }
                     } else {
                       await _categoryService.delete(id: _categoryId);
                       if (mounted) {
+                        Navigator.of(context).pop();
                         Navigator.of(context).pop();
                       }
                     }
@@ -270,7 +267,12 @@ class _categoryDetailViewState extends State<categoryDetailView> {
                           : "My Event");
                   // Update Notification
                   if (mounted) {
-                    Navigator.of(context).pop();
+                    Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CategoryView(),
+              ),
+            );
                   }
                 }
               },
