@@ -532,8 +532,12 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                               _customNotificationScrollOff();
                             },
                             child: const Text(
-                              "...",
-                              style: TextStyle(fontSize: 18),
+                              ". . .",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ],

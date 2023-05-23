@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/calendars/calendars_constants.dart';
 import 'calendars_model.dart';
@@ -34,5 +35,16 @@ class CalendarController {
         .limit(1)
         .get();
     return querySnapshot.docs.map((doc) => Calendars.fromSnapshot(doc)).first;
+  }
+
+  DateTime? showToday({required TextEditingController today}) {
+    if (today.text == "Today") {
+      // setState(() {
+      //   selectedDay = DateTime.now();
+      // });
+      today.text = "";
+      return DateTime.now();
+    }
+    return null;
   }
 }

@@ -3,6 +3,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:urtask/color.dart';
 import 'package:intl/intl.dart';
 import 'package:urtask/services/events/events_model.dart';
+import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/views/event_view.dart';
 
 class CalendarView extends StatefulWidget {
@@ -23,6 +24,22 @@ class CalendarView extends StatefulWidget {
 class _CalendarViewState extends State<CalendarView> {
   DateTime selectedDay = DateTime.now();
    CalendarFormat calendar = CalendarFormat.month; 
+  DateTime pilihanDay = DateTime.now();
+  late final CalendarController _calendarService;
+
+  @override
+  void initState() {
+    _calendarService = CalendarController();
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant CalendarView oldWidget) {
+    if (oldWidget.today.text == "Today") {
+      selectedDay = DateTime.now();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +50,8 @@ class _CalendarViewState extends State<CalendarView> {
             top: 20.0,
           ),
           child: TableCalendar(
-            focusedDay: _showToday() ?? selectedDay,
+            focusedDay:
+                _calendarService.showToday(today: widget.today) ?? selectedDay,
             firstDay: DateTime.utc(2010, 10, 16),
             lastDay: DateTime.utc(2025, 10, 16),
             rowHeight: 45,
@@ -60,7 +78,7 @@ class _CalendarViewState extends State<CalendarView> {
             selectedDayPredicate: (DateTime date) {
               return isSameDay(selectedDay, date);
             },
-            calendarStyle: CalendarStyle(
+            calendarStyle: const CalendarStyle(
               weekendTextStyle: TextStyle(color: Colors.red),
               selectedDecoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -73,7 +91,7 @@ class _CalendarViewState extends State<CalendarView> {
             ),
           ),
         ),
-        Divider(
+        const Divider(
           height: 2,
           thickness: 2,
           color: Colors.black26,
@@ -83,7 +101,8 @@ class _CalendarViewState extends State<CalendarView> {
           child: Align(
               alignment: Alignment.topLeft,
               child: Text(DateFormat('yMMMMd').format(selectedDay),
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600))),
+                  style: const TextStyle(
+                      fontSize: 25, fontWeight: FontWeight.w600))),
         ),
         
         if(widget.calendarFilter == calendar)...[
@@ -98,18 +117,6 @@ class _CalendarViewState extends State<CalendarView> {
         
         
       ],
-    ),);
-  }
-
-  DateTime? _showToday() {
-    if (widget.today.text == "Today" && selectedDay != DateTime.now()) {
-      setState(() {
-        selectedDay = DateTime.now();
-      });
-      widget.today.text = "";
-      return selectedDay;
-    }
-    //widget.today.text = DateFormat('yMMMM').format(selectedDay);
-    return null;
+    );
   }
 }

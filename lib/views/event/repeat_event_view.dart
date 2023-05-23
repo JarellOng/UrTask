@@ -854,8 +854,12 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                                 _untilDateScrollOff();
                               },
                               child: const Text(
-                                "...",
-                                style: TextStyle(fontSize: 18),
+                                ". . .",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
