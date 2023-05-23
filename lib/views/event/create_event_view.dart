@@ -356,8 +356,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                           child: const SizedBox(
                             width: 110,
                             child: Text(
-                              "...",
-                              style: TextStyle(fontSize: 18),
+                              ". . .",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -408,8 +412,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                               _startTimeScrollOff();
                             },
                             child: const Text(
-                              "...",
-                              style: TextStyle(fontSize: 18),
+                              ". . .",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ],
@@ -490,8 +498,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                               _endDateScrollOff();
                             },
                             child: const Text(
-                              "...",
-                              style: TextStyle(fontSize: 18),
+                              ". . .",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -541,8 +553,12 @@ class _CreateEventViewState extends State<CreateEventView> {
                               _endTimeScrollOff();
                             },
                             child: const Text(
-                              "...",
-                              style: TextStyle(fontSize: 18),
+                              ". . .",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ],
