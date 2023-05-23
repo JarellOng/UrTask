@@ -69,12 +69,16 @@ class _CategoryViewState extends State<CategoryView> {
                               final color = snapshot.data as color_model.Colors;
                               return ListTile(
                                   onTap: () async {
-                                    final categoryDetail = await Navigator.push(
+                                    await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            categoryDetailView(
+                                            CategoryDetailView(
                                           categoryId: category.id,
+                                          categoryName: category.name,
+                                          colorId: color.id,
+                                          colorName: color.name,
+                                          colorHex: color.hex,
                                         ),
                                       ),
                                     );

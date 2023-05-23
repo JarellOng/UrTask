@@ -91,4 +91,11 @@ class CategoryController {
     final categories = await _getCollection();
     await categories.doc(id).delete();
   }
+
+  bool isPreset({required String id}) {
+    if (id.substring(0, 8) == "category") {
+      return true;
+    }
+    return false;
+  }
 }

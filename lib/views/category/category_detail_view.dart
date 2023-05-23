@@ -16,18 +16,27 @@ import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/views/color_view.dart';
 
-class categoryDetailView extends StatefulWidget {
+class CategoryDetailView extends StatefulWidget {
   final String categoryId;
-  const categoryDetailView({
+  final String categoryName;
+  final String colorId;
+  final String colorName;
+  final String colorHex;
+
+  const CategoryDetailView({
     super.key,
     required this.categoryId,
+    required this.categoryName,
+    required this.colorId,
+    required this.colorName,
+    required this.colorHex,
   });
 
   @override
-  State<categoryDetailView> createState() => _categoryDetailViewState();
+  State<CategoryDetailView> createState() => _CategoryDetailViewState();
 }
 
-class _categoryDetailViewState extends State<categoryDetailView> {
+class _CategoryDetailViewState extends State<CategoryDetailView> {
   late final ColorController _colorService;
   late final EventController _eventService;
   late final CategoryController _categoryService;
@@ -37,10 +46,10 @@ class _categoryDetailViewState extends State<categoryDetailView> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
-  String _categoryId = "";
-  String colorId = "color1";
-  String colorName = "Tomato";
-  String colorHex = "#D50000";
+  late String _categoryId;
+  late String colorId;
+  late String colorName;
+  late String colorHex;
   final userId = AuthService.firebase().currentUser!.id;
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
@@ -57,13 +66,18 @@ class _categoryDetailViewState extends State<categoryDetailView> {
     _categoryService = CategoryController();
     _eventCategoryTitle = TextEditingController();
     eventTitleFocus = FocusNode();
-    setup();
+    _categoryId = widget.categoryId;
+    _eventCategoryTitle.text = widget.categoryName;
+    colorId = widget.colorId;
+    colorName = widget.colorName;
+    colorHex = widget.colorHex;
     super.initState();
   }
 
   @override
   void dispose() {
     _eventCategoryTitle.dispose();
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
@@ -108,9 +122,11 @@ class _categoryDetailViewState extends State<categoryDetailView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Event Category",
-            style: TextStyle(color: Colors.white)),
-        iconTheme: IconThemeData(color: Colors.white),
+        title: const Text(
+          "Event Category Detail",
+          style: TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
       ),
       body: WillPopScope(
@@ -139,57 +155,80 @@ class _categoryDetailViewState extends State<categoryDetailView> {
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   children: [
-                    TextField(
-                      controller: _eventCategoryTitle,
-                      focusNode: eventTitleFocus,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      maxLines: 2,
-                      decoration: const InputDecoration(
-                          isDense: true,
+                    // NAME
+                    SizedBox(
+                      width: 350,
+                      child: TextField(
+                        readOnly: _categoryService.isPreset(id: _categoryId),
+                        controller: _eventCategoryTitle,
+                        focusNode: eventTitleFocus,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        decoration: const InputDecoration(
                           hintText: "Event Category Name",
-                          hintStyle: TextStyle(fontSize: 18)),
-                      style: TextStyle(fontSize: 18),
-                      onChanged: (value) {
-                        eventIsEdited = true;
-                      },
+                          hintStyle: TextStyle(fontSize: 18),
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        onChanged: (value) {
+                          eventIsEdited = true;
+                        },
+                      ),
                     ),
-                    SizedBox(height: 20),
+
+                    const Divider(
+                      indent: 10,
+                      endIndent: 10,
+                      height: 1,
+                      thickness: 1,
+                      color: Color.fromARGB(255, 125, 121, 121),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // COLOR
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 6),
                           child: Text("Color:", style: TextStyle(fontSize: 20)),
                         ),
-                        Container(
-                            width: 200,
-                            child: ListTile(
-                              title: Center(
-                                child: Text(colorName,
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white)),
+                        SizedBox(
+                          width: 200,
+                          child: ListTile(
+                            enabled:
+                                !_categoryService.isPreset(id: _categoryId),
+                            title: Center(
+                              child: Text(
+                                colorName,
+                                style: const TextStyle(
+                                    fontSize: 20, color: Colors.white),
                               ),
-                              tileColor: HexColor.fromHex(colorHex),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              visualDensity: VisualDensity(vertical: -4),
-                              onTap: () async {
+                            ),
+                            tileColor: HexColor.fromHex(colorHex),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            visualDensity: const VisualDensity(vertical: -4),
+                            onTap: () async {
+                              setState(() {
+                                eventTitleFocus.unfocus();
+                                eventIsEdited = true;
+                              });
+                              final colorDetail = await showColorsDialog(
+                                  context, _colorService);
+                              if (colorDetail.isNotEmpty) {
                                 setState(() {
-                                  eventTitleFocus.unfocus();
-                                  eventIsEdited = true;
+                                  colorId = colorDetail[0];
+                                  colorName = colorDetail[1];
+                                  colorHex = colorDetail[2];
                                 });
-                                final colorDetail = await showColorsDialog(
-                                    context, _colorService);
-                                if (colorDetail.isNotEmpty) {
-                                  setState(() {
-                                    colorId = colorDetail[0];
-                                    colorName = colorDetail[1];
-                                    colorHex = colorDetail[2];
-                                  });
-                                }
-                              },
-                            ))
+                              }
+                            },
+                          ),
+                        )
                       ],
                     ),
                   ],
@@ -203,81 +242,83 @@ class _categoryDetailViewState extends State<categoryDetailView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // DELETE BUTTON
-            TextButton(
-              onPressed: () async {
-                if (_connectionStatus == ConnectivityResult.none) {
-                  showOfflineDialog(
-                    context: context,
-                    text: "Please turn on your Internet connection",
-                  );
-                } else {
-                  final shouldDelete = await showDeleteDialog(
-                    context,
-                    "Are you sure you want to delete this event?",
-                  );
-                  if (shouldDelete) {
-                    showLoadingDialog(context: context, text: "Deleting");
-                    if (_eventGroupId != null && mounted) {
-                      final shouldDeleteAllRepeatedEvents =
-                          await showEventGroupDeleteDialog(context);
-                      if (shouldDeleteAllRepeatedEvents == true) {
-                        await _eventService.bulkDeleteByCategoryId(
-                            id: _eventGroupId!);
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
+            if (!_categoryService.isPreset(id: _categoryId)) ...[
+              // DELETE BUTTON
+              TextButton(
+                onPressed: () async {
+                  if (_connectionStatus == ConnectivityResult.none) {
+                    showOfflineDialog(
+                      context: context,
+                      text: "Please turn on your Internet connection",
+                    );
+                  } else {
+                    final shouldDelete = await showDeleteDialog(
+                      context,
+                      "Are you sure you want to delete this event?",
+                    );
+                    if (shouldDelete) {
+                      showLoadingDialog(context: context, text: "Deleting");
+                      if (_eventGroupId != null && mounted) {
+                        final shouldDeleteAllRepeatedEvents =
+                            await showEventGroupDeleteDialog(context);
+                        if (shouldDeleteAllRepeatedEvents == true) {
+                          await _eventService.bulkDeleteByCategoryId(
+                              id: _eventGroupId!);
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          }
+                        } else if (shouldDeleteAllRepeatedEvents == false) {
+                          await _categoryService.delete(id: _categoryId);
+                          if (mounted) {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          }
                         }
-                      } else if (shouldDeleteAllRepeatedEvents == false) {
+                      } else {
                         await _categoryService.delete(id: _categoryId);
                         if (mounted) {
                           Navigator.of(context).pop();
                           Navigator.of(context).pop();
                         }
                       }
-                    } else {
-                      await _categoryService.delete(id: _categoryId);
-                      if (mounted) {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                      }
                     }
                   }
-                }
-              },
-              child: const Text("Delete", style: TextStyle(fontSize: 18)),
-            ),
-
-            // SAVE BUTTON
-            TextButton(
-              onPressed: () async {
-                if (_connectionStatus == ConnectivityResult.none) {
-                  showOfflineDialog(
-                    context: context,
-                    text: "Please turn on your Internet connection",
-                  );
-                } else {
-                  showLoadingDialog(context: context, text: "Saving");
-                  // Update Categories
-                  await _categoryService.update(
-                      id: _categoryId,
-                      colorId: colorId,
-                      name: _eventCategoryTitle.text.isNotEmpty
-                          ? _eventCategoryTitle.text
-                          : "My Event");
-                  // Update Notification
-                  if (mounted) {
-                    Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CategoryView(),
+                },
+                child: const Text("Delete", style: TextStyle(fontSize: 18)),
               ),
-            );
+
+              // SAVE BUTTON
+              TextButton(
+                onPressed: () async {
+                  if (_connectionStatus == ConnectivityResult.none) {
+                    showOfflineDialog(
+                      context: context,
+                      text: "Please turn on your Internet connection",
+                    );
+                  } else {
+                    showLoadingDialog(context: context, text: "Saving");
+                    // Update Categories
+                    await _categoryService.update(
+                        id: _categoryId,
+                        colorId: colorId,
+                        name: _eventCategoryTitle.text.isNotEmpty
+                            ? _eventCategoryTitle.text
+                            : "My Event");
+                    // Update Notification
+                    if (mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CategoryView(),
+                        ),
+                      );
+                    }
                   }
-                }
-              },
-              child: const Text("Save", style: TextStyle(fontSize: 18)),
-            ),
+                },
+                child: const Text("Save", style: TextStyle(fontSize: 18)),
+              ),
+            ],
           ],
         ),
       ),
