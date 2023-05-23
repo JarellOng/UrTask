@@ -39,9 +39,6 @@ class CalendarController {
 
   DateTime? showToday({required TextEditingController today}) {
     if (today.text == "Today") {
-      // setState(() {
-      //   selectedDay = DateTime.now();
-      // });
       today.text = "";
       return DateTime.now();
     }
