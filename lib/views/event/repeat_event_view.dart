@@ -96,6 +96,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
 
     if (selectedType == RepeatType.perDay) {
       perDayAmount = TextEditingController(text: selectedTypeAmount.toString());
+      if (perDayAmount.text != "1") {
+        perDayPlural = true;
+      }
       perDayFlag = true;
     } else {
       perDayAmount = TextEditingController(text: "1");
@@ -103,6 +106,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     if (selectedType == RepeatType.perWeek) {
       perWeekAmount =
           TextEditingController(text: selectedTypeAmount.toString());
+      if (perWeekAmount.text != "1") {
+        perWeekPlural = true;
+      }
       perWeekFlag = true;
     } else {
       perWeekAmount = TextEditingController(text: "1");
@@ -110,6 +116,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     if (selectedType == RepeatType.perMonth) {
       perMonthAmount =
           TextEditingController(text: selectedTypeAmount.toString());
+      if (perMonthAmount.text != "1") {
+        perMonthPlural = true;
+      }
       perMonthFlag = true;
     } else {
       perMonthAmount = TextEditingController(text: "1");
@@ -117,6 +126,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     if (selectedType == RepeatType.perYear) {
       perYearAmount =
           TextEditingController(text: selectedTypeAmount.toString());
+      if (perYearAmount.text != "1") {
+        perYearPlural = true;
+      }
       perYearFlag = true;
     } else {
       perYearAmount = TextEditingController(text: "1");
@@ -125,6 +137,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
         selectedDurationAmount != null) {
       specificNumberAmount =
           TextEditingController(text: selectedDurationAmount.toString());
+      if (specificNumberAmount.text != "1") {
+        specificNumberPlural = true;
+      }
     } else {
       specificNumberAmount = TextEditingController(text: "1");
     }
@@ -169,63 +184,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        if (selectedType == RepeatType.noRepeat) {
-          setState(() {
-            selectedDuration = RepeatDuration.values.elementAt(0);
-          });
-          Navigator.of(context).pop([selectedType, selectedDuration, 0, null]);
-          return true;
-        } else {
-          setState(() {
-            if (selectedType == RepeatType.perDay) {
-              if (perDayAmount.text == "") {
-                perDayAmount.text = "1";
-              }
-              selectedTypeAmount = int.parse(perDayAmount.text);
-            } else if (selectedType == RepeatType.perWeek) {
-              if (perWeekAmount.text == "") {
-                perWeekAmount.text = "1";
-              }
-              selectedTypeAmount = int.parse(perWeekAmount.text);
-            } else if (selectedType == RepeatType.perMonth) {
-              if (perMonthAmount.text == "") {
-                perMonthAmount.text = "1";
-              }
-              selectedTypeAmount = int.parse(perMonthAmount.text);
-            } else if (selectedType == RepeatType.perYear) {
-              if (perYearAmount.text == "") {
-                perYearAmount.text = "1";
-              }
-              selectedTypeAmount = int.parse(perYearAmount.text);
-            }
-          });
-          if (selectedDuration == RepeatDuration.specificNumber) {
-            if (specificNumberAmount.text == "") {
-              specificNumberAmount.text = "1";
-            }
-            selectedDurationAmount = int.parse(specificNumberAmount.text);
-            Navigator.of(context).pop([
-              selectedType,
-              selectedDuration,
-              selectedTypeAmount,
-              selectedDurationAmount
-            ]);
-          } else if (selectedDuration == RepeatDuration.until) {
-            if (untilDateScrollToggle == true) {
-              _untilDateScrollOff();
-            }
-            selectedDurationDate = selectedUntilDateTime;
-            Navigator.of(context).pop([
-              selectedType,
-              selectedDuration,
-              selectedTypeAmount,
-              selectedDurationDate
-            ]);
-          }
-        }
-        return true;
-      },
+      onWillPop: () async => _saveRepeatPreference(),
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(color: Colors.white),
@@ -247,26 +206,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 ),
                 value: RepeatType.noRepeat,
                 groupValue: selectedType,
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                    perDayFlag = false;
-                    perDayFocus.unfocus();
-                    perWeekFlag = false;
-                    perWeekFocus.unfocus();
-                    perMonthFlag = false;
-                    perMonthFocus.unfocus();
-                    perYearFlag = false;
-                    perYearFocus.unfocus();
-                    if (specificNumberAmount.text == "") {
-                      specificNumberAmount.text = "1";
-                    }
-                    if (untilDateScrollToggle == true) {
-                      _untilDateScrollOff();
-                      untilDateScrollToggle = false;
-                    }
-                  });
-                },
+                onChanged: (value) => _selectNoRepeat(type: value),
               ),
 
               const Divider(
@@ -305,32 +245,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              perDayPlural =
-                                  value.isEmpty || int.parse(value) <= 1
-                                      ? false
-                                      : true;
-                            });
-                            if (value.isNotEmpty) {
-                              if (int.parse(value) <= 0) {
-                                setState(() {
-                                  perDayAmount.text = "1";
-                                  perDayAmount.selection =
-                                      const TextSelection.collapsed(offset: 1);
-                                  perDayPlural = false;
-                                });
-                              }
-                              if (int.parse(value) > 365) {
-                                setState(() {
-                                  perDayAmount.text = "365";
-                                  perDayAmount.selection =
-                                      const TextSelection.collapsed(offset: 3);
-                                  perDayPlural = true;
-                                });
-                              }
-                            }
-                          },
+                          onChanged: (value) => _setPerDayAmount(amount: value),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           enableSuggestions: false,
@@ -356,21 +271,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 ),
                 value: RepeatType.perDay,
                 groupValue: selectedType,
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                    perDayFlag = true;
-                    perWeekFlag = false;
-                    perWeekFocus.unfocus();
-                    perMonthFlag = false;
-                    perMonthFocus.unfocus();
-                    perYearFlag = false;
-                    perYearFocus.unfocus();
-                    if (perDayAmount.text == "") {
-                      perDayAmount.text = "1";
-                    }
-                  });
-                },
+                onChanged: (value) => _selectPerDay(type: value),
               ),
 
               const Divider(
@@ -409,32 +310,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              perWeekPlural =
-                                  value.isEmpty || int.parse(value) <= 1
-                                      ? false
-                                      : true;
-                            });
-                            if (value.isNotEmpty) {
-                              if (int.parse(value) <= 0) {
-                                setState(() {
-                                  perWeekAmount.text = "1";
-                                  perWeekAmount.selection =
-                                      const TextSelection.collapsed(offset: 1);
-                                  perWeekPlural = false;
-                                });
-                              }
-                              if (int.parse(value) > 52) {
-                                setState(() {
-                                  perWeekAmount.text = "52";
-                                  perWeekAmount.selection =
-                                      const TextSelection.collapsed(offset: 2);
-                                  perWeekPlural = true;
-                                });
-                              }
-                            }
-                          },
+                          onChanged: (value) => _setPerWeekAmount(
+                            amount: value,
+                          ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           enableSuggestions: false,
@@ -460,21 +338,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 ),
                 value: RepeatType.perWeek,
                 groupValue: selectedType,
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                    perWeekFlag = true;
-                    perDayFlag = false;
-                    perDayFocus.unfocus();
-                    perMonthFlag = false;
-                    perMonthFocus.unfocus();
-                    perYearFlag = false;
-                    perYearFocus.unfocus();
-                    if (perWeekAmount.text == "") {
-                      perWeekAmount.text = "1";
-                    }
-                  });
-                },
+                onChanged: (value) => _selectPerWeek(type: value),
               ),
 
               const Divider(
@@ -513,32 +377,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              perMonthPlural =
-                                  value.isEmpty || int.parse(value) <= 1
-                                      ? false
-                                      : true;
-                            });
-                            if (value.isNotEmpty) {
-                              if (int.parse(value) <= 0) {
-                                setState(() {
-                                  perMonthAmount.text = "1";
-                                  perMonthAmount.selection =
-                                      const TextSelection.collapsed(offset: 1);
-                                  perMonthPlural = false;
-                                });
-                              }
-                              if (int.parse(value) > 12) {
-                                setState(() {
-                                  perMonthAmount.text = "12";
-                                  perMonthAmount.selection =
-                                      const TextSelection.collapsed(offset: 2);
-                                  perMonthPlural = true;
-                                });
-                              }
-                            }
-                          },
+                          onChanged: (value) => _setPerMonthAmount(
+                            amount: value,
+                          ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           enableSuggestions: false,
@@ -564,21 +405,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 ),
                 value: RepeatType.perMonth,
                 groupValue: selectedType,
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                    perMonthFlag = true;
-                    perDayFlag = false;
-                    perDayFocus.unfocus();
-                    perWeekFlag = false;
-                    perWeekFocus.unfocus();
-                    perYearFlag = false;
-                    perYearFocus.unfocus();
-                    if (perMonthAmount.text == "") {
-                      perMonthAmount.text = "1";
-                    }
-                  });
-                },
+                onChanged: (value) => _selectPerMonth(type: value),
               ),
 
               const Divider(
@@ -617,32 +444,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              perYearPlural =
-                                  value.isEmpty || int.parse(value) <= 1
-                                      ? false
-                                      : true;
-                            });
-                            if (value.isNotEmpty) {
-                              if (int.parse(value) <= 0) {
-                                setState(() {
-                                  perYearAmount.text = "1";
-                                  perYearAmount.selection =
-                                      const TextSelection.collapsed(offset: 1);
-                                  perYearPlural = false;
-                                });
-                              }
-                              if (int.parse(value) > 10) {
-                                setState(() {
-                                  perYearAmount.text = "10";
-                                  perYearAmount.selection =
-                                      const TextSelection.collapsed(offset: 2);
-                                  perYearPlural = true;
-                                });
-                              }
-                            }
-                          },
+                          onChanged: (value) => _setPerYearAmount(
+                            amount: value,
+                          ),
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
                           enableSuggestions: false,
@@ -668,21 +472,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                 ),
                 value: RepeatType.perYear,
                 groupValue: selectedType,
-                onChanged: (value) {
-                  setState(() {
-                    selectedType = value;
-                    perYearFlag = true;
-                    perDayFlag = false;
-                    perDayFocus.unfocus();
-                    perWeekFlag = false;
-                    perWeekFocus.unfocus();
-                    perMonthFlag = false;
-                    perMonthFocus.unfocus();
-                    if (perYearAmount.text == "") {
-                      perYearAmount.text = "1";
-                    }
-                  });
-                },
+                onChanged: (value) => _selectPerYear(type: value),
               ),
 
               const Divider(
@@ -742,34 +532,9 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                             ),
-                            onChanged: (value) {
-                              setState(() {
-                                specificNumberPlural =
-                                    value.isEmpty || int.parse(value) <= 1
-                                        ? false
-                                        : true;
-                              });
-                              if (value.isNotEmpty) {
-                                if (int.parse(value) <= 0) {
-                                  setState(() {
-                                    specificNumberAmount.text = "1";
-                                    specificNumberAmount.selection =
-                                        const TextSelection.collapsed(
-                                            offset: 1);
-                                    specificNumberPlural = false;
-                                  });
-                                }
-                                if (int.parse(value) > 100) {
-                                  setState(() {
-                                    specificNumberAmount.text = "100";
-                                    specificNumberAmount.selection =
-                                        const TextSelection.collapsed(
-                                            offset: 3);
-                                    specificNumberPlural = true;
-                                  });
-                                }
-                              }
-                            },
+                            onChanged: (value) => _setSpecificNumberAmount(
+                              amount: value,
+                            ),
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
                             enableSuggestions: false,
@@ -795,19 +560,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                   ),
                   value: RepeatDuration.specificNumber,
                   groupValue: selectedDuration,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedDuration = value;
-                      specificNumberFlag = true;
-                      untilFlag = false;
-                      if (untilDateScrollToggle == true) {
-                        _untilDateScrollOff();
-                      }
-                      if (specificNumberAmount.text == "") {
-                        specificNumberAmount.text = "1";
-                      }
-                    });
-                  },
+                  onChanged: (value) => _selectSpecificNumber(duration: value),
                 ),
 
                 const Divider(
@@ -829,9 +582,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                       if (untilFlag == true) ...[
                         if (untilDateScrollToggle == false) ...[
                           TextButton(
-                            onPressed: () {
-                              _untilDateScrollOn();
-                            },
+                            onPressed: () => _untilDateScrollOn(),
                             child: Text(
                               DateTimeHelper.dateToString(
                                 month: selectedUntilDateTime.month - 1,
@@ -850,9 +601,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                                 backgroundColor:
                                     const Color.fromARGB(255, 234, 220, 220),
                               ),
-                              onPressed: () {
-                                _untilDateScrollOff();
-                              },
+                              onPressed: () => _untilDateScrollOff(),
                               child: const Text(
                                 ". . .",
                                 style: TextStyle(
@@ -869,13 +618,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
                   ),
                   value: RepeatDuration.until,
                   groupValue: selectedDuration,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedDuration = value;
-                      untilFlag = true;
-                      specificNumberFlag = false;
-                    });
-                  },
+                  onChanged: (value) => _selectUntil(duration: value),
                 ),
 
                 if (untilDateScrollToggle == true) ...[
@@ -903,6 +646,64 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     );
   }
 
+  bool _saveRepeatPreference() {
+    if (selectedType == RepeatType.noRepeat) {
+      setState(() {
+        selectedDuration = RepeatDuration.values.elementAt(0);
+      });
+      Navigator.of(context).pop([selectedType, selectedDuration, 0, null]);
+      return true;
+    } else {
+      setState(() {
+        if (selectedType == RepeatType.perDay) {
+          if (perDayAmount.text == "") {
+            perDayAmount.text = "1";
+          }
+          selectedTypeAmount = int.parse(perDayAmount.text);
+        } else if (selectedType == RepeatType.perWeek) {
+          if (perWeekAmount.text == "") {
+            perWeekAmount.text = "1";
+          }
+          selectedTypeAmount = int.parse(perWeekAmount.text);
+        } else if (selectedType == RepeatType.perMonth) {
+          if (perMonthAmount.text == "") {
+            perMonthAmount.text = "1";
+          }
+          selectedTypeAmount = int.parse(perMonthAmount.text);
+        } else if (selectedType == RepeatType.perYear) {
+          if (perYearAmount.text == "") {
+            perYearAmount.text = "1";
+          }
+          selectedTypeAmount = int.parse(perYearAmount.text);
+        }
+      });
+      if (selectedDuration == RepeatDuration.specificNumber) {
+        if (specificNumberAmount.text == "") {
+          specificNumberAmount.text = "1";
+        }
+        selectedDurationAmount = int.parse(specificNumberAmount.text);
+        Navigator.of(context).pop([
+          selectedType,
+          selectedDuration,
+          selectedTypeAmount,
+          selectedDurationAmount
+        ]);
+      } else if (selectedDuration == RepeatDuration.until) {
+        if (untilDateScrollToggle == true) {
+          _untilDateScrollOff();
+        }
+        selectedDurationDate = selectedUntilDateTime;
+        Navigator.of(context).pop([
+          selectedType,
+          selectedDuration,
+          selectedTypeAmount,
+          selectedDurationDate
+        ]);
+      }
+    }
+    return true;
+  }
+
   void _untilDateScrollOn() {
     setState(() {
       untilDay = FixedExtentScrollController(
@@ -917,6 +718,226 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     });
     setState(() {
       untilDateScrollToggle = true;
+    });
+  }
+
+  void _selectNoRepeat({RepeatType? type}) {
+    setState(() {
+      selectedType = type;
+      perDayFlag = false;
+      perDayFocus.unfocus();
+      perWeekFlag = false;
+      perWeekFocus.unfocus();
+      perMonthFlag = false;
+      perMonthFocus.unfocus();
+      perYearFlag = false;
+      perYearFocus.unfocus();
+      if (specificNumberAmount.text == "") {
+        specificNumberAmount.text = "1";
+      }
+      if (untilDateScrollToggle == true) {
+        _untilDateScrollOff();
+        untilDateScrollToggle = false;
+      }
+    });
+  }
+
+  void _setPerDayAmount({required String amount}) {
+    setState(() {
+      perDayPlural = amount.isEmpty || int.parse(amount) <= 1 ? false : true;
+    });
+    if (amount.isNotEmpty) {
+      if (int.parse(amount) <= 0) {
+        setState(() {
+          perDayAmount.text = "1";
+          perDayAmount.selection = const TextSelection.collapsed(offset: 1);
+          perDayPlural = false;
+        });
+      }
+      if (int.parse(amount) > 365) {
+        setState(() {
+          perDayAmount.text = "365";
+          perDayAmount.selection = const TextSelection.collapsed(offset: 3);
+          perDayPlural = true;
+        });
+      }
+    }
+  }
+
+  void _selectPerDay({RepeatType? type}) {
+    setState(() {
+      selectedType = type;
+      perDayFlag = true;
+      perWeekFlag = false;
+      perWeekFocus.unfocus();
+      perMonthFlag = false;
+      perMonthFocus.unfocus();
+      perYearFlag = false;
+      perYearFocus.unfocus();
+      if (perDayAmount.text == "") {
+        perDayAmount.text = "1";
+      }
+    });
+  }
+
+  void _setPerWeekAmount({required String amount}) {
+    setState(() {
+      perWeekPlural = amount.isEmpty || int.parse(amount) <= 1 ? false : true;
+    });
+    if (amount.isNotEmpty) {
+      if (int.parse(amount) <= 0) {
+        setState(() {
+          perWeekAmount.text = "1";
+          perWeekAmount.selection = const TextSelection.collapsed(offset: 1);
+          perWeekPlural = false;
+        });
+      }
+      if (int.parse(amount) > 52) {
+        setState(() {
+          perWeekAmount.text = "52";
+          perWeekAmount.selection = const TextSelection.collapsed(offset: 2);
+          perWeekPlural = true;
+        });
+      }
+    }
+  }
+
+  void _selectPerWeek({RepeatType? type}) {
+    setState(() {
+      selectedType = type;
+      perWeekFlag = true;
+      perDayFlag = false;
+      perDayFocus.unfocus();
+      perMonthFlag = false;
+      perMonthFocus.unfocus();
+      perYearFlag = false;
+      perYearFocus.unfocus();
+      if (perWeekAmount.text == "") {
+        perWeekAmount.text = "1";
+      }
+    });
+  }
+
+  void _setPerMonthAmount({required String amount}) {
+    setState(() {
+      perMonthPlural = amount.isEmpty || int.parse(amount) <= 1 ? false : true;
+    });
+    if (amount.isNotEmpty) {
+      if (int.parse(amount) <= 0) {
+        setState(() {
+          perMonthAmount.text = "1";
+          perMonthAmount.selection = const TextSelection.collapsed(offset: 1);
+          perMonthPlural = false;
+        });
+      }
+      if (int.parse(amount) > 12) {
+        setState(() {
+          perMonthAmount.text = "12";
+          perMonthAmount.selection = const TextSelection.collapsed(offset: 2);
+          perMonthPlural = true;
+        });
+      }
+    }
+  }
+
+  void _selectPerMonth({RepeatType? type}) {
+    setState(() {
+      selectedType = type;
+      perMonthFlag = true;
+      perDayFlag = false;
+      perDayFocus.unfocus();
+      perWeekFlag = false;
+      perWeekFocus.unfocus();
+      perYearFlag = false;
+      perYearFocus.unfocus();
+      if (perMonthAmount.text == "") {
+        perMonthAmount.text = "1";
+      }
+    });
+  }
+
+  void _setPerYearAmount({required String amount}) {
+    setState(() {
+      perYearPlural = amount.isEmpty || int.parse(amount) <= 1 ? false : true;
+    });
+    if (amount.isNotEmpty) {
+      if (int.parse(amount) <= 0) {
+        setState(() {
+          perYearAmount.text = "1";
+          perYearAmount.selection = const TextSelection.collapsed(offset: 1);
+          perYearPlural = false;
+        });
+      }
+      if (int.parse(amount) > 10) {
+        setState(() {
+          perYearAmount.text = "10";
+          perYearAmount.selection = const TextSelection.collapsed(offset: 2);
+          perYearPlural = true;
+        });
+      }
+    }
+  }
+
+  void _selectPerYear({RepeatType? type}) {
+    setState(() {
+      selectedType = type;
+      perYearFlag = true;
+      perDayFlag = false;
+      perDayFocus.unfocus();
+      perWeekFlag = false;
+      perWeekFocus.unfocus();
+      perMonthFlag = false;
+      perMonthFocus.unfocus();
+      if (perYearAmount.text == "") {
+        perYearAmount.text = "1";
+      }
+    });
+  }
+
+  void _setSpecificNumberAmount({required String amount}) {
+    setState(() {
+      specificNumberPlural =
+          amount.isEmpty || int.parse(amount) <= 1 ? false : true;
+    });
+    if (amount.isNotEmpty) {
+      if (int.parse(amount) <= 0) {
+        setState(() {
+          specificNumberAmount.text = "1";
+          specificNumberAmount.selection =
+              const TextSelection.collapsed(offset: 1);
+          specificNumberPlural = false;
+        });
+      }
+      if (int.parse(amount) > 100) {
+        setState(() {
+          specificNumberAmount.text = "100";
+          specificNumberAmount.selection =
+              const TextSelection.collapsed(offset: 3);
+          specificNumberPlural = true;
+        });
+      }
+    }
+  }
+
+  void _selectSpecificNumber({RepeatDuration? duration}) {
+    setState(() {
+      selectedDuration = duration;
+      specificNumberFlag = true;
+      untilFlag = false;
+      if (untilDateScrollToggle == true) {
+        _untilDateScrollOff();
+      }
+      if (specificNumberAmount.text == "") {
+        specificNumberAmount.text = "1";
+      }
+    });
+  }
+
+  void _selectUntil({RepeatDuration? duration}) {
+    setState(() {
+      selectedDuration = duration;
+      untilFlag = true;
+      specificNumberFlag = false;
     });
   }
 

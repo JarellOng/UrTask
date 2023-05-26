@@ -40,9 +40,7 @@ class _CustomNotificationUotViewState extends State<CustomNotificationUotView> {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Center(
         child: Text(
-          (widget.amount != null && widget.amount! <= 1)
-              ? uotName
-              : "${uotName}s",
+          _printUotName(),
           style: TextStyle(
             fontSize: 25,
             color: widget.color ?? HexColor.fromHex("#cdc4c4"),
@@ -50,5 +48,11 @@ class _CustomNotificationUotViewState extends State<CustomNotificationUotView> {
         ),
       ),
     );
+  }
+
+  String _printUotName() {
+    return (widget.amount != null && widget.amount! <= 1)
+        ? uotName
+        : "${uotName}s";
   }
 }

@@ -57,34 +57,7 @@ class _NotificationEventViewState extends State<NotificationEventView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async {
-        setState(() {
-          if (selectedNotifications.isEmpty) {
-            remindMe = false;
-          }
-          if (remindMe == false) {
-            selectedNotifications.clear();
-            selectedNotifications[NotificationTime.tenMinsBefore] =
-                NotificationType.alert;
-          }
-        });
-        if (customNotificationScrollToggle == true) {
-          _customNotificationScrollOff();
-        }
-        if (selectedNotifications.containsKey(NotificationTime.custom)) {
-          Navigator.of(context).pop([
-            remindMe,
-            selectedNotifications,
-            {
-              selectedCustomNotifcationAmount: CustomNotificationUOT.values
-                  .elementAt(selectedCustomNotifcationUot)
-            }
-          ]);
-          return true;
-        }
-        Navigator.of(context).pop([remindMe, selectedNotifications]);
-        return true;
-      },
+      onWillPop: () async => _saveNotificationPreferences(),
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(color: Colors.white),
@@ -105,24 +78,15 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Text(
-                        "Remind me!",
-                        style: TextStyle(fontSize: 18),
-                      ),
+                      SizedBox(width: 20),
+                      Text("Remind me!", style: TextStyle(fontSize: 18)),
                     ],
                   ),
                   Transform.scale(
                     scale: 0.8,
                     child: CupertinoSwitch(
                       value: remindMe,
-                      onChanged: (value) {
-                        setState(() {
-                          remindMe = value;
-                        });
-                      },
+                      onChanged: (value) => _toggleNotification(toggle: value),
                       activeColor: primary,
                     ),
                   ),
@@ -149,20 +113,9 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     "At time of event",
                     style: TextStyle(fontSize: 18),
                   ),
-                  onTap: () {
-                    if (selectedNotifications
-                        .containsKey(NotificationTime.timeOfEvent)) {
-                      setState(() {
-                        selectedNotifications
-                            .remove(NotificationTime.timeOfEvent);
-                      });
-                    } else {
-                      setState(() {
-                        selectedNotifications[NotificationTime.timeOfEvent] =
-                            NotificationType.alert;
-                      });
-                    }
-                  },
+                  onTap: () => _selectNotificationTime(
+                    time: NotificationTime.timeOfEvent,
+                  ),
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.timeOfEvent)) ...[
@@ -192,12 +145,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.timeOfEvent],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.timeOfEvent] =
-                            NotificationType.alert;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.timeOfEvent,
+                      type: value!,
+                    ),
                   ),
 
                   // Push
@@ -210,12 +161,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.timeOfEvent],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.timeOfEvent] =
-                            NotificationType.push;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.timeOfEvent,
+                      type: value!,
+                    ),
                   ),
                 ],
 
@@ -237,20 +186,9 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     "10 minutes before",
                     style: TextStyle(fontSize: 18),
                   ),
-                  onTap: () {
-                    if (selectedNotifications
-                        .containsKey(NotificationTime.tenMinsBefore)) {
-                      setState(() {
-                        selectedNotifications
-                            .remove(NotificationTime.tenMinsBefore);
-                      });
-                    } else {
-                      setState(() {
-                        selectedNotifications[NotificationTime.tenMinsBefore] =
-                            NotificationType.alert;
-                      });
-                    }
-                  },
+                  onTap: () => _selectNotificationTime(
+                    time: NotificationTime.tenMinsBefore,
+                  ),
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.tenMinsBefore)) ...[
@@ -280,12 +218,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.tenMinsBefore],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.tenMinsBefore] =
-                            NotificationType.alert;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.tenMinsBefore,
+                      type: value!,
+                    ),
                   ),
 
                   // Push
@@ -298,12 +234,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.tenMinsBefore],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.tenMinsBefore] =
-                            NotificationType.push;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.tenMinsBefore,
+                      type: value!,
+                    ),
                   ),
                 ],
 
@@ -325,20 +259,9 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     "1 hour before",
                     style: TextStyle(fontSize: 18),
                   ),
-                  onTap: () {
-                    if (selectedNotifications
-                        .containsKey(NotificationTime.hourBefore)) {
-                      setState(() {
-                        selectedNotifications
-                            .remove(NotificationTime.hourBefore);
-                      });
-                    } else {
-                      setState(() {
-                        selectedNotifications[NotificationTime.hourBefore] =
-                            NotificationType.alert;
-                      });
-                    }
-                  },
+                  onTap: () => _selectNotificationTime(
+                    time: NotificationTime.hourBefore,
+                  ),
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.hourBefore)) ...[
@@ -368,12 +291,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.hourBefore],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.hourBefore] =
-                            NotificationType.alert;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.hourBefore,
+                      type: value!,
+                    ),
                   ),
 
                   // Push
@@ -386,12 +307,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.hourBefore],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.hourBefore] =
-                            NotificationType.push;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.hourBefore,
+                      type: value!,
+                    ),
                   ),
                 ],
 
@@ -413,20 +332,9 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     "1 day before",
                     style: TextStyle(fontSize: 18),
                   ),
-                  onTap: () {
-                    if (selectedNotifications
-                        .containsKey(NotificationTime.dayBefore)) {
-                      setState(() {
-                        selectedNotifications
-                            .remove(NotificationTime.dayBefore);
-                      });
-                    } else {
-                      setState(() {
-                        selectedNotifications[NotificationTime.dayBefore] =
-                            NotificationType.alert;
-                      });
-                    }
-                  },
+                  onTap: () => _selectNotificationTime(
+                    time: NotificationTime.dayBefore,
+                  ),
                 ),
                 if (selectedNotifications
                     .containsKey(NotificationTime.dayBefore)) ...[
@@ -456,12 +364,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.alert,
                     groupValue:
                         selectedNotifications[NotificationTime.dayBefore],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.dayBefore] =
-                            NotificationType.alert;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.dayBefore,
+                      type: value!,
+                    ),
                   ),
 
                   // Push
@@ -474,12 +380,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     value: NotificationType.push,
                     groupValue:
                         selectedNotifications[NotificationTime.dayBefore],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.dayBefore] =
-                            NotificationType.push;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.dayBefore,
+                      type: value!,
+                    ),
                   ),
                 ],
 
@@ -510,9 +414,7 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                           .containsKey(NotificationTime.custom)) ...[
                         if (customNotificationScrollToggle == false) ...[
                           TextButton(
-                            onPressed: () {
-                              _customNotificationScrollOn();
-                            },
+                            onPressed: () => _customNotificationScrollOn(),
                             child: Text(
                               _eventService.printCustomNotification(
                                 amount: selectedCustomNotifcationAmount,
@@ -523,20 +425,21 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                           ),
                         ],
                         if (customNotificationScrollToggle == true) ...[
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 234, 220, 220),
-                            ),
-                            onPressed: () {
-                              _customNotificationScrollOff();
-                            },
-                            child: const Text(
-                              ". . .",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                          SizedBox(
+                            width: 150,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 234, 220, 220),
+                              ),
+                              onPressed: () => _customNotificationScrollOff(),
+                              child: const Text(
+                                ". . .",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
@@ -544,22 +447,9 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                       ]
                     ],
                   ),
-                  onTap: () {
-                    if (selectedNotifications
-                        .containsKey(NotificationTime.custom)) {
-                      setState(() {
-                        selectedNotifications.remove(NotificationTime.custom);
-                        if (customNotificationScrollToggle == true) {
-                          _customNotificationScrollOff();
-                        }
-                      });
-                    } else {
-                      setState(() {
-                        selectedNotifications[NotificationTime.custom] =
-                            NotificationType.alert;
-                      });
-                    }
-                  },
+                  onTap: () => _selectNotificationTime(
+                    time: NotificationTime.custom,
+                  ),
                 ),
                 if (customNotificationScrollToggle == true) ...[
                   CustomNotificationScrollView(
@@ -596,12 +486,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     ),
                     value: NotificationType.alert,
                     groupValue: selectedNotifications[NotificationTime.custom],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.custom] =
-                            NotificationType.alert;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.custom,
+                      type: value!,
+                    ),
                   ),
 
                   // Push
@@ -613,12 +501,10 @@ class _NotificationEventViewState extends State<NotificationEventView> {
                     ),
                     value: NotificationType.push,
                     groupValue: selectedNotifications[NotificationTime.custom],
-                    onChanged: (value) {
-                      setState(() {
-                        selectedNotifications[NotificationTime.custom] =
-                            NotificationType.push;
-                      });
-                    },
+                    onChanged: (value) => _selectNotificationType(
+                      time: NotificationTime.custom,
+                      type: value!,
+                    ),
                   ),
                 ],
 
@@ -635,6 +521,111 @@ class _NotificationEventViewState extends State<NotificationEventView> {
         ),
       ),
     );
+  }
+
+  bool _saveNotificationPreferences() {
+    setState(() {
+      if (selectedNotifications.isEmpty) {
+        remindMe = false;
+      }
+      if (remindMe == false) {
+        selectedNotifications.clear();
+        selectedNotifications[NotificationTime.tenMinsBefore] =
+            NotificationType.alert;
+      }
+    });
+    if (customNotificationScrollToggle == true) {
+      _customNotificationScrollOff();
+    }
+    if (selectedNotifications.containsKey(NotificationTime.custom)) {
+      if (selectedCustomNotifcationAmount == 0) {
+        if (!selectedNotifications.containsKey(NotificationTime.timeOfEvent)) {
+          _selectNotificationTime(time: NotificationTime.timeOfEvent);
+          _selectNotificationType(
+            time: NotificationTime.timeOfEvent,
+            type: selectedNotifications[NotificationTime.custom]!,
+          );
+        }
+        selectedNotifications.remove(NotificationTime.custom);
+      } else if (selectedCustomNotifcationAmount == 10 &&
+          selectedCustomNotifcationUot == 0) {
+        if (!selectedNotifications
+            .containsKey(NotificationTime.tenMinsBefore)) {
+          _selectNotificationTime(time: NotificationTime.tenMinsBefore);
+          _selectNotificationType(
+            time: NotificationTime.tenMinsBefore,
+            type: selectedNotifications[NotificationTime.custom]!,
+          );
+        }
+        selectedNotifications.remove(NotificationTime.custom);
+      } else if ((selectedCustomNotifcationAmount == 1 &&
+              selectedCustomNotifcationUot == 1) ||
+          (selectedCustomNotifcationAmount == 60 &&
+              selectedCustomNotifcationUot == 0)) {
+        if (!selectedNotifications.containsKey(NotificationTime.hourBefore)) {
+          _selectNotificationTime(time: NotificationTime.hourBefore);
+          _selectNotificationType(
+            time: NotificationTime.hourBefore,
+            type: selectedNotifications[NotificationTime.custom]!,
+          );
+        }
+        selectedNotifications.remove(NotificationTime.custom);
+      } else if ((selectedCustomNotifcationAmount == 1 &&
+              selectedCustomNotifcationUot == 2) ||
+          (selectedCustomNotifcationAmount == 24 &&
+              selectedCustomNotifcationUot == 1)) {
+        if (!selectedNotifications.containsKey(NotificationTime.dayBefore)) {
+          _selectNotificationTime(time: NotificationTime.dayBefore);
+          _selectNotificationType(
+            time: NotificationTime.dayBefore,
+            type: selectedNotifications[NotificationTime.custom]!,
+          );
+        }
+        selectedNotifications.remove(NotificationTime.custom);
+      }
+      Navigator.of(context).pop([
+        remindMe,
+        selectedNotifications,
+        {
+          selectedCustomNotifcationAmount: CustomNotificationUOT.values
+              .elementAt(selectedCustomNotifcationUot)
+        }
+      ]);
+      return true;
+    }
+    Navigator.of(context).pop([remindMe, selectedNotifications]);
+    return true;
+  }
+
+  void _toggleNotification({required bool toggle}) {
+    setState(() {
+      remindMe = toggle;
+    });
+  }
+
+  void _selectNotificationTime({required NotificationTime time}) {
+    if (selectedNotifications.containsKey(time)) {
+      setState(() {
+        selectedNotifications.remove(time);
+        if (time == NotificationTime.custom &&
+            customNotificationScrollToggle == true) {
+          _customNotificationScrollOff();
+        }
+      });
+    } else {
+      setState(() {
+        selectedNotifications[time] = NotificationType.alert;
+      });
+    }
+  }
+
+  void _selectNotificationType({
+    required NotificationTime time,
+    required NotificationType type,
+  }) {
+    setState(() {
+      selectedNotifications[time] = type;
+    });
   }
 
   void _customNotificationScrollOn() {
@@ -654,13 +645,13 @@ class _NotificationEventViewState extends State<NotificationEventView> {
       selectedCustomNotifcationUot = customNotificationUot.selectedItem;
       if (selectedCustomNotifcationUot == 0) {
         selectedCustomNotifcationAmount =
-            customNotificationAmount.selectedItem % 62;
+            customNotificationAmount.selectedItem % 61;
       } else if (selectedCustomNotifcationUot == 1) {
         selectedCustomNotifcationAmount =
-            customNotificationAmount.selectedItem % 26;
+            customNotificationAmount.selectedItem % 25;
       } else if (selectedCustomNotifcationUot == 2) {
         selectedCustomNotifcationAmount =
-            customNotificationAmount.selectedItem % 367;
+            customNotificationAmount.selectedItem % 366;
       }
     });
     setState(() {

@@ -56,27 +56,14 @@ class _CalendarViewState extends State<CalendarView> {
               rowHeight: 45,
               calendarFormat: widget.calendarFilter,
               headerVisible: false,
-              onDaySelected: (DateTime selectDay, DateTime focusDay) {
-                setState(() {
-                  selectedDay = selectDay;
-                });
-                widget.selectedDate.text =
-                    selectedDay.toString().substring(0, 10);
-              },
-              onPageChanged: (focusedDay) {
-                setState(() {
-                  selectedDay = focusedDay;
-                });
-                widget.today.text = DateFormat('yMMMM').format(selectedDay);
-                widget.selectedDate.text =
-                    selectedDay.toString().substring(0, 10);
-              },
+              onDaySelected: (selectedDay, focusedDay) =>
+                  _changeSelectedDay(selectedDay: selectedDay),
+              onPageChanged: (focusedDay) =>
+                  _changeSelectedDay(selectedDay: focusedDay),
               eventLoader: (day) {
                 return [day];
               },
-              selectedDayPredicate: (DateTime date) {
-                return isSameDay(selectedDay, date);
-              },
+              selectedDayPredicate: (day) => isSameDay(selectedDay, day),
               calendarStyle: const CalendarStyle(
                 weekendTextStyle: TextStyle(color: Colors.red),
                 selectedDecoration: BoxDecoration(
@@ -98,26 +85,40 @@ class _CalendarViewState extends State<CalendarView> {
           Padding(
             padding: const EdgeInsets.only(top: 12.0, bottom: 16.0, left: 16.0),
             child: Align(
-                alignment: Alignment.topLeft,
-                child: Text(DateFormat('yMMMMd').format(selectedDay),
-                    style: const TextStyle(
-                        fontSize: 25, fontWeight: FontWeight.w600))),
+              alignment: Alignment.topLeft,
+              child: Text(
+                DateFormat('yMMMMd').format(selectedDay),
+                style: const TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
           if (widget.calendarFilter == calendar) ...[
             ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 330.0,
-                ),
-                child: EventView(selectedDay: selectedDay))
+              constraints: const BoxConstraints(
+                maxHeight: 330.0,
+              ),
+              child: EventView(selectedDay: selectedDay),
+            )
           ] else ...[
             ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 510.0,
-                ),
-                child: EventView(selectedDay: selectedDay))
+              constraints: const BoxConstraints(
+                maxHeight: 510.0,
+              ),
+              child: EventView(selectedDay: selectedDay),
+            )
           ]
         ],
       ),
     );
+  }
+
+  void _changeSelectedDay({required DateTime selectedDay}) {
+    setState(() {
+      this.selectedDay = selectedDay;
+      widget.selectedDate.text = selectedDay.toString().substring(0, 10);
+    });
   }
 }

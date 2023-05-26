@@ -48,11 +48,7 @@ class _CustomNotificationScrollViewState
           width: 100,
           child: ListWheelScrollView.useDelegate(
             controller: widget.amount,
-            onSelectedItemChanged: (value) {
-              setState(() {
-                selectedAmount = value;
-              });
-            },
+            onSelectedItemChanged: (value) => _scrollAmount(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -79,27 +75,7 @@ class _CustomNotificationScrollViewState
           width: 120,
           child: ListWheelScrollView.useDelegate(
             controller: widget.uot,
-            onSelectedItemChanged: (value) => setState(() {
-              selectedUot = value;
-              if (selectedUot == 0) {
-                amountLimit = 61;
-                if (amountLimit <= selectedAmount) {
-                  widget.amount.jumpToItem(60);
-                } else {
-                  widget.amount.jumpToItem(selectedAmount);
-                }
-              } else if (selectedUot == 1) {
-                amountLimit = 25;
-                if (amountLimit <= selectedAmount) {
-                  widget.amount.jumpToItem(24);
-                } else {
-                  widget.amount.jumpToItem(selectedAmount);
-                }
-              } else if (selectedUot == 2) {
-                amountLimit = 366;
-                widget.amount.jumpToItem(selectedAmount);
-              }
-            }),
+            onSelectedItemChanged: (value) => _scrollUot(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -122,5 +98,35 @@ class _CustomNotificationScrollViewState
         ),
       ],
     );
+  }
+
+  void _scrollAmount({required int index}) {
+    setState(() {
+      selectedAmount = index;
+    });
+  }
+
+  void _scrollUot({required int index}) {
+    setState(() {
+      selectedUot = index;
+      if (selectedUot == 0) {
+        amountLimit = 61;
+        if (amountLimit <= selectedAmount) {
+          widget.amount.jumpToItem(60);
+        } else {
+          widget.amount.jumpToItem(selectedAmount);
+        }
+      } else if (selectedUot == 1) {
+        amountLimit = 25;
+        if (amountLimit <= selectedAmount) {
+          widget.amount.jumpToItem(24);
+        } else {
+          widget.amount.jumpToItem(selectedAmount);
+        }
+      } else if (selectedUot == 2) {
+        amountLimit = 366;
+        widget.amount.jumpToItem(selectedAmount);
+      }
+    });
   }
 }

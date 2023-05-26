@@ -17,7 +17,7 @@ class HourView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Center(
         child: Text(
-          hours < 10 ? '0$hours' : hours.toString(),
+          _printTwoDigitHour(),
           style: TextStyle(
             fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
@@ -25,5 +25,9 @@ class HourView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _printTwoDigitHour() {
+    return hours < 10 ? '0$hours' : hours.toString();
   }
 }

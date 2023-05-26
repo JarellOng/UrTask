@@ -31,14 +31,12 @@ class _ProfileViewState extends State<ProfileView> {
       appBar: AppBar(
         title: Text(
           name,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         automaticallyImplyLeading: false,
         leading: IconButton(
-          icon: Icon(Icons.account_circle, size: 32, color: Colors.white),
-          onPressed: () => Navigator.pop(
-            context,
-          ),
+          icon: const Icon(Icons.account_circle, size: 32, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -59,14 +57,7 @@ class _ProfileViewState extends State<ProfileView> {
             const Spacer(),
             Center(
               child: ElevatedButton(
-                onPressed: () async {
-                  final shouldLogout = await showLogoutDialog(context);
-                  if (shouldLogout) {
-                    if (mounted) {
-                      Navigator.of(context).pop(shouldLogout);
-                    }
-                  }
-                },
+                onPressed: _shouldLogout,
                 child: const Text('Logout'),
               ),
             ),
@@ -74,5 +65,14 @@ class _ProfileViewState extends State<ProfileView> {
         ),
       ),
     );
+  }
+
+  void _shouldLogout() async {
+    final shouldLogout = await showLogoutDialog(context);
+    if (shouldLogout) {
+      if (mounted) {
+        Navigator.of(context).pop(shouldLogout);
+      }
+    }
   }
 }

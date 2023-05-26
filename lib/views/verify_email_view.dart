@@ -24,11 +24,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
           const Text(
               "If you haven't received a verification email yet, press the button below"),
           TextButton(
-            onPressed: () {
-              context
-                  .read<AuthBloc>()
-                  .add(const AuthEventSendEmailVerification());
-            },
+            onPressed: () => _sendEmailVerification(),
             child: const Text("Send email verification"),
           ),
           TextButton(
@@ -40,5 +36,9 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
         ],
       ),
     );
+  }
+
+  void _sendEmailVerification() {
+    context.read<AuthBloc>().add(const AuthEventSendEmailVerification());
   }
 }

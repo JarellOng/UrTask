@@ -7,7 +7,6 @@ import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/category/category_detail_view.dart';
 import 'package:urtask/views/category/create_category_view.dart';
-import 'package:urtask/views/home_view.dart';
 
 class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
@@ -34,15 +33,10 @@ class _CategoryViewState extends State<CategoryView> {
       appBar: AppBar(
         title: const Text("Event Categories",
             style: TextStyle(color: Colors.white)),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_outlined),
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomeView(),
-            ),
-          ),
+          icon: const Icon(Icons.arrow_back_outlined),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         centerTitle: true,
       ),
@@ -51,7 +45,6 @@ class _CategoryViewState extends State<CategoryView> {
         stream: _categoryService.getAll(),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
             case ConnectionState.active:
               if (snapshot.hasData) {
                 final categories = snapshot.data as Iterable<Categories>;
@@ -68,34 +61,25 @@ class _CategoryViewState extends State<CategoryView> {
                             if (snapshot.hasData) {
                               final color = snapshot.data as color_model.Colors;
                               return ListTile(
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CategoryDetailView(
-                                          categoryId: category.id,
-                                          categoryName: category.name,
-                                          colorId: color.id,
-                                          colorName: color.name,
-                                          colorHex: color.hex,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  leading: Icon(
-                                    Icons.circle,
-                                    color: HexColor.fromHex(color.hex),
+                                onTap: () => _toCategoryDetail(
+                                  category: category,
+                                  color: color,
+                                ),
+                                leading: Icon(
+                                  Icons.circle,
+                                  color: HexColor.fromHex(color.hex),
+                                ),
+                                title: Text(
+                                  category.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 20,
                                   ),
-                                  title: Text(
-                                    category.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 20),
-                                  ),
-                                  shape: Border(
-                                      bottom:
-                                          BorderSide(color: Colors.black26)));
+                                ),
+                                shape: const Border(
+                                  bottom: BorderSide(color: Colors.black26),
+                                ),
+                              );
                             } else {
                               return Column();
                             }
@@ -115,14 +99,36 @@ class _CategoryViewState extends State<CategoryView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const CreateCategoryView(),
-          ),
-        ),
+        onPressed: () => _toCreateCategory(),
         tooltip: 'Increment',
-        child: Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  void _toCategoryDetail({
+    required Categories category,
+    required color_model.Colors color,
+  }) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CategoryDetailView(
+          categoryId: category.id,
+          categoryName: category.name,
+          colorId: color.id,
+          colorName: color.name,
+          colorHex: color.hex,
+        ),
+      ),
+    );
+  }
+
+  void _toCreateCategory() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CreateCategoryView(),
       ),
     );
   }
