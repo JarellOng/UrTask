@@ -20,7 +20,6 @@ class _RegisterViewState extends State<RegisterView> {
   bool _isHidden = true;
   bool _isHidden2 = true;
 
-  // Init State
   @override
   void initState() {
     _name = TextEditingController();
@@ -30,21 +29,6 @@ class _RegisterViewState extends State<RegisterView> {
     super.initState();
   }
 
-  // Toggle Password Visibility
-  void _togglePasswordVisibility() {
-    setState(() {
-      _isHidden = !_isHidden;
-    });
-  }
-
-  // Toggle Repeat Password Visibility
-  void _toggleRepeatPasswordVisibility() {
-    setState(() {
-      _isHidden2 = !_isHidden2;
-    });
-  }
-
-  // Dispose
   @override
   void dispose() {
     _name.dispose();
@@ -134,20 +118,7 @@ class _RegisterViewState extends State<RegisterView> {
                   children: [
                     // Enter Button
                     TextButton(
-                      onPressed: () async {
-                        final name = _name.text;
-                        final email = _email.text;
-                        final password = _password.text;
-                        final repeatPassword = _repeatPassword.text;
-                        context.read<AuthBloc>().add(
-                              AuthEventRegister(
-                                name,
-                                email,
-                                password,
-                                repeatPassword,
-                              ),
-                            );
-                      },
+                      onPressed: () => _register(),
                       child: const Text("Enter"),
                     ),
                   ],
@@ -158,5 +129,30 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       ),
     );
+  }
+
+  // Toggle Password Visibility
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
+
+  // Toggle Repeat Password Visibility
+  void _toggleRepeatPasswordVisibility() {
+    setState(() {
+      _isHidden2 = !_isHidden2;
+    });
+  }
+
+  void _register() async {
+    context.read<AuthBloc>().add(
+          AuthEventRegister(
+            _name.text,
+            _email.text,
+            _password.text,
+            _repeatPassword.text,
+          ),
+        );
   }
 }

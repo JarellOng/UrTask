@@ -14,7 +14,7 @@ import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/category/categories_view.dart';
-import 'package:urtask/views/color_view.dart';
+import 'package:urtask/utilities/dialogs/colors_dialog.dart';
 
 class CategoryDetailView extends StatefulWidget {
   final String categoryId;
@@ -54,6 +54,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
 
+  // ignore: prefer_typing_uninitialized_variables
   var _eventGroupId;
 
   @override
@@ -81,43 +82,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     super.dispose();
   }
 
-  Future<void> initConnectivity() async {
-    late ConnectivityResult result;
-
-    try {
-      result = await _connectivity.checkConnectivity();
-    } on PlatformException {
-      return;
-    }
-
-    if (!mounted) {
-      return Future.value(null);
-    }
-
-    return _updateConnectionStatus(result);
-  }
-
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-    setState(() {
-      _connectionStatus = result;
-    });
-  }
-
-  void setup() async {
-    final category = await _categoryService
-        .get(id: widget.categoryId)
-        .then((value) => value);
-    final color =
-        await _colorService.get(id: category.colorId).then((value) => value);
-    setState(() {
-      _categoryId = category.id;
-      _eventCategoryTitle.text = category.name;
-      colorId = color.id;
-      colorName = color.name;
-      colorHex = color.hex;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,25 +94,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         centerTitle: true,
       ),
       body: WillPopScope(
-        onWillPop: () async {
-          setState(() {
-            eventTitleFocus.unfocus();
-          });
-          if (eventIsEdited) {
-            final shouldDiscard = await showDiscardDialog(
-              context,
-              "Are you sure you want to discard this event?",
-            );
-            if (shouldDiscard) {
-              if (mounted) {
-                Navigator.of(context).pop();
-                return true;
-              }
-            }
-            return false;
-          }
-          return true;
-        },
+        onWillPop: () => _shouldDiscardChanges(),
         child: Column(
           children: [
             Padding(
@@ -212,21 +158,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20)),
                             visualDensity: const VisualDensity(vertical: -4),
-                            onTap: () async {
-                              setState(() {
-                                eventTitleFocus.unfocus();
-                                eventIsEdited = true;
-                              });
-                              final colorDetail = await showColorsDialog(
-                                  context, _colorService);
-                              if (colorDetail.isNotEmpty) {
-                                setState(() {
-                                  colorId = colorDetail[0];
-                                  colorName = colorDetail[1];
-                                  colorHex = colorDetail[2];
-                                });
-                              }
-                            },
+                            onTap: () => _pickColor(),
                           ),
                         )
                       ],
@@ -245,77 +177,13 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             if (!_categoryService.isPreset(id: _categoryId)) ...[
               // DELETE BUTTON
               TextButton(
-                onPressed: () async {
-                  if (_connectionStatus == ConnectivityResult.none) {
-                    showOfflineDialog(
-                      context: context,
-                      text: "Please turn on your Internet connection",
-                    );
-                  } else {
-                    final shouldDelete = await showDeleteDialog(
-                      context,
-                      "Are you sure you want to delete this event?",
-                    );
-                    if (shouldDelete) {
-                      showLoadingDialog(context: context, text: "Deleting");
-                      if (_eventGroupId != null && mounted) {
-                        final shouldDeleteAllRepeatedEvents =
-                            await showEventGroupDeleteDialog(context);
-                        if (shouldDeleteAllRepeatedEvents == true) {
-                          await _eventService.bulkDeleteByCategoryId(
-                              id: _eventGroupId!);
-                          if (mounted) {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
-                          }
-                        } else if (shouldDeleteAllRepeatedEvents == false) {
-                          await _categoryService.delete(id: _categoryId);
-                          if (mounted) {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
-                          }
-                        }
-                      } else {
-                        await _categoryService.delete(id: _categoryId);
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        }
-                      }
-                    }
-                  }
-                },
+                onPressed: () => _shouldDelete(),
                 child: const Text("Delete", style: TextStyle(fontSize: 18)),
               ),
 
               // SAVE BUTTON
               TextButton(
-                onPressed: () async {
-                  if (_connectionStatus == ConnectivityResult.none) {
-                    showOfflineDialog(
-                      context: context,
-                      text: "Please turn on your Internet connection",
-                    );
-                  } else {
-                    showLoadingDialog(context: context, text: "Saving");
-                    // Update Categories
-                    await _categoryService.update(
-                        id: _categoryId,
-                        colorId: colorId,
-                        name: _eventCategoryTitle.text.isNotEmpty
-                            ? _eventCategoryTitle.text
-                            : "My Event");
-                    // Update Notification
-                    if (mounted) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CategoryView(),
-                        ),
-                      );
-                    }
-                  }
-                },
+                onPressed: () => _saveChanges(),
                 child: const Text("Save", style: TextStyle(fontSize: 18)),
               ),
             ],
@@ -323,5 +191,129 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         ),
       ),
     );
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException {
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
+  Future<bool> _shouldDiscardChanges() async {
+    setState(() {
+      eventTitleFocus.unfocus();
+    });
+    if (eventIsEdited) {
+      final shouldDiscard = await showDiscardDialog(
+        context,
+        "Are you sure you want to discard this event?",
+      );
+      if (shouldDiscard) {
+        if (mounted) {
+          Navigator.of(context).pop();
+          return true;
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+
+  void _pickColor() async {
+    setState(() {
+      eventTitleFocus.unfocus();
+      eventIsEdited = true;
+    });
+    final colorDetail = await showColorsDialog(context, _colorService);
+    if (colorDetail.isNotEmpty) {
+      setState(() {
+        colorId = colorDetail[0];
+        colorName = colorDetail[1];
+        colorHex = colorDetail[2];
+      });
+    }
+  }
+
+  void _shouldDelete() async {
+    if (_connectionStatus == ConnectivityResult.none) {
+      showOfflineDialog(
+        context: context,
+        text: "Please turn on your Internet connection",
+      );
+    } else {
+      final shouldDelete = await showDeleteDialog(
+        context,
+        "Are you sure you want to delete this event?",
+      );
+      if (shouldDelete) {
+        showLoadingDialog(context: context, text: "Deleting");
+        if (_eventGroupId != null && mounted) {
+          final shouldDeleteAllRepeatedEvents =
+              await showEventGroupDeleteDialog(context);
+          if (shouldDeleteAllRepeatedEvents == true) {
+            await _eventService.bulkDeleteByCategoryId(id: _eventGroupId!);
+            if (mounted) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            }
+          } else if (shouldDeleteAllRepeatedEvents == false) {
+            await _categoryService.delete(id: _categoryId);
+            if (mounted) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            }
+          }
+        } else {
+          await _categoryService.delete(id: _categoryId);
+          if (mounted) {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          }
+        }
+      }
+    }
+  }
+
+  void _saveChanges() async {
+    if (_connectionStatus == ConnectivityResult.none) {
+      showOfflineDialog(
+        context: context,
+        text: "Please turn on your Internet connection",
+      );
+    } else {
+      showLoadingDialog(context: context, text: "Saving");
+      // Update Categories
+      await _categoryService.update(
+          id: _categoryId,
+          colorId: colorId,
+          name: _eventCategoryTitle.text.isNotEmpty
+              ? _eventCategoryTitle.text
+              : "My Event");
+      // Update Notification
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CategoryView(),
+          ),
+        );
+      }
+    }
   }
 }

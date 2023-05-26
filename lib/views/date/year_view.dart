@@ -17,7 +17,7 @@ class YearView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Center(
         child: Text(
-          (DateTime.now().year + year).toString(),
+          _printYear(),
           style: TextStyle(
             fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
@@ -25,5 +25,9 @@ class YearView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _printYear() {
+    return (DateTime.now().year + year).toString();
   }
 }

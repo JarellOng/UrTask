@@ -72,35 +72,19 @@ class _HomeViewState extends State<HomeView> {
                 size: 32,
                 color: Colors.white,
               ),
-              onPressed: () {
-                setState(() {
-                  today.text = "Today";
-                });
-              },
+              onPressed: () => _toToday(),
             ),
           ),
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: IconButton(
-              icon: const Icon(Icons.account_circle,
-                  size: 32, color: Colors.white),
-              onPressed: () async {
-                final userDetail = await _userDetailService.get(id: userId);
-                if (mounted) {
-                  final isLogout = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProfileView(name: userDetail.name),
-                    ),
-                  );
-                  if (isLogout == true) {
-                    if (mounted) {
-                      context.read<AuthBloc>().add(const AuthEventLogOut());
-                    }
-                  }
-                }
-              },
+              icon: const Icon(
+                Icons.account_circle,
+                size: 32,
+                color: Colors.white,
+              ),
+              onPressed: () => _toProfile(userId: userId),
             ),
           ),
         ],
@@ -111,17 +95,21 @@ class _HomeViewState extends State<HomeView> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
               child: ListTile(
-                title: const Text('Week',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
+                title: const Text(
+                  'Week',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
+                ),
                 selected: _selectedDestination == 1,
                 shape: RoundedRectangleBorder(borderRadius: borderRadius),
                 onTap: () {
-                  selectDestination(1);
-                  uot = CalendarFormat.week;
+                  _selectCalendarFormat(1, CalendarFormat.week);
                 },
                 contentPadding: const EdgeInsets.only(
-                    top: 8.0, right: 8.0, bottom: 8.0, left: 12.0),
+                  top: 8.0,
+                  right: 8.0,
+                  bottom: 8.0,
+                  left: 12.0,
+                ),
                 selectedColor: Colors.white,
                 selectedTileColor: primary,
               ),
@@ -130,15 +118,13 @@ class _HomeViewState extends State<HomeView> {
               padding:
                   const EdgeInsets.only(right: 8.0, bottom: 8.0, left: 8.0),
               child: ListTile(
-                title: const Text('Month',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
+                title: const Text(
+                  'Month',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
+                ),
                 selected: _selectedDestination == 0,
                 shape: RoundedRectangleBorder(borderRadius: borderRadius),
-                onTap: () {
-                  selectDestination(0);
-                  uot = CalendarFormat.month;
-                },
+                onTap: () => _selectCalendarFormat(0, CalendarFormat.month),
                 contentPadding: const EdgeInsets.only(
                   top: 8.0,
                   right: 8.0,
@@ -153,15 +139,11 @@ class _HomeViewState extends State<HomeView> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListTile(
-                title: const Text('Edit Category',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CategoryView(),
-                  ),
+                title: const Text(
+                  'Edit Category',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
                 ),
+                onTap: () => _toEventCategories(),
                 contentPadding: const EdgeInsets.only(
                     top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
                 selectedColor: Colors.white,
@@ -209,12 +191,7 @@ class _HomeViewState extends State<HomeView> {
             foregroundColor: primary,
             label: 'Event Category',
             labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CreateCategoryView(),
-              ),
-            ),
+            onTap: () => _toCreateCategory(),
           ),
           SpeedDialChild(
             child: const Icon(Icons.event),
@@ -222,24 +199,17 @@ class _HomeViewState extends State<HomeView> {
             foregroundColor: primary,
             label: 'Event',
             labelStyle: const TextStyle(fontSize: 18.0),
-            onTap: () {
-              final date = DateTime.parse(selectedDate.text);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CreateEventView(selectedDate: date),
-                ),
-              );
-            },
+            onTap: () => _toCreateEvent(),
           ),
         ],
       ),
     );
   }
 
-  void selectDestination(int index) {
+  void _selectCalendarFormat(int index, CalendarFormat format) {
     setState(() {
       _selectedDestination = index;
+      uot = format;
     });
   }
 
@@ -248,6 +218,57 @@ class _HomeViewState extends State<HomeView> {
     if (calendar == null) {
       await _calendarService.create(userId: userId);
     }
+  }
+
+  void _toToday() {
+    setState(() {
+      today.text = "Today";
+    });
+  }
+
+  void _toProfile({required String userId}) async {
+    final userDetail = await _userDetailService.get(id: userId);
+    if (mounted) {
+      final isLogout = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileView(name: userDetail.name),
+        ),
+      );
+      if (isLogout == true) _logout();
+    }
+  }
+
+  void _logout() async {
+    context.read<AuthBloc>().add(const AuthEventLogOut());
+  }
+
+  void _toEventCategories() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CategoryView(),
+      ),
+    );
+  }
+
+  void _toCreateCategory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CreateCategoryView(),
+      ),
+    );
+  }
+
+  void _toCreateEvent() {
+    final date = DateTime.parse(selectedDate.text);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreateEventView(selectedDate: date),
+      ),
+    );
   }
 }
 

@@ -17,7 +17,7 @@ class MonthView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Center(
         child: Text(
-          _month(count: month),
+          _printMonth(index: month),
           style: TextStyle(
             fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
@@ -28,18 +28,18 @@ class MonthView extends StatelessWidget {
   }
 }
 
-String _month({required int count}) {
-  if (count == 0) return "JAN";
-  if (count == 1) return "FEB";
-  if (count == 2) return "MAR";
-  if (count == 3) return "APR";
-  if (count == 4) return "MAY";
-  if (count == 5) return "JUN";
-  if (count == 6) return "JUL";
-  if (count == 7) return "AUG";
-  if (count == 8) return "SEP";
-  if (count == 9) return "OCT";
-  if (count == 10) return "NOV";
-  if (count == 11) return "DEC";
+String _printMonth({required int index}) {
+  if (index == 0) return "JAN";
+  if (index == 1) return "FEB";
+  if (index == 2) return "MAR";
+  if (index == 3) return "APR";
+  if (index == 4) return "MAY";
+  if (index == 5) return "JUN";
+  if (index == 6) return "JUL";
+  if (index == 7) return "AUG";
+  if (index == 8) return "SEP";
+  if (index == 9) return "OCT";
+  if (index == 10) return "NOV";
+  if (index == 11) return "DEC";
   return "";
 }

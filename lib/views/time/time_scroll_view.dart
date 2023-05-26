@@ -38,9 +38,7 @@ class _TimeScrollViewState extends State<TimeScrollView> {
           width: 100,
           child: ListWheelScrollView.useDelegate(
             controller: widget.hour,
-            onSelectedItemChanged: (value) => setState(() {
-              selectedHour = value;
-            }),
+            onSelectedItemChanged: (value) => _scrollHour(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -77,9 +75,7 @@ class _TimeScrollViewState extends State<TimeScrollView> {
           width: 100,
           child: ListWheelScrollView.useDelegate(
             controller: widget.minute,
-            onSelectedItemChanged: (value) => setState(() {
-              selectedMinute = value;
-            }),
+            onSelectedItemChanged: (value) => _scrollMinute(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -101,5 +97,17 @@ class _TimeScrollViewState extends State<TimeScrollView> {
         ),
       ],
     );
+  }
+
+  void _scrollHour({required int index}) {
+    setState(() {
+      selectedHour = index;
+    });
+  }
+
+  void _scrollMinute({required int index}) {
+    setState(() {
+      selectedMinute = index;
+    });
   }
 }

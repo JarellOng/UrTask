@@ -60,31 +60,7 @@ class _DateScrollViewState extends State<DateScrollView> {
           width: 90,
           child: ListWheelScrollView.useDelegate(
             controller: widget.month,
-            onSelectedItemChanged: (value) {
-              setState(() {
-                selectedMonth = value;
-                if (selectedMonth == 1) {
-                  dayCount = isLeapYear ? 29 : 28;
-                  if (selectedDay >= 29) widget.day.jumpToItem(dayCount - 1);
-                  if (selectedDay == 28 && dayCount == 29) {
-                    widget.day.jumpToItem(28);
-                  }
-                } else if (selectedMonth.isEven && selectedMonth <= 6 ||
-                    selectedMonth == 7 ||
-                    selectedMonth == 9 ||
-                    selectedMonth == 11) {
-                  widget.day.jumpToItem(selectedDay);
-                  dayCount = 31;
-                } else {
-                  if (selectedDay % 30 == 0 && selectedDay != 0) {
-                    widget.day.jumpToItem(29);
-                  } else {
-                    widget.day.jumpToItem(selectedDay);
-                  }
-                  dayCount = 30;
-                }
-              });
-            },
+            onSelectedItemChanged: (value) => _scrollMonth(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -111,11 +87,7 @@ class _DateScrollViewState extends State<DateScrollView> {
           width: 90,
           child: ListWheelScrollView.useDelegate(
             controller: widget.day,
-            onSelectedItemChanged: (value) {
-              setState(() {
-                selectedDay = value;
-              });
-            },
+            onSelectedItemChanged: (value) => _scrollDay(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -142,23 +114,7 @@ class _DateScrollViewState extends State<DateScrollView> {
           width: 90,
           child: ListWheelScrollView.useDelegate(
             controller: widget.year,
-            onSelectedItemChanged: (value) {
-              setState(() {
-                selectedYear = value;
-                currentYear += selectedYear;
-                isLeapYear = (currentYear % 4 == 0) &&
-                    (currentYear % 100 != 0 || currentYear % 400 == 0);
-                if (selectedMonth == 1) {
-                  dayCount = isLeapYear ? 29 : 28;
-                  if (selectedDay == 28) {
-                    widget.day.jumpToItem(dayCount - 1);
-                  } else {
-                    widget.day.jumpToItem(selectedDay);
-                  }
-                }
-                currentYear -= selectedYear;
-              });
-            },
+            onSelectedItemChanged: (value) => _scrollYear(index: value),
             itemExtent: 35,
             perspective: 0.0001,
             physics: const FixedExtentScrollPhysics(),
@@ -180,5 +136,55 @@ class _DateScrollViewState extends State<DateScrollView> {
         ),
       ],
     );
+  }
+
+  void _scrollMonth({required int index}) {
+    setState(() {
+      selectedMonth = index;
+      if (selectedMonth == 1) {
+        dayCount = isLeapYear ? 29 : 28;
+        if (selectedDay >= 29) widget.day.jumpToItem(dayCount - 1);
+        if (selectedDay == 28 && dayCount == 29) {
+          widget.day.jumpToItem(28);
+        }
+      } else if (selectedMonth.isEven && selectedMonth <= 6 ||
+          selectedMonth == 7 ||
+          selectedMonth == 9 ||
+          selectedMonth == 11) {
+        widget.day.jumpToItem(selectedDay);
+        dayCount = 31;
+      } else {
+        if (selectedDay % 30 == 0 && selectedDay != 0) {
+          widget.day.jumpToItem(29);
+        } else {
+          widget.day.jumpToItem(selectedDay);
+        }
+        dayCount = 30;
+      }
+    });
+  }
+
+  void _scrollDay({required int index}) {
+    setState(() {
+      selectedDay = index;
+    });
+  }
+
+  void _scrollYear({required int index}) {
+    setState(() {
+      selectedYear = index;
+      currentYear += selectedYear;
+      isLeapYear = (currentYear % 4 == 0) &&
+          (currentYear % 100 != 0 || currentYear % 400 == 0);
+      if (selectedMonth == 1) {
+        dayCount = isLeapYear ? 29 : 28;
+        if (selectedDay == 28) {
+          widget.day.jumpToItem(dayCount - 1);
+        } else {
+          widget.day.jumpToItem(selectedDay);
+        }
+      }
+      currentYear -= selectedYear;
+    });
   }
 }

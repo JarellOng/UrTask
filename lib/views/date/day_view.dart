@@ -17,7 +17,7 @@ class DayView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Center(
         child: Text(
-          (day + 1).toString(),
+          _printDay(),
           style: TextStyle(
             fontSize: 23,
             color: color ?? HexColor.fromHex("#cdc4c4"),
@@ -25,5 +25,9 @@ class DayView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _printDay() {
+    return (day + 1).toString();
   }
 }

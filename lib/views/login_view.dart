@@ -17,7 +17,6 @@ class _LoginViewState extends State<LoginView> {
   late final TextEditingController _password;
   bool _isHidden = true;
 
-  // Init State
   @override
   void initState() {
     _email = TextEditingController();
@@ -25,14 +24,6 @@ class _LoginViewState extends State<LoginView> {
     super.initState();
   }
 
-  // Toggle Password Visibility
-  void _togglePasswordVisibility() {
-    setState(() {
-      _isHidden = !_isHidden;
-    });
-  }
-
-  // Dispose
   @override
   void dispose() {
     _email.dispose();
@@ -83,24 +74,13 @@ class _LoginViewState extends State<LoginView> {
 
               // Login Button
               TextButton(
-                onPressed: () async {
-                  final email = _email.text;
-                  final password = _password.text;
-                  context.read<AuthBloc>().add(
-                        AuthEventLogIn(
-                          email,
-                          password,
-                        ),
-                      );
-                },
+                onPressed: () => _login(),
                 child: const Text("Enter"),
               ),
 
               // Register Page Nav
               TextButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(const AuthEventShouldRegister());
-                },
+                onPressed: () => _toRegistration(),
                 child: const Text("Don't have an account? Sign up here"),
               ),
             ],
@@ -108,5 +88,25 @@ class _LoginViewState extends State<LoginView> {
         ),
       ),
     );
+  }
+
+  // Toggle Password Visibility
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isHidden = !_isHidden;
+    });
+  }
+
+  void _login() async {
+    context.read<AuthBloc>().add(
+          AuthEventLogIn(
+            _email.text,
+            _password.text,
+          ),
+        );
+  }
+
+  void _toRegistration() {
+    context.read<AuthBloc>().add(const AuthEventShouldRegister());
   }
 }
