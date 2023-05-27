@@ -5,17 +5,13 @@ import 'package:urtask/utilities/dialogs/logout_dialog.dart';
 class ProfileView extends StatefulWidget {
   final String name;
 
-  const ProfileView({
-    super.key,
-    required this.name,
-  });
+  const ProfileView({super.key, required this.name});
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  final userId = AuthService.firebase().currentUser!.id;
   final userEmail = AuthService.firebase().currentUser!.email;
   late String name;
 
@@ -30,7 +26,7 @@ class _ProfileViewState extends State<ProfileView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          name,
+          widget.name,
           style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         automaticallyImplyLeading: false,
