@@ -5,13 +5,13 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:urtask/color.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:urtask/services/auth/auth_service.dart';
+import 'package:urtask/services/auth/auth_user.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/user_details/user_detail_controller.dart';
-import 'package:urtask/utilities/dialogs/categories_dialog.dart';
 import 'package:urtask/views/calendar_view.dart';
 import 'package:urtask/views/profile_view.dart';
 import 'package:urtask/views/category/categories_view.dart';
@@ -31,6 +31,7 @@ class _HomeViewState extends State<HomeView> {
   late final CalendarController _calendarService;
   late final UserDetailController _userDetailService;
   late final TextEditingController selectedDate;
+  final currentUser = AuthService.firebase().currentUser!;
 
   @override
   void initState() {
@@ -51,7 +52,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     var borderRadius = const BorderRadius.all(Radius.circular(20));
-    final userId = AuthService.firebase().currentUser!.id;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +84,7 @@ class _HomeViewState extends State<HomeView> {
                 size: 32,
                 color: Colors.white,
               ),
-              onPressed: () => _toProfile(userId: userId),
+              onPressed: () => _toProfile(user: currentUser),
             ),
           ),
         ],
@@ -216,7 +216,7 @@ class _HomeViewState extends State<HomeView> {
   void _setupCalendar() async {
     final calendar = await _calendarService.get();
     if (calendar == null) {
-      await _calendarService.create(userId: userId);
+      await _calendarService.create(userId: currentUser.id);
     }
   }
 
@@ -226,8 +226,8 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  void _toProfile({required String userId}) async {
-    final userDetail = await _userDetailService.get(id: userId);
+  void _toProfile({required AuthUser user}) async {
+    final userDetail = await _userDetailService.get(id: user.id);
     if (mounted) {
       final isLogout = await Navigator.push(
         context,

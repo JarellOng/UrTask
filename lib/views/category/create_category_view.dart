@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
@@ -22,7 +21,6 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   String colorId = "color1";
   String colorName = "Tomato";
   String colorHex = "#D50000";
-  final userId = AuthService.firebase().currentUser!.id;
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
 
