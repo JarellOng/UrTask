@@ -67,6 +67,37 @@ class EventController {
                 )));
   }
 
+  Future<Map<DateTime, List<Events>>> getAllMarker() async {
+    final events = await _getCollection();
+    final eventList = await events
+        .snapshots()
+        .map((data) => data.docs.map((doc) => Events.fromSnapshot(doc)))
+        .first;
+    Map<DateTime, List<Events>> eventMap = {};
+    for (var event in eventList) {
+      final start = event.start.toDate();
+      final end = event.end.toDate();
+      var startDate = DateTime(start.year, start.month, start.day);
+      final endDate = DateTime(end.year, end.month, end.day);
+      // if (startDate != endDate) {
+      //   while (start != endDate) {
+      //     if (eventMap[startDate] == null) {
+      //       eventMap[startDate] = [];
+      //     }
+      //     eventMap[startDate]!.add(event);
+      //     startDate.add(const Duration(days: 1));
+      //   }
+      // }
+      // else {
+      if (eventMap[startDate] == null) {
+        eventMap[startDate] = [];
+      }
+      eventMap[startDate]!.add(event);
+      // }
+    }
+    return eventMap;
+  }
+
   Future<void> update({
     required String id,
     required String title,
