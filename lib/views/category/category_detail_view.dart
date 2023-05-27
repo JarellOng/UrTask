@@ -262,23 +262,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       if (shouldDelete) {
         showLoadingDialog(context: context, text: "Deleting");
         if (_eventGroupId != null && mounted) {
-          final shouldDeleteAllRepeatedEvents =
-              await showEventGroupDeleteDialog(context);
-          if (shouldDeleteAllRepeatedEvents == true) {
-            await _eventService.bulkDeleteByCategoryId(id: _eventGroupId!);
-            if (mounted) {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            }
-          } else if (shouldDeleteAllRepeatedEvents == false) {
-            await _categoryService.delete(id: _categoryId);
-            if (mounted) {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            }
-          }
-        } else {
           await _categoryService.delete(id: _categoryId);
+          await _eventService.bulkDeleteByCategoryId(id: _categoryId);
           if (mounted) {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
@@ -302,7 +287,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           colorId: colorId,
           name: _eventCategoryTitle.text.isNotEmpty
               ? _eventCategoryTitle.text
-              : "My Event");
+              : "My Category");
       // Update Notification
       if (mounted) {
         Navigator.push(

@@ -6,7 +6,6 @@ import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
 import 'package:urtask/services/auth/firebase_auth_provider.dart';
-import 'package:urtask/services/user_details/user_detail_controller.dart';
 import 'package:urtask/views/home_view.dart';
 import 'package:urtask/views/login_view.dart';
 import 'package:urtask/views/register_view.dart';

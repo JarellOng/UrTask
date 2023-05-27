@@ -66,7 +66,10 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
                           isDense: true,
                           hintText: "Event Category Name",
                           hintStyle: TextStyle(fontSize: 18)),
-                      style: const TextStyle(fontSize: 18),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                       onChanged: (value) {
                         eventIsEdited = true;
                       },
