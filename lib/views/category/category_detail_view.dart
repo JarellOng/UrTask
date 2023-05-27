@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:urtask/services/auth/auth_service.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
@@ -50,7 +49,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   late String colorId;
   late String colorName;
   late String colorHex;
-  final userId = AuthService.firebase().currentUser!.id;
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
 
