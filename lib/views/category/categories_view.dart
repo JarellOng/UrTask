@@ -41,62 +41,68 @@ class _CategoryViewState extends State<CategoryView> {
         centerTitle: true,
       ),
       //backgroundColor: const Color.fromARGB(31, 133, 133, 133),
-      body: StreamBuilder(
-        stream: _categoryService.getAll(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.active:
-              if (snapshot.hasData) {
-                final categories = snapshot.data as Iterable<Categories>;
-                return ListView.builder(
-                  padding: const EdgeInsets.only(top: 4, right: 12, left: 12),
-                  itemCount: categories.length,
-                  itemBuilder: (context, index) {
-                    final category = categories.elementAt(index);
-                    return FutureBuilder(
-                      future: _colorService.get(id: category.colorId),
-                      builder: (context, snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.done:
-                            if (snapshot.hasData) {
-                              final color = snapshot.data as color_model.Colors;
-                              return ListTile(
-                                onTap: () => _toCategoryDetail(
-                                  category: category,
-                                  color: color,
-                                ),
-                                leading: Icon(
-                                  Icons.circle,
-                                  color: HexColor.fromHex(color.hex),
-                                ),
-                                title: Text(
-                                  category.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 20,
+      body: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxHeight: 720.0,
+        ),
+        child: StreamBuilder(
+          stream: _categoryService.getAll(),
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                if (snapshot.hasData) {
+                  final categories = snapshot.data as Iterable<Categories>;
+                  return ListView.builder(
+                    padding: const EdgeInsets.only(top: 4, right: 12, left: 12),
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories.elementAt(index);
+                      return FutureBuilder(
+                        future: _colorService.get(id: category.colorId),
+                        builder: (context, snapshot) {
+                          switch (snapshot.connectionState) {
+                            case ConnectionState.done:
+                              if (snapshot.hasData) {
+                                final color =
+                                    snapshot.data as color_model.Colors;
+                                return ListTile(
+                                  onTap: () => _toCategoryDetail(
+                                    category: category,
+                                    color: color,
                                   ),
-                                ),
-                                shape: const Border(
-                                  bottom: BorderSide(color: Colors.black26),
-                                ),
-                              );
-                            } else {
+                                  leading: Icon(
+                                    Icons.circle,
+                                    color: HexColor.fromHex(color.hex),
+                                  ),
+                                  title: Text(
+                                    category.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 20),
+                                  ),
+                                  shape: const Border(
+                                    bottom: BorderSide(color: Colors.black26),
+                                  ),
+                                );
+                              } else {
+                                return Column();
+                              }
+                            default:
                               return Column();
-                            }
-                          default:
-                            return Column();
-                        }
-                      },
-                    );
-                  },
-                );
-              } else {
+                          }
+                        },
+                      );
+                    },
+                  );
+                } else {
+                  return Column();
+                }
+              default:
                 return Column();
-              }
-            default:
-              return Column();
-          }
-        },
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _toCreateCategory(),

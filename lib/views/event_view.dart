@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:urtask/helpers/datetime/datetime_helper.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
@@ -23,6 +24,9 @@ class _EventViewState extends State<EventView> {
   late final CategoryController _categoryController;
   late final ColorController _colorService;
   late final NotificationController _notificationService;
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now();
+  DateTime currentDate = DateTime.now();
 
   @override
   void initState() {
@@ -47,99 +51,118 @@ class _EventViewState extends State<EventView> {
                 shrinkWrap: true,
                 itemCount: events.length,
                 separatorBuilder: (context, index) {
-                  return const Divider(thickness: 1, color: Colors.black26);
+                  return Column();
                 },
                 itemBuilder: (context, index) {
                   final event = events.elementAt(index);
-                  return ListTile(
-                    onTap: () => _setupEventDetailDataAndPush(event: event),
-                    leading: Transform.translate(
-                      offset: const Offset(-8, -6),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 60,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 6),
-                              child: Column(children: const [
-                                Text(
-                                  "17.00",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                  final startTime = event.start.toDate();
+                  final endTime = event.end.toDate();
+                  startDate = startTime;
+                  endDate = endTime;
+                  return Column(
+                    children: [
+                      ListTile(
+                        minVerticalPadding: 0,
+                        onTap: () => _setupEventDetailDataAndPush(event: event),
+                        leading: Transform.translate(
+                          offset: const Offset(-8, -6),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 60,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: Column(children: [
+                                    Text(
+                                      _validateStartTime(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      _validateEndTime(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black45,
+                                      ),
+                                    )
+                                  ]),
                                 ),
-                                Text(
-                                  "19.00",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black45,
-                                  ),
-                                )
-                              ]),
-                            ),
+                              ),
+                              const VerticalDivider(color: Colors.black45),
+                            ],
                           ),
-                          const VerticalDivider(color: Colors.black45),
-                        ],
-                      ),
-                    ),
-                    title: Text(
-                      event.title,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Align(
-                      alignment: Alignment.topLeft,
-                      child: FutureBuilder(
-                        future: _categoryController.get(id: event.categoryId),
-                        builder: (context, snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.done:
-                              if (snapshot.hasData) {
-                                final category = snapshot.data as Categories;
-                                return FutureBuilder(
-                                    future:
-                                        _colorService.get(id: category.colorId),
-                                    builder: (context, snapshot) {
-                                      switch (snapshot.connectionState) {
-                                        case ConnectionState.done:
-                                          if (snapshot.hasData) {
-                                            final color = snapshot.data
-                                                as color_model.Colors;
-                                            return Chip(
-                                              backgroundColor:
-                                                  HexColor.fromHex(color.hex),
-                                              label: Text(
-                                                category.name,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            return Column();
+                        ),
+                        title: Text(
+                          event.title,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Align(
+                          alignment: Alignment.topLeft,
+                          child: FutureBuilder(
+                            future:
+                                _categoryController.get(id: event.categoryId),
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.done:
+                                  if (snapshot.hasData) {
+                                    final category =
+                                        snapshot.data as Categories;
+                                    return FutureBuilder(
+                                        future: _colorService.get(
+                                            id: category.colorId),
+                                        builder: (context, snapshot) {
+                                          switch (snapshot.connectionState) {
+                                            case ConnectionState.done:
+                                              if (snapshot.hasData) {
+                                                final color = snapshot.data
+                                                    as color_model.Colors;
+                                                return Chip(
+                                                  backgroundColor:
+                                                      HexColor.fromHex(
+                                                          color.hex),
+                                                  label: Text(
+                                                    category.name,
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                return Column();
+                                              }
+                                            default:
+                                              return Column();
                                           }
-                                        default:
-                                          return Column();
-                                      }
-                                    });
-                              } else {
-                                return Column();
+                                        });
+                                  } else {
+                                    return Column();
+                                  }
+                                default:
+                                  return Column();
                               }
-                            default:
-                              return Column();
-                          }
-                        },
+                            },
+                          ),
+                        ),
+                        horizontalTitleGap: -2,
+                        trailing: event.important
+                            ? const Icon(
+                                Icons.error_outlined,
+                                size: 32,
+                                color: Colors.red,
+                              )
+                            : null,
                       ),
-                    ),
-                    horizontalTitleGap: -2,
-                    trailing: event.important
-                        ? const Icon(Icons.error_outlined,
-                            size: 32, color: Colors.red)
-                        : null,
+                      const Divider(
+                        thickness: 1,
+                        color: Colors.black26,
+                      ),
+                    ],
                   );
                 },
               );
@@ -185,6 +208,53 @@ class _EventViewState extends State<EventView> {
           ),
         ),
       );
+    }
+  }
+
+  String _validateStartTime() {
+    int selectedStartHour = startDate.hour;
+    int selectedStartMinute = startDate.minute;
+    final startDateValidation = DateTimeHelper.dateToString(
+      month: startDate.month,
+      day: startDate.day,
+      year: startDate.year,
+    );
+    final currentDateValidation = DateTimeHelper.dateToString(
+      month: widget.selectedDay.month,
+      day: widget.selectedDay.day,
+      year: widget.selectedDay.year,
+    );
+
+    if (startDateValidation == currentDateValidation) {
+      return DateTimeHelper.timeToString(
+        hour: selectedStartHour,
+        minute: selectedStartMinute,
+      );
+    } else {
+      return '00.00';
+    }
+  }
+
+  String _validateEndTime() {
+    int selectedEndHour = endDate.hour;
+    int selectedEndMinute = endDate.minute;
+    final endDateValidation = DateTimeHelper.dateToString(
+      month: endDate.month,
+      day: endDate.day,
+      year: endDate.year,
+    );
+    final currentDateValidation = DateTimeHelper.dateToString(
+      month: widget.selectedDay.month,
+      day: widget.selectedDay.day,
+      year: widget.selectedDay.year,
+    );
+    if (endDateValidation == currentDateValidation) {
+      return DateTimeHelper.timeToString(
+        hour: selectedEndHour,
+        minute: selectedEndMinute,
+      );
+    } else {
+      return '23.59';
     }
   }
 }
