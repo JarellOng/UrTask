@@ -51,15 +51,6 @@ class _HomeViewState extends State<HomeView> {
     super.dispose();
   }
 
-  void toSearchEvent() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SearchEventView(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     var borderRadius = const BorderRadius.all(Radius.circular(20));
@@ -72,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: IconButton(
               icon: const Icon(Icons.search, size: 32, color: Colors.white),
-              onPressed: () => toSearchEvent(),
+              onPressed: () => _toSearchEvent(),
             ),
           ),
 
@@ -280,6 +271,15 @@ class _HomeViewState extends State<HomeView> {
       context,
       MaterialPageRoute(
         builder: (context) => CreateEventView(selectedDate: date),
+      ),
+    );
+  }
+
+  void _toSearchEvent() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SearchEventView(),
       ),
     );
   }

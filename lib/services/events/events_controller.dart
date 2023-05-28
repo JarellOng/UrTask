@@ -67,6 +67,20 @@ class EventController {
                 )));
   }
 
+  Stream<Iterable<Events>> search({required String query}) async* {
+    final events = await _getCollection();
+    final eventStream = events.orderBy(eventStartField).snapshots();
+    if (query.isEmpty) {
+      yield* eventStream
+          .map((data) => data.docs.map((doc) => Events.fromSnapshot(doc)));
+    } else {
+      yield* eventStream.map((data) => data.docs
+          .map((doc) => Events.fromSnapshot(doc))
+          .where((element) =>
+              element.title.toLowerCase().contains(query.toLowerCase())));
+    }
+  }
+
   Future<Map<DateTime, List<Events>>> getAllMarker() async {
     final events = await _getCollection();
     final eventList = await events
@@ -146,20 +160,6 @@ class EventController {
           .getByEventId(id: element.id)
           .then((value) => value.map((e) => e.id).toList());
       await notificationController.bulkDelete(ids: notificationIds);
-    }
-  }
-
-  Future<List<Events>> search({required String query}) async {
-    final events = FirebaseFirestore.instance.collection('events');
-    final querySnapshot = await events.get();
-    if (query.isEmpty) {
-      return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc)).toList();
-    } else {
-      return querySnapshot.docs
-          .map((doc) => Events.fromSnapshot(doc))
-          .where((event) =>
-              event.title.toLowerCase().contains(query.toLowerCase()))
-          .toList();
     }
   }
 
