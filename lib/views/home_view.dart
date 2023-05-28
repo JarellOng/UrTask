@@ -17,9 +17,11 @@ import 'package:urtask/views/profile_view.dart';
 import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
 import 'package:urtask/views/category/create_category_view.dart';
+import 'package:urtask/views/event_search_result.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  const HomeView({Key? key}) : super(key: key);
+
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -32,6 +34,7 @@ class _HomeViewState extends State<HomeView> {
   late final UserDetailController _userDetailService;
   late final TextEditingController selectedDate;
   final currentUser = AuthService.firebase().currentUser!;
+  late final TextEditingController searchEventController;
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _HomeViewState extends State<HomeView> {
     _calendarService = CalendarController();
     _userDetailService = UserDetailController();
     selectedDate = TextEditingController(text: DateTime.now().toString());
+    searchEventController = TextEditingController();
     _setupCalendar();
     super.initState();
   }
@@ -46,7 +50,18 @@ class _HomeViewState extends State<HomeView> {
   @override
   void dispose() {
     today.dispose();
+    searchEventController.dispose();
     super.dispose();
+  }
+
+  void searchEvent() {
+    final String searchTerm = searchEventController.text;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EventSearchResults(searchTerm: searchTerm),
+      ),
+    );
   }
 
   @override
@@ -55,12 +70,14 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       appBar: AppBar(
-        //leading: Icon(Icons.menu, size: 32, color: Colors.white),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.search, size: 32, color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: IconButton(
+              icon: const Icon(Icons.search, size: 32, color: Colors.white),
+              onPressed: searchEvent,
+            ),
           ),
 
           // Show Today
