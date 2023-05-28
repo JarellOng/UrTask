@@ -67,6 +67,20 @@ class EventController {
                 )));
   }
 
+  Stream<Iterable<Events>> search({required String query}) async* {
+    final events = await _getCollection();
+    final eventStream = events.orderBy(eventStartField).snapshots();
+    if (query.isEmpty) {
+      yield* eventStream
+          .map((data) => data.docs.map((doc) => Events.fromSnapshot(doc)));
+    } else {
+      yield* eventStream.map((data) => data.docs
+          .map((doc) => Events.fromSnapshot(doc))
+          .where((element) =>
+              element.title.toLowerCase().contains(query.toLowerCase())));
+    }
+  }
+
   Future<Map<DateTime, List<Events>>> getAllMarker() async {
     final events = await _getCollection();
     final eventList = await events
