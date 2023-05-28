@@ -1,37 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:urtask/services/events/events_controller.dart';
 
-class EventSearchResults extends StatelessWidget {
-  final String searchTerm;
-  final TextEditingController _searchController = TextEditingController();
+class SearchEventView extends StatefulWidget {
+  const SearchEventView({super.key});
 
-  EventSearchResults({Key? key, required this.searchTerm}) : super(key: key);
+  @override
+  State<SearchEventView> createState() => _SearchEventViewState();
+}
 
-  Future<List<Event>> _searchEvents() async {
-    final events = FirebaseFirestore.instance.collection('events');
-    final querySnapshot = await events.get();
-    if (searchTerm.isEmpty) {
-      return querySnapshot.docs.map((doc) => Event.fromSnapshot(doc)).toList();
-    } else {
-      return querySnapshot.docs
-          .map((doc) => Event.fromSnapshot(doc))
-          .where((event) =>
-              event.title.toLowerCase().contains(searchTerm.toLowerCase()))
-          .toList();
-    }
+class _SearchEventViewState extends State<SearchEventView> {
+  late final TextEditingController search;
+  late final EventController _eventService;
+
+  @override
+  void initState() {
+    search = TextEditingController();
+    _eventService = EventController();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    _searchController.text = searchTerm;
-
     return Scaffold(
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
             Navigator.of(context).pop();
           },
-          child: Icon(
+          child: const Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
@@ -41,16 +38,16 @@ class EventSearchResults extends StatelessWidget {
             Expanded(
               child: Container(
                 height: 30,
-                padding: EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20), // Curved edges
                 ),
                 child: Center(
                   child: TextField(
-                    controller: _searchController,
-                    style: TextStyle(fontSize: 12, color: Colors.black),
-                    decoration: InputDecoration(
+                    controller: search,
+                    style: const TextStyle(fontSize: 12, color: Colors.black),
+                    decoration: const InputDecoration(
                       hintText: 'Enter Event Title',
                       hintStyle: TextStyle(color: Colors.grey),
                       border: InputBorder.none,
@@ -68,7 +65,7 @@ class EventSearchResults extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             GestureDetector(
               onTap: () {
                 // Perform the search here
@@ -81,7 +78,7 @@ class EventSearchResults extends StatelessWidget {
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.search,
                   color: Colors.white,
                 ),
@@ -90,29 +87,31 @@ class EventSearchResults extends StatelessWidget {
           ],
         ),
       ),
-      body: FutureBuilder<List<Event>>(
-        future: _searchEvents(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            final events = snapshot.data ?? [];
-            return ListView.builder(
-              itemCount: events.length,
-              itemBuilder: (context, index) {
-                final event = events[index];
-                return EventWidget(event: event);
-              },
-            );
-          }
-        },
-      ),
+      body: Column(),
+
+      // FutureBuilder<List<Event>>(
+      //   future: _eventService.search(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.connectionState == ConnectionState.waiting) {
+      //       return const Center(
+      //         child: CircularProgressIndicator(),
+      //       );
+      //     } else if (snapshot.hasError) {
+      //       return Center(
+      //         child: Text('Error: ${snapshot.error}'),
+      //       );
+      //     } else {
+      //       final events = snapshot.data ?? [];
+      //       return ListView.builder(
+      //         itemCount: events.length,
+      //         itemBuilder: (context, index) {
+      //           final event = events[index];
+      //           return EventWidget(event: event);
+      //         },
+      //       );
+      //     }
+      //   },
+      // ),
       floatingActionButton: FloatingActionButton(
         // Floating action button
         onPressed: () {

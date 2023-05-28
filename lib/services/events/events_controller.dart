@@ -149,6 +149,20 @@ class EventController {
     }
   }
 
+  Future<List<Events>> search({required String query}) async {
+    final events = FirebaseFirestore.instance.collection('events');
+    final querySnapshot = await events.get();
+    if (query.isEmpty) {
+      return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc)).toList();
+    } else {
+      return querySnapshot.docs
+          .map((doc) => Events.fromSnapshot(doc))
+          .where((event) =>
+              event.title.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+  }
+
   String printSelectedRepeat({
     required RepeatType type,
     required int typeAmount,
