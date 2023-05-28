@@ -99,10 +99,9 @@ class _SearchEventViewState extends State<SearchEventView> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          if (searchQuery != null) ...[
-            StreamBuilder(
+      body: searchQuery == null
+          ? Column()
+          : StreamBuilder(
               stream: _eventService.search(query: searchQuery!),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
@@ -265,10 +264,7 @@ class _SearchEventViewState extends State<SearchEventView> {
                     return Column();
                 }
               },
-            )
-          ]
-        ],
-      ),
+            ),
     );
   }
 
