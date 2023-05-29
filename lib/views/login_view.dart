@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:urtask/services/auth/auth_exceptions.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:urtask/utilities/dialogs/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -34,63 +36,150 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) async {},
+      listener: (context, state) async {
+        if (state is AuthStateLoggedOut) {
+          // Auth Exceptions
+          if (state.exception is UserNotFoundAuthException) {
+            await showErrorDialog(
+              context,
+              "Cannot find a user with the entered credentials!",
+            );
+          } else if (state.exception is WrongPasswordAuthException) {
+            await showErrorDialog(context, "Wrong credentials");
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(context, "Authentication error");
+          }
+        }
+      },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Login"),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Email
-              TextField(
-                controller: _email,
-                enableSuggestions: false,
-                autocorrect: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: "Email",
+        backgroundColor: const Color(0xFFFCC8BD),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                Center(
+                  child: Image.asset(
+                    'assets/app_icon.png', // Replace with your app icon asset path
+                    width: 100,
+                    height: 100,
+                  ),
                 ),
-              ),
-
-              // Password
-              TextFormField(
-                controller: _password,
-                obscureText: _isHidden,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  suffixIcon: GestureDetector(
-                    onTap: _togglePasswordVisibility,
-                    child: Icon(
-                      _isHidden ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey,
+                SizedBox(height: 30),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-
-              // Login Button
-              TextButton(
-                onPressed: () => _login(),
-                child: const Text("Enter"),
-              ),
-
-              // Register Page Nav
-              TextButton(
-                onPressed: () => _toRegistration(),
-                child: const Text("Don't have an account? Sign up here"),
-              ),
-            ],
+                SizedBox(height: 30),
+                TextField(
+                  controller: _email,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  controller: _password,
+                  obscureText: _isHidden,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: _togglePasswordVisibility,
+                      child: Icon(
+                        _isHidden ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 80),
+                Center(
+                  child: FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: TextButton(
+                        onPressed: () => _login(),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Color(0xFF9C3B35)),
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          "Enter",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 100),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => _toRegistration(),
+                      child: Text(
+                        "Sign up here",
+                        style: TextStyle(
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Toggle Password Visibility
   void _togglePasswordVisibility() {
     setState(() {
       _isHidden = !_isHidden;
