@@ -11,11 +11,13 @@ class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;
   final TextEditingController today;
   final TextEditingController selectedDate;
+  final List<String> myList;
   const CalendarView({
     super.key,
     required this.calendarFilter,
     required this.today,
     required this.selectedDate,
+    required this.myList,
   });
 
   @override
@@ -119,14 +121,14 @@ class _CalendarViewState extends State<CalendarView> {
               constraints: const BoxConstraints(
                 maxHeight: 330.0,
               ),
-              child: EventView(selectedDay: selectedDay),
+              child: EventView(selectedDay: selectedDay, myList: widget.myList),
             )
           ] else ...[
             ConstrainedBox(
               constraints: const BoxConstraints(
                 maxHeight: 510.0,
               ),
-              child: EventView(selectedDay: selectedDay),
+              child: EventView(selectedDay: selectedDay, myList: widget.myList),
             )
           ]
         ],
@@ -138,10 +140,15 @@ class _CalendarViewState extends State<CalendarView> {
     setState(() {
       this.selectedDay = selectedDay;
       widget.selectedDate.text = selectedDay.toString().substring(0, 10);
+      setupMarker().then((value) {
+        setState(() {
+          eventMap = value;
+        });
+      });
     });
   }
 
   Future<Map<DateTime, List<Events>>> setupMarker() async {
-    return await _eventService.getAllMarker();
+    return await _eventService.getAllMarker(excludedCategoryIds: widget.myList);
   }
 }

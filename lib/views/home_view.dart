@@ -19,6 +19,9 @@ import 'package:urtask/views/event/create_event_view.dart';
 import 'package:urtask/views/category/create_category_view.dart';
 import 'package:urtask/views/search_event_view.dart';
 
+List<String> myList = [];
+Map<String, bool> checkboxListValues = {};
+
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
 
@@ -158,11 +161,16 @@ class _HomeViewState extends State<HomeView> {
               height: 1,
               thickness: 2,
             ),
-            const CategoryList()
+            ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxHeight: 465.0,
+                ),
+                child: const CategoryList())
           ],
         ),
       ),
       body: CalendarView(
+        myList: myList,
         calendarFilter: uot,
         today: today,
         selectedDate: selectedDate,
@@ -293,7 +301,6 @@ class CategoryList extends StatefulWidget {
 }
 
 class _CategoryListState extends State<CategoryList> {
-  bool? _value = true;
   late final CategoryController _categoryService;
   //List<bool> checkboxValues = [];
   //int i = 0;
@@ -313,6 +320,7 @@ class _CategoryListState extends State<CategoryList> {
           case ConnectionState.active:
             if (snapshot.hasData) {
               final categories = snapshot.data as Iterable<Categories>;
+              categories.map((e) => checkboxListValues[e.id] = true);
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: categories.length,
@@ -320,9 +328,23 @@ class _CategoryListState extends State<CategoryList> {
                   final category = categories.elementAt(index);
                   return CheckboxListTile(
                     onChanged: (newValue) => setState(() {
-                      _value = newValue;
+                      if (checkboxListValues[category.id] == null) {
+                        checkboxListValues[category.id] = true;
+                      }
+                      checkboxListValues[category.id] =
+                          !checkboxListValues[category.id]!;
+                      //print(checkboxListValues);
+
+                      if (newValue == true) {
+                        myList.remove(category.id);
+                      }
+                      if (newValue == false) {
+                        myList.add(category.id);
+                      }
+
+                      print(myList);
                     }),
-                    value: _value,
+                    value: checkboxListValues[category.id] ?? true,
                     title: Text(category.name),
                     controlAffinity: ListTileControlAffinity.leading,
                   );

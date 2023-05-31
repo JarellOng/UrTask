@@ -40,7 +40,6 @@ class _CategoryViewState extends State<CategoryView> {
         ),
         centerTitle: true,
       ),
-      //backgroundColor: const Color.fromARGB(31, 133, 133, 133),
       body: ConstrainedBox(
         constraints: const BoxConstraints(
           maxHeight: 720.0,

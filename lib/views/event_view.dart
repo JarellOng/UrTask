@@ -13,7 +13,8 @@ import 'package:urtask/views/event/event_detail_view.dart';
 
 class EventView extends StatefulWidget {
   final DateTime selectedDay;
-  const EventView({super.key, required this.selectedDay});
+  final List<String> myList;
+  const EventView({super.key, required this.selectedDay, required this.myList});
 
   @override
   State<EventView> createState() => _EventViewState();
@@ -40,7 +41,8 @@ class _EventViewState extends State<EventView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _eventService.getByDate(dateTime: widget.selectedDay),
+      stream: _eventService.getByDate(
+          dateTime: widget.selectedDay, excludedCategoryIds: widget.myList),
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.active:
@@ -113,6 +115,7 @@ class _EventViewState extends State<EventView> {
                                   if (snapshot.hasData) {
                                     final category =
                                         snapshot.data as Categories;
+                                    //print(widget.myList);
                                     return FutureBuilder(
                                         future: _colorService.get(
                                             id: category.colorId),
