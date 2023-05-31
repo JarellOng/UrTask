@@ -12,7 +12,6 @@ import 'package:urtask/utilities/dialogs/event_group_delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
-import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/utilities/dialogs/colors_dialog.dart';
 
 class CategoryDetailView extends StatefulWidget {
@@ -220,7 +219,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     if (eventIsEdited) {
       final shouldDiscard = await showDiscardDialog(
         context,
-        "Are you sure you want to discard this event?",
+        "Are you sure you want to discard this event category?",
       );
       if (shouldDiscard) {
         if (mounted) {
@@ -257,17 +256,15 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     } else {
       final shouldDelete = await showDeleteDialog(
         context,
-        "Are you sure you want to delete this event?",
+        "Are you sure you want to delete this event category?",
       );
       if (shouldDelete) {
         showLoadingDialog(context: context, text: "Deleting");
-        if (_eventGroupId != null && mounted) {
-          await _categoryService.delete(id: _categoryId);
-          await _eventService.bulkDeleteByCategoryId(id: _categoryId);
-          if (mounted) {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-          }
+        await _categoryService.delete(id: _categoryId);
+        await _eventService.bulkDeleteByCategoryId(id: _categoryId);
+        if (mounted) {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
         }
       }
     }
@@ -290,12 +287,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
               : "My Category");
       // Update Notification
       if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const CategoryView(),
-          ),
-        );
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
       }
     }
   }

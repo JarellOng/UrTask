@@ -3,17 +3,21 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:urtask/color.dart';
 import 'package:intl/intl.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
+import 'package:urtask/services/events/events_controller.dart';
+import 'package:urtask/services/events/events_model.dart';
 import 'package:urtask/views/event_view.dart';
 
 class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;
   final TextEditingController today;
   final TextEditingController selectedDate;
+  final List<String> myList;
   const CalendarView({
     super.key,
     required this.calendarFilter,
     required this.today,
     required this.selectedDate,
+    required this.myList,
   });
 
   @override
@@ -24,10 +28,18 @@ class _CalendarViewState extends State<CalendarView> {
   DateTime selectedDay = DateTime.now();
   CalendarFormat calendar = CalendarFormat.month;
   late final CalendarController _calendarService;
+  late final EventController _eventService;
+  Map<DateTime, List<Events>> eventMap = {};
 
   @override
   void initState() {
     _calendarService = CalendarController();
+    _eventService = EventController();
+    setupMarker().then((value) {
+      setState(() {
+        eventMap = value;
+      });
+    });
     super.initState();
   }
 
@@ -35,6 +47,11 @@ class _CalendarViewState extends State<CalendarView> {
   void didUpdateWidget(covariant CalendarView oldWidget) {
     if (oldWidget.today.text == "Today") {
       selectedDay = DateTime.now();
+      setupMarker().then((value) {
+        setState(() {
+          eventMap = value;
+        });
+      });
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -61,7 +78,11 @@ class _CalendarViewState extends State<CalendarView> {
               onPageChanged: (focusedDay) =>
                   _changeSelectedDay(selectedDay: focusedDay),
               eventLoader: (day) {
-                return [day];
+                return eventMap[
+                            DateTime.parse(day.toString().substring(0, 23))] !=
+                        null
+                    ? [1]
+                    : [];
               },
               selectedDayPredicate: (day) => isSameDay(selectedDay, day),
               calendarStyle: const CalendarStyle(
@@ -100,14 +121,14 @@ class _CalendarViewState extends State<CalendarView> {
               constraints: const BoxConstraints(
                 maxHeight: 330.0,
               ),
-              child: EventView(selectedDay: selectedDay),
+              child: EventView(selectedDay: selectedDay, myList: widget.myList),
             )
           ] else ...[
             ConstrainedBox(
               constraints: const BoxConstraints(
                 maxHeight: 510.0,
               ),
-              child: EventView(selectedDay: selectedDay),
+              child: EventView(selectedDay: selectedDay, myList: widget.myList),
             )
           ]
         ],
@@ -119,6 +140,15 @@ class _CalendarViewState extends State<CalendarView> {
     setState(() {
       this.selectedDay = selectedDay;
       widget.selectedDate.text = selectedDay.toString().substring(0, 10);
+      setupMarker().then((value) {
+        setState(() {
+          eventMap = value;
+        });
+      });
     });
+  }
+
+  Future<Map<DateTime, List<Events>>> setupMarker() async {
+    return await _eventService.getAllMarker(excludedCategoryIds: widget.myList);
   }
 }

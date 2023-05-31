@@ -1,7 +1,13 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
+import 'package:urtask/utilities/dialogs/loading_dialog.dart';
+import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/utilities/dialogs/colors_dialog.dart';
@@ -18,6 +24,10 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   late final CategoryController _categoryService;
   late final TextEditingController _eventCategoryTitle;
 
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   String colorId = "color1";
   String colorName = "Tomato";
   String colorHex = "#D50000";
@@ -26,6 +36,9 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
 
   @override
   void initState() {
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     _colorService = ColorController();
     _categoryService = CategoryController();
     _eventCategoryTitle = TextEditingController();
@@ -36,6 +49,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   @override
   void dispose() {
     _eventCategoryTitle.dispose();
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
@@ -118,6 +132,28 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
     );
   }
 
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException {
+      return;
+    }
+
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+  }
+
   Future<bool> _shouldDiscard() async {
     setState(() {
       eventTitleFocus.unfocus();
@@ -125,7 +161,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
     if (eventIsEdited || _eventCategoryTitle.text.isNotEmpty) {
       final shouldDiscard = await showDiscardDialog(
         context,
-        "Are you sure you want to discard this event?",
+        "Are you sure you want to discard this event category?",
       );
       if (shouldDiscard) {
         if (mounted) {
@@ -159,13 +195,22 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   }
 
   void _save() async {
-    await _categoryService.create(
-        colorId: colorId,
-        name: _eventCategoryTitle.text.isNotEmpty
-            ? _eventCategoryTitle.text
-            : "My Category");
-    if (mounted) {
-      Navigator.of(context).pop();
+    if (_connectionStatus == ConnectivityResult.none) {
+      showOfflineDialog(
+        context: context,
+        text: "Please turn on your Internet connection",
+      );
+    } else {
+      showLoadingDialog(context: context, text: "Saving");
+      await _categoryService.create(
+          colorId: colorId,
+          name: _eventCategoryTitle.text.isNotEmpty
+              ? _eventCategoryTitle.text
+              : "My Category");
+      if (mounted) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      }
     }
   }
 }
