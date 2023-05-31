@@ -17,12 +17,14 @@ import 'package:urtask/views/profile_view.dart';
 import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
 import 'package:urtask/views/category/create_category_view.dart';
+import 'package:urtask/views/search_event_view.dart';
 
 List<String> myList = [];
 Map<String, bool> checkboxListValues = {};
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  const HomeView({Key? key}) : super(key: key);
+
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -58,12 +60,14 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       appBar: AppBar(
-        //leading: Icon(Icons.menu, size: 32, color: Colors.white),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(Icons.search, size: 32, color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: IconButton(
+              icon: const Icon(Icons.search, size: 32, color: Colors.white),
+              onPressed: () => _toSearchEvent(),
+            ),
           ),
 
           // Show Today
@@ -275,6 +279,15 @@ class _HomeViewState extends State<HomeView> {
       context,
       MaterialPageRoute(
         builder: (context) => CreateEventView(selectedDate: date),
+      ),
+    );
+  }
+
+  void _toSearchEvent() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SearchEventView(),
       ),
     );
   }

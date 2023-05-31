@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:urtask/services/auth/auth_exceptions.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
+import 'package:urtask/views/login_view.dart';
+import 'package:urtask/utilities/dialogs/error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
-  const RegisterView({super.key});
+  const RegisterView({Key? key}) : super(key: key);
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -41,90 +44,187 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) async {},
+      listener: (context, state) async {
+        // Auth Exceptions
+        if (state is AuthStateRegistering) {
+          if (state.exception is WeakPasswordAuthException) {
+            await showErrorDialog(context, "Weak password");
+          } else if (state.exception is EmailAlreadyInUseAuthException) {
+            await showErrorDialog(context, "Email is already in use");
+          } else if (state.exception is InvalidEmailAuthException) {
+            await showErrorDialog(context, "Invalid email");
+          } else if (state.exception is GenericAuthException) {
+            await showErrorDialog(context, "Failed to register");
+          }
+        }
+      },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Register"),
+          elevation: 0,
+          backgroundColor:
+              const Color(0xFFFCC8BD), // Same color as Scaffold background
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.black, // Change the color to black
+            ),
+            onPressed: () {
+              context.read<AuthBloc>().add(const AuthEventLogOut());
+            },
+          ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(""),
+        backgroundColor: const Color(0xFFFCC8BD),
+        body: SingleChildScrollView(
+          // Added SingleChildScrollView
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 50),
+                const Text("Register",
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
 
-              // Name
-              TextField(
-                controller: _name,
-                enableSuggestions: false,
-                autocorrect: false,
-                autofocus: true,
-                keyboardType: TextInputType.name,
-                decoration: const InputDecoration(
-                  hintText: "Name",
-                ),
-              ),
-
-              // Email
-              TextField(
-                controller: _email,
-                enableSuggestions: false,
-                autocorrect: false,
-                autofocus: true,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  hintText: "Email",
-                ),
-              ),
-
-              // Password
-              TextFormField(
-                controller: _password,
-                obscureText: _isHidden,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  suffixIcon: GestureDetector(
-                    onTap: _togglePasswordVisibility,
-                    child: Icon(
-                      _isHidden ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey,
+                // Name
+                SizedBox(height: 30),
+                TextFormField(
+                  controller: _name,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.name,
+                  decoration: InputDecoration(
+                    hintText: "Name",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
                     ),
                   ),
                 ),
-              ),
 
-              // Repeat Password
-              TextFormField(
-                controller: _repeatPassword,
-                obscureText: _isHidden,
-                enableSuggestions: false,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  hintText: 'Repeat Password',
-                  suffixIcon: GestureDetector(
-                    onTap: _toggleRepeatPasswordVisibility,
-                    child: Icon(
-                      _isHidden2 ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey,
+                // Email
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: _email,
+                  enableSuggestions: false,
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: "Email",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
                     ),
                   ),
                 ),
-              ),
 
-              Center(
-                child: Column(
-                  children: [
-                    // Enter Button
-                    TextButton(
-                      onPressed: () => _register(),
-                      child: const Text("Enter"),
+                // Password
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: _password,
+                  obscureText: _isHidden,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
                     ),
-                  ],
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: _togglePasswordVisibility,
+                      child: Icon(
+                        _isHidden ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+
+                // Repeat Password
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: _repeatPassword,
+                  obscureText: _isHidden2,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(
+                    hintText: 'Repeat Password',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 15.0,
+                      horizontal: 20.0,
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTap: _toggleRepeatPasswordVisibility,
+                      child: Icon(
+                        _isHidden2 ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 80),
+                Center(
+                  child: FractionallySizedBox(
+                    widthFactor: 0.5,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: TextButton(
+                        onPressed: () async {
+                          if (_password.text != _repeatPassword.text) {
+                            await showErrorDialog(context,
+                                "Your repeat passsword does not match with your password");
+                          } else {
+                            _register();
+                          }
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xFF9C3B35),
+                          ),
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          "Enter",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

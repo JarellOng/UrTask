@@ -5,7 +5,7 @@ import 'package:urtask/utilities/dialogs/logout_dialog.dart';
 class ProfileView extends StatefulWidget {
   final String name;
 
-  const ProfileView({super.key, required this.name});
+  const ProfileView({Key? key, required this.name}) : super(key: key);
 
   @override
   State<ProfileView> createState() => _ProfileViewState();
@@ -43,7 +43,7 @@ class _ProfileViewState extends State<ProfileView> {
             const SizedBox(height: 16.0),
             Text(
               'Email',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.headline6,
             ),
             const SizedBox(height: 16.0),
             Text(
@@ -52,9 +52,27 @@ class _ProfileViewState extends State<ProfileView> {
             ),
             const Spacer(),
             Center(
-              child: ElevatedButton(
-                onPressed: _shouldLogout,
-                child: const Text('Logout'),
+              child: FractionallySizedBox(
+                widthFactor: 0.5,
+                child: TextButton(
+                  onPressed: _shouldLogout,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xFF9C3B35)),
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
