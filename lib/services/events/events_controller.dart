@@ -114,23 +114,29 @@ class EventController {
       final end = event.end.toDate();
       var startDate = DateTime(start.year, start.month, start.day);
       final endDate = DateTime(end.year, end.month, end.day);
-      /* if (startDate != endDate) {
-        while (start != endDate) {
-         if (eventMap[startDate] == null) {
-      eventMap[startDate] = [];
-           }
-           eventMap[startDate]!.add(event);
-           startDate.add(const Duration(days: 1));
-         }
-       }
-       else { */
-      if (eventMap[startDate] == null || eventMap[endDate] == null) {
-        eventMap[startDate] = [];
-        eventMap[endDate] = [];
+      final difference = endDate.difference(startDate).inDays;
+      if (difference == 0) {
+        if (!eventMap.containsKey(startDate)) {
+          eventMap[startDate] = [event];
+        }
+      } else if (difference == 1) {
+        if (!eventMap.containsKey(startDate) &&
+            !eventMap.containsKey(endDate)) {
+          eventMap[startDate] = [event];
+          eventMap[endDate] = [event];
+        }
       }
-      eventMap[startDate]!.add(event);
-      eventMap[endDate]!.add(event);
-      // }
+      //
+      else {
+        var tempDate = startDate;
+        final lastDate = endDate.add(const Duration(days: 1));
+        do {
+          if (!eventMap.containsKey(tempDate)) {
+            eventMap[tempDate] = [event];
+          }
+          tempDate = tempDate.add(const Duration(days: 1));
+        } while (tempDate != lastDate);
+      }
     }
     return eventMap;
   }
