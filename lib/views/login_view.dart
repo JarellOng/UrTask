@@ -45,9 +45,15 @@ class _LoginViewState extends State<LoginView> {
               "Cannot find a user with the entered credentials!",
             );
           } else if (state.exception is WrongPasswordAuthException) {
-            await showErrorDialog(context, "Wrong credentials");
+            await showErrorDialog(
+              context,
+              "Cannot find a user with the entered credentials!",
+            );
           } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(context, "Authentication error");
+            await showErrorDialog(
+              context,
+              "Authentication error, please try again later..",
+            );
           }
         }
       },
@@ -66,8 +72,8 @@ class _LoginViewState extends State<LoginView> {
                     height: 100,
                   ),
                 ),
-                SizedBox(height: 30),
-                Align(
+                const SizedBox(height: 30),
+                const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Login',
@@ -77,7 +83,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 TextField(
                   controller: _email,
                   enableSuggestions: false,
@@ -96,7 +102,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _password,
                   obscureText: _isHidden,
@@ -122,7 +128,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 Center(
                   child: FractionallySizedBox(
                     widthFactor: 0.5,
@@ -131,42 +137,54 @@ class _LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: TextButton(
-                        onPressed: () => _login(),
+                        onPressed: () async {
+                          if (_email.text.isEmpty || _password.text.isEmpty) {
+                            await showErrorDialog(
+                              context,
+                              "Please fill in the login credentials!",
+                            );
+                          } else {
+                            _login();
+                          }
+                        },
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
-                              Color(0xFF9C3B35)),
+                              const Color(0xFF9C3B35)),
                           shape: MaterialStateProperty.all<OutlinedBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           "Enter",
                           style: TextStyle(
                             color: Colors.white,
+                            fontSize: 18,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 100),
+                const SizedBox(height: 100),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Don't have an account? ",
+                    const Text(
+                      "Don't have an account?",
                       style: TextStyle(
                         color: Colors.black,
+                        fontSize: 18,
                       ),
                     ),
                     TextButton(
                       onPressed: () => _toRegistration(),
-                      child: Text(
+                      child: const Text(
                         "Sign up here",
                         style: TextStyle(
                           color: Colors.blue,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -186,13 +204,8 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
-  void _login() async {
-    context.read<AuthBloc>().add(
-          AuthEventLogIn(
-            _email.text,
-            _password.text,
-          ),
-        );
+  void _login() {
+    context.read<AuthBloc>().add(AuthEventLogIn(_email.text, _password.text));
   }
 
   void _toRegistration() {

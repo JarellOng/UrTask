@@ -71,6 +71,7 @@ class LoadingScreen {
                             return Text(
                               snapshot.data as String,
                               textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 18),
                             );
                           } else {
                             return Container();

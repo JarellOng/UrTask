@@ -4,7 +4,6 @@ import 'package:urtask/services/auth/auth_exceptions.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
-import 'package:urtask/views/login_view.dart';
 import 'package:urtask/utilities/dialogs/error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
@@ -48,13 +47,17 @@ class _RegisterViewState extends State<RegisterView> {
         // Auth Exceptions
         if (state is AuthStateRegistering) {
           if (state.exception is WeakPasswordAuthException) {
-            await showErrorDialog(context, "Weak password");
+            await showErrorDialog(
+                context, "Password needs to be more than 5 characters!");
           } else if (state.exception is EmailAlreadyInUseAuthException) {
-            await showErrorDialog(context, "Email is already in use");
+            await showErrorDialog(context, "Email is already in use!");
           } else if (state.exception is InvalidEmailAuthException) {
-            await showErrorDialog(context, "Invalid email");
+            await showErrorDialog(context, "Not a valid email!");
           } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(context, "Failed to register");
+            await showErrorDialog(
+              context,
+              "Failed to register, please try again later..",
+            );
           }
         }
       },
@@ -64,7 +67,7 @@ class _RegisterViewState extends State<RegisterView> {
           backgroundColor:
               const Color(0xFFFCC8BD), // Same color as Scaffold background
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
               color: Colors.black, // Change the color to black
             ),
@@ -81,13 +84,13 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 const Text("Register",
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
 
                 // Name
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 TextFormField(
                   controller: _name,
                   enableSuggestions: false,
@@ -109,7 +112,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
 
                 // Email
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _email,
                   enableSuggestions: false,
@@ -131,7 +134,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
 
                 // Password
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _password,
                   obscureText: _isHidden,
@@ -159,7 +162,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
 
                 // Repeat Password
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _repeatPassword,
                   obscureText: _isHidden2,
@@ -217,11 +220,28 @@ class _RegisterViewState extends State<RegisterView> {
                           "Enter",
                           style: TextStyle(
                             color: Colors.white,
+                            fontSize: 18,
                           ),
                         ),
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 90),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Center(
+                      child: Text(
+                        "Need to verify?\n Try logging in with the registered email!",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
