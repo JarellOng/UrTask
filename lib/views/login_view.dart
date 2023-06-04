@@ -45,9 +45,15 @@ class _LoginViewState extends State<LoginView> {
               "Cannot find a user with the entered credentials!",
             );
           } else if (state.exception is WrongPasswordAuthException) {
-            await showErrorDialog(context, "Wrong credentials");
+            await showErrorDialog(
+              context,
+              "Cannot find a user with the entered credentials!",
+            );
           } else if (state.exception is GenericAuthException) {
-            await showErrorDialog(context, "Authentication error");
+            await showErrorDialog(
+              context,
+              "Authentication error, please try again later..",
+            );
           }
         }
       },
@@ -131,7 +137,16 @@ class _LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: TextButton(
-                        onPressed: () => _login(),
+                        onPressed: () async {
+                          if (_email.text.isEmpty || _password.text.isEmpty) {
+                            await showErrorDialog(
+                              context,
+                              "Please fill in the login credentials!",
+                            );
+                          } else {
+                            _login();
+                          }
+                        },
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
                               const Color(0xFF9C3B35)),
@@ -145,6 +160,7 @@ class _LoginViewState extends State<LoginView> {
                           "Enter",
                           style: TextStyle(
                             color: Colors.white,
+                            fontSize: 18,
                           ),
                         ),
                       ),
@@ -156,9 +172,10 @@ class _LoginViewState extends State<LoginView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Don't have an account? ",
+                      "Don't have an account?",
                       style: TextStyle(
                         color: Colors.black,
+                        fontSize: 18,
                       ),
                     ),
                     TextButton(
@@ -167,6 +184,7 @@ class _LoginViewState extends State<LoginView> {
                         "Sign up here",
                         style: TextStyle(
                           color: Colors.blue,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -186,13 +204,8 @@ class _LoginViewState extends State<LoginView> {
     });
   }
 
-  void _login() async {
-    context.read<AuthBloc>().add(
-          AuthEventLogIn(
-            _email.text,
-            _password.text,
-          ),
-        );
+  void _login() {
+    context.read<AuthBloc>().add(AuthEventLogIn(_email.text, _password.text));
   }
 
   void _toRegistration() {

@@ -53,20 +53,23 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 30),
                   const Text(
                     "You’ve entered",
+                    style: TextStyle(fontSize: 18),
                   ),
                 ],
               ),
             ),
             Text(
-              userEmail,
+              "${userEmail.substring(0, 1)}*****${userEmail.substring(userEmail.indexOf("@") - 2)}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             const Center(
               child: Text(
-                "as the email address to your account. Please verify your email address by clicking on the link in the email we’ve sent.",
+                "as the email address to your account.\n\n Please verify your email address by clicking on the link in the email we’ve sent.",
                 textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18),
               ),
             ),
             const SizedBox(height: 20),
@@ -88,6 +91,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
                 ),
               ),
