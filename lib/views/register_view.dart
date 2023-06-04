@@ -64,7 +64,7 @@ class _RegisterViewState extends State<RegisterView> {
           backgroundColor:
               const Color(0xFFFCC8BD), // Same color as Scaffold background
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
               color: Colors.black, // Change the color to black
             ),
@@ -81,13 +81,13 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 const Text("Register",
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
 
                 // Name
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 TextFormField(
                   controller: _name,
                   enableSuggestions: false,
@@ -109,7 +109,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
 
                 // Email
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _email,
                   enableSuggestions: false,
@@ -131,7 +131,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
 
                 // Password
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _password,
                   obscureText: _isHidden,
@@ -159,7 +159,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
 
                 // Repeat Password
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _repeatPassword,
                   obscureText: _isHidden2,

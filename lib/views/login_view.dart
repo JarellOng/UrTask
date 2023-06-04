@@ -66,8 +66,8 @@ class _LoginViewState extends State<LoginView> {
                     height: 100,
                   ),
                 ),
-                SizedBox(height: 30),
-                Align(
+                const SizedBox(height: 30),
+                const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Login',
@@ -77,7 +77,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 TextField(
                   controller: _email,
                   enableSuggestions: false,
@@ -96,7 +96,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextField(
                   controller: _password,
                   obscureText: _isHidden,
@@ -122,7 +122,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 Center(
                   child: FractionallySizedBox(
                     widthFactor: 0.5,
@@ -134,14 +134,14 @@ class _LoginViewState extends State<LoginView> {
                         onPressed: () => _login(),
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
-                              Color(0xFF9C3B35)),
+                              const Color(0xFF9C3B35)),
                           shape: MaterialStateProperty.all<OutlinedBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           "Enter",
                           style: TextStyle(
                             color: Colors.white,
@@ -151,11 +151,11 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                SizedBox(height: 100),
+                const SizedBox(height: 100),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Don't have an account? ",
                       style: TextStyle(
                         color: Colors.black,
@@ -163,7 +163,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     TextButton(
                       onPressed: () => _toRegistration(),
-                      child: Text(
+                      child: const Text(
                         "Sign up here",
                         style: TextStyle(
                           color: Colors.blue,

@@ -63,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 0),
             child: IconButton(
               icon: const Icon(Icons.search, size: 32, color: Colors.white),
               onPressed: () => _toSearchEvent(),
@@ -142,7 +142,9 @@ class _HomeViewState extends State<HomeView> {
                 selectedTileColor: primary,
               ),
             ),
-            const DottedLine(),
+            const Divider(
+              thickness: 2,
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListTile(
@@ -157,10 +159,8 @@ class _HomeViewState extends State<HomeView> {
                 selectedTileColor: primary,
               ),
             ),
-            const Divider(
-              height: 1,
-              thickness: 2,
-            ),
+            const DottedLine(),
+            
             ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxHeight: 465.0,
@@ -320,7 +320,7 @@ class _CategoryListState extends State<CategoryList> {
           case ConnectionState.active:
             if (snapshot.hasData) {
               final categories = snapshot.data as Iterable<Categories>;
-              categories.map((e) => checkboxListValues[e.id] = true);
+              
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: categories.length,
@@ -333,7 +333,6 @@ class _CategoryListState extends State<CategoryList> {
                       }
                       checkboxListValues[category.id] =
                           !checkboxListValues[category.id]!;
-                      //print(checkboxListValues);
 
                       if (newValue == true) {
                         myList.remove(category.id);
@@ -341,11 +340,9 @@ class _CategoryListState extends State<CategoryList> {
                       if (newValue == false) {
                         myList.add(category.id);
                       }
-
-                      print(myList);
                     }),
                     value: checkboxListValues[category.id] ?? true,
-                    title: Text(category.name),
+                    title: Text(category.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),),
                     controlAffinity: ListTileControlAffinity.leading,
                   );
                 },

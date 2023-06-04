@@ -58,7 +58,7 @@ class _ProfileViewState extends State<ProfileView> {
                   onPressed: _shouldLogout,
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Color(0xFF9C3B35)),
+                        MaterialStateProperty.all<Color>(const Color(0xFF9C3B35)),
                     shape: MaterialStateProperty.all<OutlinedBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),

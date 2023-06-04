@@ -22,7 +22,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
         backgroundColor:
             const Color(0xFFFCC8BD), // Same color as Scaffold background
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.black, // Change the color to black
           ),
@@ -63,8 +63,8 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
             Text(
               userEmail,
             ),
-            Center(
-              child: const Text(
+            const Center(
+              child: Text(
                 "as the email address to your account. Please verify your email address by clicking on the link in the email we’ve sent.",
                 textAlign: TextAlign.center,
               ),
@@ -76,7 +76,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 onPressed: () => _sendEmailVerification(),
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(Color(0xFF9C3B35)),
+                      MaterialStateProperty.all<Color>(const Color(0xFF9C3B35)),
                   shape: MaterialStateProperty.all<OutlinedBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
