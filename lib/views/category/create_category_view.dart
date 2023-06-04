@@ -165,12 +165,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
       );
       if (shouldDiscard) {
         if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CategoryView(),
-            ),
-          );
+          Navigator.of(context).pop();
           return true;
         }
       }

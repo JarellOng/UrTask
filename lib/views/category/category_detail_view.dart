@@ -8,7 +8,6 @@ import 'package:urtask/services/colors/colors_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/utilities/dialogs/delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/discard_dialog.dart';
-import 'package:urtask/utilities/dialogs/event_group_delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
@@ -50,9 +49,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   late String colorHex;
   late final FocusNode eventTitleFocus;
   bool eventIsEdited = false;
-
-  // ignore: prefer_typing_uninitialized_variables
-  var _eventGroupId;
 
   @override
   void initState() {
