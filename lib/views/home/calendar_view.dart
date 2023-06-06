@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/events/events_model.dart';
-import 'package:urtask/views/event_view.dart';
+import 'package:urtask/views/home/event_view.dart';
 
 class CalendarView extends StatefulWidget {
   final CalendarFormat calendarFilter;

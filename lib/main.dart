@@ -6,10 +6,10 @@ import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
 import 'package:urtask/services/auth/firebase_auth_provider.dart';
-import 'package:urtask/views/home_view.dart';
-import 'package:urtask/views/login_view.dart';
-import 'package:urtask/views/register_view.dart';
-import 'package:urtask/views/verify_email_view.dart';
+import 'package:urtask/views/auth/login_view.dart';
+import 'package:urtask/views/auth/register_view.dart';
+import 'package:urtask/views/auth/verify_email_view.dart';
+import 'package:urtask/views/home/home_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
