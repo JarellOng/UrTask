@@ -17,7 +17,7 @@ import 'package:urtask/views/home/calendar_view.dart';
 import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/views/event/create_event_view.dart';
 import 'package:urtask/views/category/create_category_view.dart';
-import 'package:urtask/views/search_event_view.dart';
+import 'package:urtask/views/home/search_event_view.dart';
 
 List<String> myList = [];
 Map<String, bool> checkboxListValues = {};
