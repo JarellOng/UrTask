@@ -57,7 +57,7 @@ class _NotificationEventViewState extends State<NotificationEventView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => _saveNotificationPreferences(),
+      onWillPop: () => _saveNotificationPreferences(),
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(color: Colors.white),
@@ -523,7 +523,7 @@ class _NotificationEventViewState extends State<NotificationEventView> {
     );
   }
 
-  bool _saveNotificationPreferences() {
+  Future<bool> _saveNotificationPreferences() async {
     setState(() {
       if (selectedNotifications.isEmpty) {
         remindMe = false;

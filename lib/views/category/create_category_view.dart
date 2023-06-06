@@ -9,7 +9,6 @@ import 'package:urtask/utilities/dialogs/discard_dialog.dart';
 import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
-import 'package:urtask/views/category/categories_view.dart';
 import 'package:urtask/utilities/dialogs/colors_dialog.dart';
 
 class CreateCategoryView extends StatefulWidget {
@@ -67,63 +66,65 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
         child: Column(
           children: [
             Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _eventCategoryTitle,
-                      focusNode: eventTitleFocus,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      maxLines: 2,
-                      decoration: const InputDecoration(
-                          isDense: true,
-                          hintText: "Event Category Name",
-                          hintStyle: TextStyle(fontSize: 18)),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      onChanged: (value) {
-                        eventIsEdited = true;
-                      },
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _eventCategoryTitle,
+                    focusNode: eventTitleFocus,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    maxLines: 2,
+                    decoration: const InputDecoration(
+                        isDense: true,
+                        hintText: "Event Category Name",
+                        hintStyle: TextStyle(fontSize: 18)),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 6),
-                          child: Text("Color:", style: TextStyle(fontSize: 20)),
-                        ),
-                        SizedBox(
-                            width: 200,
-                            child: ListTile(
-                              title: Center(
-                                child: Text(
-                                  colorName,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                  ),
+                    onChanged: (value) {
+                      eventIsEdited = true;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 6),
+                        child: Text("Color:", style: TextStyle(fontSize: 20)),
+                      ),
+                      SizedBox(
+                          width: 200,
+                          child: ListTile(
+                            title: Center(
+                              child: Text(
+                                colorName,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
                                 ),
                               ),
-                              tileColor: HexColor.fromHex(colorHex),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              visualDensity: const VisualDensity(vertical: -4),
-                              onTap: () => _pickColor(),
-                            ))
-                      ],
-                    ),
-                  ],
-                )),
+                            ),
+                            tileColor: HexColor.fromHex(colorHex),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            visualDensity: const VisualDensity(vertical: -4),
+                            onTap: () => _pickColor(),
+                          ))
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: Colors.black, width: 1.0))),
+          border: Border(top: BorderSide(color: Colors.black, width: 1.0)),
+        ),
         child: TextButton(
           onPressed: () => _save(),
           child: const Text("Save", style: TextStyle(fontSize: 18)),

@@ -8,14 +8,14 @@ import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/category/category_detail_view.dart';
 import 'package:urtask/views/category/create_category_view.dart';
 
-class CategoryView extends StatefulWidget {
-  const CategoryView({super.key});
+class CategoriesView extends StatefulWidget {
+  const CategoriesView({super.key});
 
   @override
-  State<CategoryView> createState() => _CategoryViewState();
+  State<CategoriesView> createState() => _CategoriesViewState();
 }
 
-class _CategoryViewState extends State<CategoryView> {
+class _CategoriesViewState extends State<CategoriesView> {
   late final CategoryController _categoryService;
   late final ColorController _colorService;
   final userId = AuthService.firebase().currentUser!.id;

@@ -67,11 +67,7 @@ class _SearchEventViewState extends State<SearchEventView> {
                       // Update the search term here
                       // You can set the searchTerm variable or use a state management solution
                     },
-                    onSubmitted: (value) {
-                      setState(() {
-                        searchQuery = search.text;
-                      });
-                    },
+                    onSubmitted: (value) => _submit(query: value),
                   ),
                 ),
               ),
@@ -266,6 +262,12 @@ class _SearchEventViewState extends State<SearchEventView> {
               },
             ),
     );
+  }
+
+  void _submit({required String query}) {
+    setState(() {
+      searchQuery = query;
+    });
   }
 
   void _setupEventDetailDataAndPush({required Events event}) async {

@@ -85,9 +85,10 @@ class _RegisterViewState extends State<RegisterView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 50),
-                const Text("Register",
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Register",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
 
                 // Name
                 const SizedBox(height: 30),
@@ -198,14 +199,7 @@ class _RegisterViewState extends State<RegisterView> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: TextButton(
-                        onPressed: () async {
-                          if (_password.text != _repeatPassword.text) {
-                            await showErrorDialog(context,
-                                "Your repeat passsword does not match with your password");
-                          } else {
-                            _register();
-                          }
-                        },
+                        onPressed: () => _submit(),
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
                             const Color(0xFF9C3B35),
@@ -249,6 +243,15 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       ),
     );
+  }
+
+  void _submit() async {
+    if (_password.text != _repeatPassword.text) {
+      await showErrorDialog(
+          context, "Your repeat passsword does not match with your password");
+    } else {
+      _register();
+    }
   }
 
   // Toggle Password Visibility

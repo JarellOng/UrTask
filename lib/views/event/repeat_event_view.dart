@@ -184,7 +184,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => _saveRepeatPreference(),
+      onWillPop: () => _saveRepeatPreference(),
       child: Scaffold(
         appBar: AppBar(
           leading: const BackButton(color: Colors.white),
@@ -646,7 +646,7 @@ class _RepeatEventViewState extends State<RepeatEventView> {
     );
   }
 
-  bool _saveRepeatPreference() {
+  Future<bool> _saveRepeatPreference() async {
     if (selectedType == RepeatType.noRepeat) {
       setState(() {
         selectedDuration = RepeatDuration.values.elementAt(0);

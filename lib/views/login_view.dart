@@ -137,16 +137,7 @@ class _LoginViewState extends State<LoginView> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: TextButton(
-                        onPressed: () async {
-                          if (_email.text.isEmpty || _password.text.isEmpty) {
-                            await showErrorDialog(
-                              context,
-                              "Please fill in the login credentials!",
-                            );
-                          } else {
-                            _login();
-                          }
-                        },
+                        onPressed: () => _submit(),
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(
                               const Color(0xFF9C3B35)),
@@ -196,6 +187,17 @@ class _LoginViewState extends State<LoginView> {
         ),
       ),
     );
+  }
+
+  void _submit() async {
+    if (_email.text.isEmpty || _password.text.isEmpty) {
+      await showErrorDialog(
+        context,
+        "Please fill in the login credentials!",
+      );
+    } else {
+      _login();
+    }
   }
 
   void _togglePasswordVisibility() {

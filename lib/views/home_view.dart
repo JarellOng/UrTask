@@ -154,13 +154,16 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 onTap: () => _toEventCategories(),
                 contentPadding: const EdgeInsets.only(
-                    top: 8.0, left: 12.0, right: 8.0, bottom: 8.0),
+                  top: 8.0,
+                  left: 12.0,
+                  right: 8.0,
+                  bottom: 8.0,
+                ),
                 selectedColor: Colors.white,
                 selectedTileColor: primary,
               ),
             ),
             const DottedLine(),
-            
             ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxHeight: 465.0,
@@ -259,7 +262,7 @@ class _HomeViewState extends State<HomeView> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CategoryView(),
+        builder: (context) => const CategoriesView(),
       ),
     );
   }
@@ -302,8 +305,6 @@ class CategoryList extends StatefulWidget {
 
 class _CategoryListState extends State<CategoryList> {
   late final CategoryController _categoryService;
-  //List<bool> checkboxValues = [];
-  //int i = 0;
 
   @override
   void initState() {
@@ -320,29 +321,23 @@ class _CategoryListState extends State<CategoryList> {
           case ConnectionState.active:
             if (snapshot.hasData) {
               final categories = snapshot.data as Iterable<Categories>;
-              
+
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   final category = categories.elementAt(index);
                   return CheckboxListTile(
-                    onChanged: (newValue) => setState(() {
-                      if (checkboxListValues[category.id] == null) {
-                        checkboxListValues[category.id] = true;
-                      }
-                      checkboxListValues[category.id] =
-                          !checkboxListValues[category.id]!;
-
-                      if (newValue == true) {
-                        myList.remove(category.id);
-                      }
-                      if (newValue == false) {
-                        myList.add(category.id);
-                      }
-                    }),
+                    onChanged: (newValue) => _toggleCategoryFilter(
+                      category: category,
+                      toggle: newValue,
+                    ),
                     value: checkboxListValues[category.id] ?? true,
-                    title: Text(category.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),),
+                    title: Text(
+                      category.name,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w400),
+                    ),
                     controlAffinity: ListTileControlAffinity.leading,
                   );
                 },
@@ -355,5 +350,21 @@ class _CategoryListState extends State<CategoryList> {
         }
       },
     );
+  }
+
+  void _toggleCategoryFilter({required Categories category, bool? toggle}) {
+    setState(() {
+      if (checkboxListValues[category.id] == null) {
+        checkboxListValues[category.id] = true;
+      }
+      checkboxListValues[category.id] = !checkboxListValues[category.id]!;
+
+      if (toggle == true) {
+        myList.remove(category.id);
+      }
+      if (toggle == false) {
+        myList.add(category.id);
+      }
+    });
   }
 }

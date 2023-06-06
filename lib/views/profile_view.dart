@@ -55,10 +55,10 @@ class _ProfileViewState extends State<ProfileView> {
               child: FractionallySizedBox(
                 widthFactor: 0.5,
                 child: TextButton(
-                  onPressed: _shouldLogout,
+                  onPressed: () => _shouldLogout(),
                   style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(const Color(0xFF9C3B35)),
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color(0xFF9C3B35)),
                     shape: MaterialStateProperty.all<OutlinedBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),

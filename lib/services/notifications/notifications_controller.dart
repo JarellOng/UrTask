@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/notifications/notifications_constants.dart';
 import 'package:urtask/services/notifications/notifications_model.dart';
@@ -41,11 +39,9 @@ class NotificationController {
   }
 
   Future<void> bulkDelete({required List<String> ids}) async {
-    final events = await _getCollection();
+    final notifications = await _getCollection();
     for (var i = 0; i < ids.length; i++) {
-      await events.doc(ids[i]).delete();
+      await notifications.doc(ids[i]).delete();
     }
   }
-
-  // TODO: Make Schedule Functions
 }

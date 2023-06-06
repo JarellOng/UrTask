@@ -274,14 +274,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       );
     } else {
       showLoadingDialog(context: context, text: "Saving");
-      // Update Categories
       await _categoryService.update(
           id: _categoryId,
           colorId: colorId,
           name: _eventCategoryTitle.text.isNotEmpty
               ? _eventCategoryTitle.text
               : "My Category");
-      // Update Notification
       if (mounted) {
         Navigator.of(context).pop();
         Navigator.of(context).pop();
