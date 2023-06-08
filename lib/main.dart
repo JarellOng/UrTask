@@ -6,13 +6,22 @@ import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/bloc/auth_state.dart';
 import 'package:urtask/services/auth/firebase_auth_provider.dart';
+import 'package:urtask/utilities/navigation_service.dart';
 import 'package:urtask/views/auth/login_view.dart';
 import 'package:urtask/views/auth/register_view.dart';
 import 'package:urtask/views/auth/verify_email_view.dart';
 import 'package:urtask/views/home/home_view.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
-void main() {
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
+  var detroit = tz.getLocation('Asia/Jakarta');
+  tz.setLocalLocation(detroit);
+  await LocalNotificationCustom.initializeLocalNotifications();
+
   runApp(
     MaterialApp(
       title: 'UrTask',

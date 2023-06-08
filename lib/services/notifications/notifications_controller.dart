@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/notifications/notifications_constants.dart';
 import 'package:urtask/services/notifications/notifications_model.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 class NotificationController {
   final calendarController = CalendarController();
@@ -15,6 +19,18 @@ class NotificationController {
       NotificationController._sharedInstance();
   NotificationController._sharedInstance();
   factory NotificationController() => _shared;
+
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('ic_launcher');
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
 
   Future<void> create({
     required String eventId,
