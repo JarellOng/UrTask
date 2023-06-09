@@ -27,6 +27,7 @@ class _SearchEventViewState extends State<SearchEventView> {
   String? searchQuery;
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
+  late final FocusNode searchFocus;
 
   @override
   void initState() {
@@ -35,13 +36,22 @@ class _SearchEventViewState extends State<SearchEventView> {
     _categoryController = CategoryController();
     _colorService = ColorController();
     _notificationService = NotificationController();
+    searchFocus = FocusNode();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchFocus.dispose();
+    search.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         leading: const BackButton(color: Colors.white),
         title: Row(
           children: [
@@ -55,6 +65,7 @@ class _SearchEventViewState extends State<SearchEventView> {
                 ),
                 child: Center(
                   child: TextField(
+                    focusNode: searchFocus,
                     controller: search,
                     style: const TextStyle(fontSize: 12, color: Colors.black),
                     decoration: const InputDecoration(
@@ -76,6 +87,7 @@ class _SearchEventViewState extends State<SearchEventView> {
             GestureDetector(
               onTap: () {
                 setState(() {
+                  searchFocus.unfocus();
                   searchQuery = search.text;
                 });
               },
@@ -266,6 +278,7 @@ class _SearchEventViewState extends State<SearchEventView> {
 
   void _submit({required String query}) {
     setState(() {
+      searchFocus.unfocus();
       searchQuery = query;
     });
   }

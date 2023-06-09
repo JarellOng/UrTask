@@ -79,6 +79,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: const Text(
           "Event Category Detail",
           style: TextStyle(color: Colors.white),
@@ -215,7 +216,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     if (eventIsEdited) {
       final shouldDiscard = await showDiscardDialog(
         context,
-        "Are you sure you want to discard this event category?",
+        "Are you sure you want to discard your changes on this event category?",
       );
       if (shouldDiscard) {
         if (mounted) {

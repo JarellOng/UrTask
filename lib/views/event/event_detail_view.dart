@@ -895,17 +895,18 @@ class _EventDetailViewState extends State<EventDetailView> {
         "Are you sure you want to delete this event?",
       );
       if (shouldDelete) {
-        showLoadingDialog(context: context, text: "Deleting");
         if (_eventGroupId != null && mounted) {
           final shouldDeleteAllRepeatedEvents =
               await showEventGroupDeleteDialog(context);
           if (shouldDeleteAllRepeatedEvents == true) {
+            showLoadingDialog(context: context, text: "Deleting");
             await _eventService.bulkDeleteByGroupId(id: _eventGroupId!);
             if (mounted) {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
             }
           } else if (shouldDeleteAllRepeatedEvents == false) {
+            showLoadingDialog(context: context, text: "Deleting");
             await _eventService.delete(id: _eventId);
             await _notificationService.bulkDelete(ids: storedNotificationIds);
             if (mounted) {
@@ -914,6 +915,7 @@ class _EventDetailViewState extends State<EventDetailView> {
             }
           }
         } else {
+          showLoadingDialog(context: context, text: "Deleting");
           await _eventService.delete(id: _eventId);
           await _notificationService.bulkDelete(ids: storedNotificationIds);
           if (mounted) {

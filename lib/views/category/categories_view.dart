@@ -31,6 +31,7 @@ class _CategoriesViewState extends State<CategoriesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: const Text("Event Categories",
             style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -104,6 +105,7 @@ class _CategoriesViewState extends State<CategoriesView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        elevation: 0,
         onPressed: () => _toCreateCategory(),
         tooltip: 'Increment',
         child: const Icon(Icons.add, color: Colors.white),

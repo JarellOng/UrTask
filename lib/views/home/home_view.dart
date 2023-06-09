@@ -60,6 +60,7 @@ class _HomeViewState extends State<HomeView> {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           Padding(
@@ -195,7 +196,7 @@ class _HomeViewState extends State<HomeView> {
         overlayOpacity: 0.8,
         //action when menu closes
 
-        elevation: 8.0, //shadow elevation of button
+        elevation: 0, //shadow elevation of button
         shape: const CircleBorder(), //shape of button
 
         children: [
