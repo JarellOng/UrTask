@@ -56,7 +56,7 @@ class _RegisterViewState extends State<RegisterView> {
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
               context,
-              "Failed to register, please try again later..",
+              "Failed to register..",
             );
           }
         }
@@ -248,7 +248,7 @@ class _RegisterViewState extends State<RegisterView> {
   void _submit() async {
     if (_password.text != _repeatPassword.text) {
       await showErrorDialog(
-          context, "Your repeat passsword does not match with your password");
+          context, "Repeat passsword does not match with your password!");
     } else {
       _register();
     }

@@ -25,6 +25,7 @@ class CalendarView extends StatefulWidget {
 }
 
 class _CalendarViewState extends State<CalendarView> {
+  DateTime current = DateTime.now();
   DateTime selectedDay = DateTime.now();
   CalendarFormat calendar = CalendarFormat.month;
   late final CalendarController _calendarService;
@@ -68,8 +69,8 @@ class _CalendarViewState extends State<CalendarView> {
             child: TableCalendar(
               focusedDay: _calendarService.showToday(today: widget.today) ??
                   selectedDay,
-              firstDay: DateTime.utc(2010, 10, 16),
-              lastDay: DateTime.utc(2025, 10, 16),
+              firstDay: DateTime.utc(2023, 01, 01),
+              lastDay: DateTime.utc(2123, 12, 31),
               rowHeight: 45,
               calendarFormat: widget.calendarFilter,
               headerVisible: false,
@@ -86,6 +87,10 @@ class _CalendarViewState extends State<CalendarView> {
               },
               selectedDayPredicate: (day) => isSameDay(selectedDay, day),
               calendarStyle: const CalendarStyle(
+                markerDecoration: BoxDecoration(
+                  color: Color.fromARGB(255, 255, 56, 56),
+                  shape: BoxShape.circle,
+                ),
                 weekendTextStyle: TextStyle(color: Colors.red),
                 selectedDecoration: BoxDecoration(
                   shape: BoxShape.circle,

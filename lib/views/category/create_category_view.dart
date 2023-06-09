@@ -56,6 +56,7 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: const Text("Create Event Category",
             style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),

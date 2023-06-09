@@ -52,7 +52,7 @@ class _LoginViewState extends State<LoginView> {
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(
               context,
-              "Authentication error, please try again later..",
+              "Login failed..",
             );
           }
         }
