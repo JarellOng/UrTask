@@ -11,7 +11,11 @@ import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/categories/categories_controller.dart';
 import 'package:urtask/services/categories/categories_model.dart';
+import 'package:urtask/services/colors/colors_controller.dart';
+import 'package:urtask/services/colors/colors_model.dart' as color_model;
+import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/user_details/user_detail_controller.dart';
+import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/views/auth/profile_view.dart';
 import 'package:urtask/views/home/calendar_view.dart';
 import 'package:urtask/views/category/categories_view.dart';
@@ -37,9 +41,15 @@ class _HomeViewState extends State<HomeView> {
   late final UserDetailController _userDetailService;
   late final TextEditingController selectedDate;
   final currentUser = AuthService.firebase().currentUser!;
+  late final EventController _eventService;
+  late final CategoryController _categoryService;
+  late final ColorController _colorService;
 
   @override
   void initState() {
+    _eventService = EventController();
+    _categoryService = CategoryController();
+    _colorService = ColorController();
     today = TextEditingController();
     _calendarService = CalendarController();
     _userDetailService = UserDetailController();
@@ -243,12 +253,35 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void _toProfile({required AuthUser user}) async {
+    showLoadingDialog(context: context, text: "Loading");
+    Map<String, Map<Categories, color_model.Colors>> categories = {};
     final userDetail = await _userDetailService.get(id: user.id);
+    final upcomingEvents = await _eventService.getUpcomingEvents();
+    for (var element in upcomingEvents) {
+      final category = await _categoryService.get(id: element.categoryId);
+      final color = await _colorService.get(id: category.colorId);
+      final categoryMap = {category: color};
+      categories[element.id] = categoryMap;
+    }
+    final upcomingImportantEvents =
+        await _eventService.getUpcomingImportantEvents();
+    for (var element in upcomingImportantEvents) {
+      final category = await _categoryService.get(id: element.categoryId);
+      final color = await _colorService.get(id: category.colorId);
+      final categoryMap = {category: color};
+      categories[element.id] = categoryMap;
+    }
     if (mounted) {
+      Navigator.of(context).pop();
       final isLogout = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfileView(name: userDetail.name),
+          builder: (context) => ProfileView(
+            name: userDetail.name,
+            upcomingEvents: upcomingEvents.toList(),
+            upcomingImportantEvents: upcomingImportantEvents.toList(),
+            categories: categories,
+          ),
         ),
       );
       if (isLogout == true) _logout();

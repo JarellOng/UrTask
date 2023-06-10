@@ -7,6 +7,7 @@ import 'package:urtask/services/events/events_controller.dart';
 import 'package:urtask/services/events/events_model.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/services/notifications/notifications_model.dart';
+import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/event/event_detail_view.dart';
 import 'package:urtask/services/colors/colors_model.dart' as color_model;
@@ -61,7 +62,7 @@ class _SearchEventViewState extends State<SearchEventView> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20), // Curved edges
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Center(
                   child: TextField(
@@ -73,11 +74,8 @@ class _SearchEventViewState extends State<SearchEventView> {
                       hintStyle: TextStyle(color: Colors.grey),
                       border: InputBorder.none,
                     ),
-                    textAlign: TextAlign.center, // Center the label
-                    onChanged: (value) {
-                      // Update the search term here
-                      // You can set the searchTerm variable or use a state management solution
-                    },
+                    textAlign: TextAlign.center,
+                    onChanged: (value) {},
                     onSubmitted: (value) => _submit(query: value),
                   ),
                 ),
@@ -284,6 +282,7 @@ class _SearchEventViewState extends State<SearchEventView> {
   }
 
   void _setupEventDetailDataAndPush({required Events event}) async {
+    showLoadingDialog(context: context, text: "Loading");
     late String colorHex;
     final futures = await Future.wait([
       _categoryController.get(id: event.categoryId),
@@ -297,6 +296,7 @@ class _SearchEventViewState extends State<SearchEventView> {
     });
     final notifications = futures[1] as Iterable<Notifications>;
     if (mounted) {
+      Navigator.of(context).pop();
       await Navigator.push(
         context,
         MaterialPageRoute(
