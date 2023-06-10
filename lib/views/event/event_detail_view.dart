@@ -215,7 +215,7 @@ class _EventDetailViewState extends State<EventDetailView> {
     } else {
       notificationFlag = false;
       selectedNotifications = {
-        NotificationTime.tenMinsBefore: NotificationType.alert
+        NotificationTime.tenMinsBefore: NotificationType.push
       };
     }
 
