@@ -128,7 +128,22 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 80),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: TextButton(
+                    onPressed: () {
+                      context
+                          .read<AuthBloc>()
+                          .add(const AuthEventForgotPassword());
+                    },
+                    style: TextButton.styleFrom(
+                      primary: Colors.blue,
+                    ),
+                    child: const Text("Forgot password?"),
+                  ),
+                ),
+                const SizedBox(height: 35),
                 Center(
                   child: FractionallySizedBox(
                     widthFactor: 0.5,
@@ -158,7 +173,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 100),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
