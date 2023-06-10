@@ -138,9 +138,12 @@ class _LoginViewState extends State<LoginView> {
                           .add(const AuthEventForgotPassword());
                     },
                     style: TextButton.styleFrom(
-                      primary: Colors.blue,
+                      foregroundColor: Colors.blue,
                     ),
-                    child: const Text("Forgot password?"),
+                    child: const Text(
+                      "Forgot password?",
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 35),
@@ -173,7 +176,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 80),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

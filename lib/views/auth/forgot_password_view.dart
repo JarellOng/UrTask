@@ -15,15 +15,18 @@ class ForgotPasswordView extends StatefulWidget {
 
 class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   late final TextEditingController _controller;
+  late final FocusNode focus;
 
   @override
   void initState() {
     _controller = TextEditingController();
+    focus = FocusNode();
     super.initState();
   }
 
   @override
   void dispose() {
+    focus.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -40,7 +43,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
           if (state.exception != null && mounted) {
             await showErrorDialog(
               context,
-              "We could not process your request. Please make sure you are a registered user, or if not, register a user now by going back one step.",
+              "We could not process your request. Please make sure you are a registered user!",
             );
           }
         }
@@ -71,11 +74,13 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "If you forgot your password, simply enter your email and we will send you a password reset link",
+                  "If you forgot your password, simply enter your email and we will send you a password reset link!",
                   textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 20),
                 TextField(
+                  focusNode: focus,
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   autofocus: true,
@@ -98,25 +103,22 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 Center(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        final email = _controller.text;
-                        context
-                            .read<AuthBloc>()
-                            .add(AuthEventForgotPassword(email: email));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF9C3B35),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    child: TextButton(
+                      onPressed: () => _submit(),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xFF9C3B35)),
+                        shape: MaterialStateProperty.all<OutlinedBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 15.0),
                       ),
                       child: const Text(
-                        "Reset Password",
+                        "Enter",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -128,5 +130,11 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         ),
       ),
     );
+  }
+
+  void _submit() {
+    focus.unfocus();
+    final email = _controller.text;
+    context.read<AuthBloc>().add(AuthEventForgotPassword(email: email));
   }
 }
