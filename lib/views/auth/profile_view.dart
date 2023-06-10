@@ -25,6 +25,7 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         title: Text(
           widget.name,
           style: const TextStyle(fontSize: 20, color: Colors.white),
@@ -41,14 +42,17 @@ class _ProfileViewState extends State<ProfileView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16.0),
-            Text(
+            const Text(
               'Email',
-              style: Theme.of(context).textTheme.headline6,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
             const SizedBox(height: 16.0),
             Text(
               userEmail,
-              style: Theme.of(context).textTheme.subtitle1,
+              style: const TextStyle(fontSize: 18),
             ),
             const Spacer(),
             Center(
@@ -70,6 +74,7 @@ class _ProfileViewState extends State<ProfileView> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
+                      fontSize: 18,
                     ),
                   ),
                 ),

@@ -1024,30 +1024,42 @@ class _CreateEventViewState extends State<CreateEventView> {
             if (key == NotificationTime.timeOfEvent) {
               _notificationService.create(
                 eventId: createdEvent,
+                eventTitle:
+                    _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
                 dateTime: startTimestamp,
-                type: value.name,
+                time: key,
+                type: value,
               );
             } else if (key == NotificationTime.tenMinsBefore) {
               _notificationService.create(
                 eventId: createdEvent,
+                eventTitle:
+                    _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
                 dateTime: Timestamp.fromDate(startTimestamp
                     .toDate()
                     .subtract(const Duration(minutes: 10))),
-                type: value.name,
+                time: key,
+                type: value,
               );
             } else if (key == NotificationTime.hourBefore) {
               _notificationService.create(
                 eventId: createdEvent,
+                eventTitle:
+                    _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
                 dateTime: Timestamp.fromDate(
                     startTimestamp.toDate().subtract(const Duration(hours: 1))),
-                type: value.name,
+                time: key,
+                type: value,
               );
             } else if (key == NotificationTime.dayBefore) {
               _notificationService.create(
                 eventId: createdEvent,
+                eventTitle:
+                    _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
                 dateTime: Timestamp.fromDate(
                     startTimestamp.toDate().subtract(const Duration(days: 1))),
-                type: value.name,
+                time: key,
+                type: value,
               );
             } else if (key == NotificationTime.custom) {
               final customAmount = selectedCustomNotification!.keys.first;
@@ -1064,9 +1076,12 @@ class _CreateEventViewState extends State<CreateEventView> {
               }
               _notificationService.create(
                 eventId: createdEvent,
+                eventTitle:
+                    _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
                 dateTime: Timestamp.fromDate(
                     startTimestamp.toDate().subtract(customDuration)),
-                type: value.name,
+                time: key,
+                type: value,
               );
             }
           },
@@ -1151,32 +1166,48 @@ class _CreateEventViewState extends State<CreateEventView> {
                 if (key == NotificationTime.timeOfEvent) {
                   _notificationService.create(
                     eventId: createdRepeatEvent,
+                    eventTitle: _eventTitle.text.isNotEmpty
+                        ? _eventTitle.text
+                        : "My Event",
                     dateTime: startTimestamp,
-                    type: value.name,
+                    time: key,
+                    type: value,
                   );
                 } else if (key == NotificationTime.tenMinsBefore) {
                   _notificationService.create(
                     eventId: createdRepeatEvent,
+                    eventTitle: _eventTitle.text.isNotEmpty
+                        ? _eventTitle.text
+                        : "My Event",
                     dateTime: Timestamp.fromDate(startTimestamp
                         .toDate()
                         .subtract(const Duration(minutes: 10))),
-                    type: value.name,
+                    time: key,
+                    type: value,
                   );
                 } else if (key == NotificationTime.hourBefore) {
                   _notificationService.create(
                     eventId: createdRepeatEvent,
+                    eventTitle: _eventTitle.text.isNotEmpty
+                        ? _eventTitle.text
+                        : "My Event",
                     dateTime: Timestamp.fromDate(startTimestamp
                         .toDate()
                         .subtract(const Duration(hours: 1))),
-                    type: value.name,
+                    time: key,
+                    type: value,
                   );
                 } else if (key == NotificationTime.dayBefore) {
                   _notificationService.create(
                     eventId: createdRepeatEvent,
+                    eventTitle: _eventTitle.text.isNotEmpty
+                        ? _eventTitle.text
+                        : "My Event",
                     dateTime: Timestamp.fromDate(startTimestamp
                         .toDate()
                         .subtract(const Duration(days: 1))),
-                    type: value.name,
+                    time: key,
+                    type: value,
                   );
                 } else if (key == NotificationTime.custom) {
                   final customAmount = selectedCustomNotification!.keys.first;
@@ -1193,9 +1224,13 @@ class _CreateEventViewState extends State<CreateEventView> {
                   }
                   _notificationService.create(
                     eventId: createdRepeatEvent,
+                    eventTitle: _eventTitle.text.isNotEmpty
+                        ? _eventTitle.text
+                        : "My Event",
                     dateTime: Timestamp.fromDate(
                         startTimestamp.toDate().subtract(customDuration)),
-                    type: value.name,
+                    time: key,
+                    type: value,
                   );
                 }
               });
@@ -1280,32 +1315,48 @@ class _CreateEventViewState extends State<CreateEventView> {
                   if (key == NotificationTime.timeOfEvent) {
                     _notificationService.create(
                       eventId: createdRepeatEvent,
+                      eventTitle: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
                       dateTime: startTimestamp,
-                      type: value.name,
+                      time: key,
+                      type: value,
                     );
                   } else if (key == NotificationTime.tenMinsBefore) {
                     _notificationService.create(
                       eventId: createdRepeatEvent,
+                      eventTitle: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
                       dateTime: Timestamp.fromDate(startTimestamp
                           .toDate()
                           .subtract(const Duration(minutes: 10))),
-                      type: value.name,
+                      time: key,
+                      type: value,
                     );
                   } else if (key == NotificationTime.hourBefore) {
                     _notificationService.create(
                       eventId: createdRepeatEvent,
+                      eventTitle: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
                       dateTime: Timestamp.fromDate(startTimestamp
                           .toDate()
                           .subtract(const Duration(hours: 1))),
-                      type: value.name,
+                      time: key,
+                      type: value,
                     );
                   } else if (key == NotificationTime.dayBefore) {
                     _notificationService.create(
                       eventId: createdRepeatEvent,
+                      eventTitle: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
                       dateTime: Timestamp.fromDate(startTimestamp
                           .toDate()
                           .subtract(const Duration(days: 1))),
-                      type: value.name,
+                      time: key,
+                      type: value,
                     );
                   } else if (key == NotificationTime.custom) {
                     final customAmount = selectedCustomNotification!.keys.first;
@@ -1322,9 +1373,13 @@ class _CreateEventViewState extends State<CreateEventView> {
                     }
                     _notificationService.create(
                       eventId: createdRepeatEvent,
+                      eventTitle: _eventTitle.text.isNotEmpty
+                          ? _eventTitle.text
+                          : "My Event",
                       dateTime: Timestamp.fromDate(
                           startTimestamp.toDate().subtract(customDuration)),
-                      type: value.name,
+                      time: key,
+                      type: value,
                     );
                   }
                 },
