@@ -8,7 +8,6 @@ import 'package:collection/collection.dart';
 
 class CalendarController {
   final calendars = FirebaseFirestore.instance.collection("calendar");
-  final userId = AuthService.firebase().currentUser!.id;
 
   static final CalendarController _shared =
       CalendarController._sharedInstance();
@@ -20,6 +19,7 @@ class CalendarController {
   }
 
   Future<Calendars?> get() async {
+    final userId = AuthService.firebase().currentUser!.id;
     final querySnapshot = await calendars
         .where(calendarUserIdField, isEqualTo: userId)
         .limit(1)
