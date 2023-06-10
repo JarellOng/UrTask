@@ -52,9 +52,10 @@ class EventController {
     return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc)).first;
   }
 
-  Stream<Iterable<Events>> getByDate(
-      {required DateTime dateTime,
-      required List<String> excludedCategoryIds}) async* {
+  Stream<Iterable<Events>> getByDate({
+    required DateTime dateTime,
+    required List<String> excludedCategoryIds,
+  }) async* {
     final events = await _getCollection();
     if (excludedCategoryIds.isNotEmpty) {
       yield* events
@@ -83,6 +84,25 @@ class EventController {
                     compare: dateTime,
                   )));
     }
+  }
+
+  Future<Iterable<Events>> getUpcomingEvents() async {
+    final events = await _getCollection();
+    final querySnapshot = await events
+        .where(eventStartField, isGreaterThan: DateTime.now())
+        .limit(3)
+        .get();
+    return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc));
+  }
+
+  Future<Iterable<Events>> getUpcomingImportantEvents() async {
+    final events = await _getCollection();
+    final querySnapshot = await events
+        .where(eventStartField, isGreaterThan: DateTime.now())
+        .where(eventImportantField, isEqualTo: true)
+        .limit(3)
+        .get();
+    return querySnapshot.docs.map((doc) => Events.fromSnapshot(doc));
   }
 
   Stream<Iterable<Events>> search({required String query}) async* {
@@ -125,9 +145,7 @@ class EventController {
           eventMap[startDate] = [event];
           eventMap[endDate] = [event];
         }
-      }
-      //
-      else {
+      } else {
         var tempDate = startDate;
         final lastDate = endDate.add(const Duration(days: 1));
         do {

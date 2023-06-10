@@ -8,6 +8,7 @@ import 'package:urtask/services/colors/colors_model.dart' as color_model;
 import 'package:urtask/services/events/events_model.dart';
 import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/services/notifications/notifications_model.dart';
+import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
 import 'package:urtask/views/event/event_detail_view.dart';
 
@@ -180,6 +181,7 @@ class _EventViewState extends State<EventView> {
   }
 
   void _setupEventDetailDataAndPush({required Events event}) async {
+    showLoadingDialog(context: context, text: "Loading");
     late String colorHex;
     final futures = await Future.wait([
       _categoryController.get(id: event.categoryId),
@@ -193,6 +195,7 @@ class _EventViewState extends State<EventView> {
     });
     final notifications = futures[1] as Iterable<Notifications>;
     if (mounted) {
+      Navigator.of(context).pop();
       await Navigator.push(
         context,
         MaterialPageRoute(
