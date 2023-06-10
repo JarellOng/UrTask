@@ -73,7 +73,7 @@ class _EventViewState extends State<EventView> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               SizedBox(
-                                width: 60,
+                                width: 80,
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 6),
                                   child: Column(children: [
