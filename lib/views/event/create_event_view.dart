@@ -104,7 +104,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   // Notification
   bool notificationFlag = true;
   Map<NotificationTime, NotificationType> selectedNotifications = {
-    NotificationTime.tenMinsBefore: NotificationType.alert
+    NotificationTime.tenMinsBefore: NotificationType.push
   };
   Map<int, CustomNotificationUOT>? selectedCustomNotification;
 

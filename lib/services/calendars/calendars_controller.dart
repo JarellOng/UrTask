@@ -19,9 +19,9 @@ class CalendarController {
   }
 
   Future<Calendars?> get() async {
-    final userId = AuthService.firebase().currentUser!.id;
+    final currentUser = AuthService.firebase().currentUser!;
     final querySnapshot = await calendars
-        .where(calendarUserIdField, isEqualTo: userId)
+        .where(calendarUserIdField, isEqualTo: currentUser.id)
         .limit(1)
         .get();
     return querySnapshot.docs
