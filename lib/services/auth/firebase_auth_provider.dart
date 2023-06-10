@@ -1,10 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:timezone/data/latest.dart';
+import 'package:timezone/timezone.dart';
 import 'package:urtask/firebase_options.dart';
 import 'package:urtask/services/auth/auth_user.dart';
 import 'package:urtask/services/auth/auth_provider.dart';
 import 'package:urtask/services/auth/auth_exceptions.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuth, FirebaseAuthException;
+import 'package:urtask/services/notifications/notifications_controller.dart';
 import 'package:urtask/services/user_details/user_detail_controller.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
@@ -23,6 +26,10 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    initializeTimeZones();
+    final indonesia = getLocation('Asia/Jakarta');
+    setLocalLocation(indonesia);
+    await NotificationController().initializeLocalNotifications();
   }
 
   @override

@@ -21,7 +21,6 @@ import 'package:urtask/utilities/dialogs/event_group_delete_dialog.dart';
 import 'package:urtask/utilities/dialogs/loading_dialog.dart';
 import 'package:urtask/utilities/dialogs/offline_dialog.dart';
 import 'package:urtask/utilities/extensions/hex_color.dart';
-import 'package:urtask/utilities/navigation_service.dart';
 import 'package:urtask/views/date/date_scroll_view.dart';
 import 'package:urtask/views/event/notification_event_view.dart';
 import 'package:urtask/views/time/time_scroll_view.dart';
@@ -902,7 +901,6 @@ class _EventDetailViewState extends State<EventDetailView> {
           if (shouldDeleteAllRepeatedEvents == true) {
             showLoadingDialog(context: context, text: "Deleting");
             await _eventService.bulkDeleteByGroupId(id: _eventGroupId!);
-            await LocalNotificationCustom.cancelNotifications();
             if (mounted) {
               Navigator.of(context).pop();
               Navigator.of(context).pop();
@@ -1005,30 +1003,42 @@ class _EventDetailViewState extends State<EventDetailView> {
           if (key == NotificationTime.timeOfEvent) {
             _notificationService.create(
               eventId: _eventId,
+              eventTitle:
+                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
               dateTime: startTimestamp,
-              type: value.name,
+              time: key,
+              type: value,
             );
           } else if (key == NotificationTime.tenMinsBefore) {
             _notificationService.create(
               eventId: _eventId,
+              eventTitle:
+                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
               dateTime: Timestamp.fromDate(startTimestamp
                   .toDate()
                   .subtract(const Duration(minutes: 10))),
-              type: value.name,
+              time: key,
+              type: value,
             );
           } else if (key == NotificationTime.hourBefore) {
             _notificationService.create(
               eventId: _eventId,
+              eventTitle:
+                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
               dateTime: Timestamp.fromDate(
                   startTimestamp.toDate().subtract(const Duration(hours: 1))),
-              type: value.name,
+              time: key,
+              type: value,
             );
           } else if (key == NotificationTime.dayBefore) {
             _notificationService.create(
               eventId: _eventId,
+              eventTitle:
+                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
               dateTime: Timestamp.fromDate(
                   startTimestamp.toDate().subtract(const Duration(days: 1))),
-              type: value.name,
+              time: key,
+              type: value,
             );
           } else if (key == NotificationTime.custom) {
             final customAmount = selectedCustomNotification!.keys.first;
@@ -1045,9 +1055,12 @@ class _EventDetailViewState extends State<EventDetailView> {
             }
             _notificationService.create(
               eventId: _eventId,
+              eventTitle:
+                  _eventTitle.text.isNotEmpty ? _eventTitle.text : "My Event",
               dateTime: Timestamp.fromDate(
                   startTimestamp.toDate().subtract(customDuration)),
-              type: value.name,
+              time: key,
+              type: value,
             );
           }
         });

@@ -1,11 +1,10 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:urtask/enums/notification_time_enum.dart';
+import 'package:urtask/enums/notification_type_enum.dart';
 import 'package:urtask/services/calendars/calendars_controller.dart';
 import 'package:urtask/services/notifications/notifications_constants.dart';
 import 'package:urtask/services/notifications/notifications_model.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
 
 class NotificationController {
   final calendarController = CalendarController();
@@ -15,34 +14,98 @@ class NotificationController {
     return calendars.doc(calendar!.id).collection(notificationCollectionId);
   }
 
-  static final NotificationController _shared =
-      NotificationController._sharedInstance();
-  NotificationController._sharedInstance();
-  factory NotificationController() => _shared;
-
-  void initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_launcher');
-
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
+  static ReceivedAction? initialAction;
+  Future<void> initializeLocalNotifications() async {
+    await AwesomeNotifications().initialize(
+      'resource://drawable/app_icon',
+      [
+        NotificationChannel(
+          channelKey: 'alerts',
+          channelName: 'Alerts',
+          channelDescription: 'Notification',
+          playSound: false,
+          onlyAlertOnce: false,
+          importance: NotificationImportance.High,
+          defaultPrivacy: NotificationPrivacy.Private,
+        )
+      ],
+      debug: true,
     );
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    // Get initial notification action is optional
+    initialAction = await AwesomeNotifications()
+        .getInitialNotificationAction(removeFromActionEvents: false);
+  }
+
+  static Future<void> schedulePushNotification({
+    required String id,
+    required String title,
+    required String body,
+    required Timestamp date,
+  }) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: id.hashCode,
+        channelKey: 'alerts',
+        title: title,
+        body: body,
+        summary: 'Reminder',
+        category: NotificationCategory.Reminder,
+        notificationLayout: NotificationLayout.Messaging,
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'DISMISS',
+          label: 'Dismiss',
+          actionType: ActionType.DismissAction,
+          isDangerousOption: true,
+        )
+      ],
+      schedule: NotificationCalendar.fromDate(
+        date: date.toDate(),
+      ),
+    );
+  }
+
+  Future<void> cancelNotification({required String id}) async {
+    await AwesomeNotifications().cancel(id.hashCode);
   }
 
   Future<void> create({
     required String eventId,
+    required String eventTitle,
     required Timestamp dateTime,
-    required String type,
+    required NotificationTime time,
+    required NotificationType type,
   }) async {
     final notifications = await _getCollection();
-    await notifications.add({
+    final notification = await notifications.add({
       notificationEventIdField: eventId,
       notificationDateTimeField: dateTime,
-      notificationTypeField: type,
+      notificationTypeField: type.name,
     });
+
+    late final String notificationDescription;
+    if (time == NotificationTime.timeOfEvent) {
+      notificationDescription = "The event has started!";
+    } else if (time == NotificationTime.tenMinsBefore) {
+      notificationDescription = "The event will start in 10 minutes!";
+    } else if (time == NotificationTime.hourBefore) {
+      notificationDescription = "The event will start in an hour!";
+    } else if (time == NotificationTime.dayBefore) {
+      notificationDescription = "The event will start in a day!";
+    } else if (time == NotificationTime.custom) {
+      notificationDescription = "Don't forget about this event!";
+    }
+
+    if (type == NotificationType.push) {
+      await schedulePushNotification(
+        id: notification.id,
+        title: eventTitle,
+        body: notificationDescription,
+        date: dateTime,
+      );
+    }
   }
 
   Future<Iterable<Notifications>> getByEventId({required String id}) async {
@@ -58,6 +121,7 @@ class NotificationController {
     final notifications = await _getCollection();
     for (var i = 0; i < ids.length; i++) {
       await notifications.doc(ids[i]).delete();
+      await cancelNotification(id: ids[i]);
     }
   }
 }
