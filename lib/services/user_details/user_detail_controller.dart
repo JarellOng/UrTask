@@ -11,9 +11,7 @@ class UserDetailController {
   factory UserDetailController() => _shared;
 
   Future<void> create({required String id, required String name}) async {
-    await userDetails.doc(id).set({
-      userDetailNameField: name,
-    });
+    await userDetails.doc(id).set({userDetailNameField: name});
   }
 
   Future<UserDetails> get({required String id}) async {
@@ -22,5 +20,9 @@ class UserDetailController {
         .limit(1)
         .get();
     return querySnapshot.docs.map((doc) => UserDetails.fromSnapshot(doc)).first;
+  }
+
+  Future<void> updateName({required String id, required String name}) async {
+    await userDetails.doc(id).set({userDetailNameField: name});
   }
 }
