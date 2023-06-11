@@ -174,8 +174,8 @@ class _HomeViewState extends State<HomeView> {
             ),
             const DottedLine(),
             ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 465.0),
-              child: const CategoryList(),
+              constraints: const BoxConstraints(maxHeight: 450.0),
+              child: Scrollbar(child: const CategoryList(), thumbVisibility: true, radius: Radius.circular(10), thickness: 10),
             )
           ],
         ),

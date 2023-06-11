@@ -269,8 +269,8 @@ class _EventDetailViewState extends State<EventDetailView> {
               ),
 
               const Divider(
-                indent: 10,
-                endIndent: 10,
+                indent: 8,
+                endIndent: 8,
                 height: 1,
                 thickness: 1,
                 color: Color.fromARGB(255, 125, 121, 121),
@@ -643,18 +643,21 @@ class _EventDetailViewState extends State<EventDetailView> {
               const Icon(Icons.event_note),
 
               // DESCRIPTION
-              SizedBox(
-                width: 350,
-                child: TextField(
-                  controller: _eventDescription,
-                  focusNode: eventDescriptionFocus,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  maxLines: 3,
-                  style: const TextStyle(fontSize: 18),
-                  decoration: const InputDecoration(
-                    hintText: "Description",
-                    border: InputBorder.none,
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: SizedBox(
+                  width: 350,
+                  child: TextField(
+                    controller: _eventDescription,
+                    focusNode: eventDescriptionFocus,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    maxLines: 3,
+                    style: const TextStyle(fontSize: 18),
+                    decoration: const InputDecoration(
+                      hintText: "Description",
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
               ),
