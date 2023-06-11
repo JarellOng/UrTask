@@ -120,8 +120,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                     ),
 
                     const Divider(
-                      indent: 10,
-                      endIndent: 10,
+                      indent: 8,
+                      endIndent: 8,
                       height: 1,
                       thickness: 1,
                       color: Color.fromARGB(255, 125, 121, 121),
