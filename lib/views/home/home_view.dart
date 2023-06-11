@@ -409,8 +409,5 @@ class _CategoryListState extends State<CategoryList> {
         myList.add(category.id);
       }
     });
-    // setState(() {
-    //   today.text = "Update";
-    // });
   }
 }
