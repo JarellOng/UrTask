@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_bloc.dart';
 import 'package:urtask/services/auth/bloc/auth_event.dart';
 import 'package:urtask/services/auth/auth_service.dart';
+import 'package:urtask/utilities/dialogs/password_reset_email_sent_dialog.dart';
 
 class VerifyEmailView extends StatefulWidget {
   const VerifyEmailView({Key? key}) : super(key: key);
@@ -102,7 +103,11 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
     );
   }
 
-  void _sendEmailVerification() {
+  void _sendEmailVerification() async {
     context.read<AuthBloc>().add(const AuthEventSendEmailVerification());
+    await showSuccessDialog(
+      context,
+      "We have sent you a verification email. Please check your email for more information.",
+    );
   }
 }

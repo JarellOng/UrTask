@@ -37,8 +37,10 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       listener: (context, state) async {
         if (state is AuthStateForgotPassword) {
           if (state.hasSentEmail) {
-            _controller.clear();
-            await showPasswordResetSentDialog(context);
+            await showSuccessDialog(
+              context,
+              "We have now sent you a password reset. Please check your email for more information.",
+            );
           }
           if (state.exception != null && mounted) {
             await showErrorDialog(
