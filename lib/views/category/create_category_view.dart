@@ -57,8 +57,10 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: const Text("Create Event Category",
-            style: TextStyle(color: Colors.white)),
+        title: const Text(
+          "Create Event Category",
+          style: TextStyle(color: Colors.white),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
       ),
@@ -75,7 +77,6 @@ class _CreateCategoryViewState extends State<CreateCategoryView> {
                     focusNode: eventTitleFocus,
                     enableSuggestions: false,
                     autocorrect: false,
-                    maxLines: 2,
                     decoration: const InputDecoration(
                         isDense: true,
                         hintText: "Event Category Name",
