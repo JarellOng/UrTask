@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:urtask/utilities/dialogs/generic_dialog.dart';
 
-Future<void> showPasswordResetSentDialog(BuildContext context) {
+Future<void> showSuccessDialog(BuildContext context, String content) {
   return showGenericDialog(
     context: context,
-    content:
-        "We have now sent you a password reset. Please check your email for more information.",
+    content: content,
     optionsBuilder: () => {
       "OK": null,
     },

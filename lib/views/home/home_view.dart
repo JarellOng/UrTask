@@ -119,9 +119,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 selected: _selectedDestination == 1,
                 shape: RoundedRectangleBorder(borderRadius: borderRadius),
-                onTap: () {
-                  _selectCalendarFormat(1, CalendarFormat.week);
-                },
+                onTap: () => _selectCalendarFormat(1, CalendarFormat.week),
                 contentPadding: const EdgeInsets.only(
                   top: 8.0,
                   right: 8.0,
@@ -176,13 +174,15 @@ class _HomeViewState extends State<HomeView> {
             ),
             const DottedLine(),
             ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 465.0,
-                ),
-                child: const CategoryList())
+              constraints: const BoxConstraints(maxHeight: 465.0),
+              child: const CategoryList(),
+            )
           ],
         ),
       ),
+      onDrawerChanged: (isOpened) => setState(() {
+        today.text = "Update";
+      }),
       body: CalendarView(
         myList: myList,
         calendarFilter: uot,
@@ -284,6 +284,9 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
       );
+      setState(() {
+        today.text = "Update";
+      });
       if (isLogout == true) _logout();
     }
   }
@@ -310,23 +313,29 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  void _toCreateEvent() {
+  void _toCreateEvent() async {
     final date = DateTime.parse(selectedDate.text);
-    Navigator.push(
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CreateEventView(selectedDate: date),
       ),
     );
+    setState(() {
+      today.text = "Update";
+    });
   }
 
-  void _toSearchEvent() {
-    Navigator.push(
+  void _toSearchEvent() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const SearchEventView(),
       ),
     );
+    setState(() {
+      today.text = "Update";
+    });
   }
 }
 
