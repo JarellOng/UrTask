@@ -785,12 +785,12 @@ class _ProfileViewState extends State<ProfileView> {
     });
   }
 
-  void _saveName() {
+  void _saveName() async {
     setState(() {
       nameFocus.unfocus();
       nameFlag = true;
-      _userDetailService.updateName(id: user.id, name: name.text);
     });
+    await _userDetailService.updateName(id: user.id, name: name.text);
   }
 
   void _shouldLogout() async {
