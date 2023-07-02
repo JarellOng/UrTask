@@ -177,20 +177,23 @@ class _CreateEventViewState extends State<CreateEventView> {
           child: Column(
             children: [
               // TITLE
-              SizedBox(
-                width: 350,
-                child: TextField(
-                  controller: _eventTitle,
-                  focusNode: eventTitleFocus,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: "Title",
-                    border: InputBorder.none,
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: SizedBox(
+                  width: 350,
+                  child: TextField(
+                    controller: _eventTitle,
+                    focusNode: eventTitleFocus,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: "Title",
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
               ),
@@ -211,7 +214,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "All Day",
                         style: TextStyle(fontSize: 18),
@@ -235,7 +238,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Start",
                         style: TextStyle(fontSize: 18),
@@ -349,7 +352,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "End",
                         style: TextStyle(fontSize: 18),
@@ -475,7 +478,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Important",
                         style: TextStyle(fontSize: 18),
@@ -510,7 +513,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Category",
                         style: TextStyle(fontSize: 18),
@@ -561,7 +564,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Repeat",
                         style: TextStyle(fontSize: 18),
@@ -605,7 +608,7 @@ class _CreateEventViewState extends State<CreateEventView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Notification",
                         style: TextStyle(fontSize: 18),
@@ -641,18 +644,21 @@ class _CreateEventViewState extends State<CreateEventView> {
               const Icon(Icons.event_note),
 
               // DESCRIPTION
-              SizedBox(
-                width: 350,
-                child: TextField(
-                  controller: _eventDescription,
-                  focusNode: eventDescriptionFocus,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  maxLines: 3,
-                  style: const TextStyle(fontSize: 18),
-                  decoration: const InputDecoration(
-                    hintText: "Description",
-                    border: InputBorder.none,
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: SizedBox(
+                  width: 350,
+                  child: TextField(
+                    controller: _eventDescription,
+                    focusNode: eventDescriptionFocus,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    maxLines: 3,
+                    style: const TextStyle(fontSize: 18),
+                    decoration: const InputDecoration(
+                      hintText: "Description",
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
               ),
