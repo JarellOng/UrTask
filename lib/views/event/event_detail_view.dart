@@ -250,20 +250,26 @@ class _EventDetailViewState extends State<EventDetailView> {
           child: Column(
             children: [
               // TITLE
-              SizedBox(
-                width: 350,
-                child: TextField(
-                  controller: _eventTitle,
-                  focusNode: eventTitleFocus,
-                  enableSuggestions: false,
-                  autocorrect: false,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: "Title",
-                    border: InputBorder.none,
+              Padding(
+                padding: const EdgeInsets.only(left: 12, right: 12),
+                child: SizedBox(
+                  width: 350,
+                  child: TextField(
+                    onChanged: (value) => setState(() {
+                      eventIsEdited = true;
+                    }),
+                    controller: _eventTitle,
+                    focusNode: eventTitleFocus,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: "Title",
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
               ),
@@ -284,7 +290,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "All Day",
                         style: TextStyle(fontSize: 18),
@@ -308,7 +314,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Start",
                         style: TextStyle(fontSize: 18),
@@ -411,7 +417,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "End",
                         style: TextStyle(fontSize: 18),
@@ -521,7 +527,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Important",
                         style: TextStyle(fontSize: 18),
@@ -556,7 +562,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Category",
                         style: TextStyle(fontSize: 18),
@@ -607,7 +613,7 @@ class _EventDetailViewState extends State<EventDetailView> {
                 children: [
                   Row(
                     children: const [
-                      SizedBox(width: 20),
+                      SizedBox(width: 16),
                       Text(
                         "Notification",
                         style: TextStyle(fontSize: 18),
@@ -644,10 +650,13 @@ class _EventDetailViewState extends State<EventDetailView> {
 
               // DESCRIPTION
               Padding(
-                padding: const EdgeInsets.only(right: 8.0),
+                padding: const EdgeInsets.only(left: 16, right: 16),
                 child: SizedBox(
                   width: 350,
                   child: TextField(
+                    onChanged: (value) => setState(() {
+                      eventIsEdited = true;
+                    }),
                     controller: _eventDescription,
                     focusNode: eventDescriptionFocus,
                     enableSuggestions: false,
